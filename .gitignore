@@ -1,0 +1,9 @@
+level_demo.ck
+roadmap.txt
+src/log.txt
+src/log
+src/debug.log
+src/obj/*
+src/run
+src/ck
+.kateproject

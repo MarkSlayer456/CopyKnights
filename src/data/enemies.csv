@@ -1,0 +1,6 @@
+type,strength,dexterity,intelligence,constitution
+BAT,3,5,0,5
+RAT,5,3,0,5
+SKELETON,10,0,0,10
+SLIME,5,5,3,15
+DRAGON,100,100,100,100
