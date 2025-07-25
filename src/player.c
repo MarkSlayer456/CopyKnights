@@ -25,7 +25,11 @@ void player_move_left(player_t *player, world_t *world)
 		if(player_can_move_left(player, world, i)) {
 			player->x[i] -= 1;
 			if(player_get_current_pos(player, world) == DOOR) {
-				if(player->global_x - 1 < 0) return;
+				if(player->global_x - 1 < 0) {
+					player->x[i] += 1;
+					// TODO display message to player
+					return;
+				}
 				player->global_x--;
 				if(!world->room[player->global_x][player->global_y].is_created) {
 					world->room[player->global_x][player->global_y] = generate_room(&world->seed, player->global_x, player->global_y, world->enemy_data);
@@ -199,11 +203,13 @@ int player_can_move_up(player_t *player, world_t *world, int knightNum)
 
 void player_wait(player_t *player, world_t *world)
 {
+	display_combat_message(world, player, "You stand still!");
     world->isPlayerTurn = 0;
 }
 
 void player_decrease_health(player_t *player, world_t *world, int attack, int knightNum)
 {
+	display_combat_message(world, player, "The player was hit!");
     player->health[knightNum] -= attack;
     if(player->health[knightNum] <= 0) {
         end_game(world, player);

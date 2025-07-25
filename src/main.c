@@ -37,9 +37,9 @@ int main(int argc, char *argv[]) {
     WINDOW *win;
 
     initscr();
-    win = newwin(25, 25, 0, 0);
-    hud = newwin(50, 50, 0, 30);
-	action_bar = newwin(5, 50, 30, 0);
+    win = newwin(21, 25, 0, 0);
+    hud = newwin(40, 50, 0, 23);
+	action_bar = newwin(5, 21, 25, 0);
     error = newwin(25, 25, 51, 30);
     
     refresh();
@@ -62,6 +62,14 @@ int main(int argc, char *argv[]) {
 	world_t *world = malloc(sizeof(world_t));
 	world->isPlayerTurn = 1;
 	world->enemy_data = calloc(MAX_ENEMIES, sizeof(enemy_data_t *));
+	
+	world->max_message_storage = DEFAULT_MAX_MESSAGE_STORAGE;
+	world->messages_size = 0;
+	world->messages = calloc(DEFAULT_MAX_MESSAGE_STORAGE, sizeof(char *));
+	for(int i = 0; i < DEFAULT_MAX_MESSAGE_STORAGE; i++) {
+		world->messages[i] = calloc(MAX_MESSAGE_LENGTH, sizeof(char));
+	}
+	
 	load_enemy_data(world->enemy_data);
 	
 	player_t *player = malloc(sizeof(player_t));

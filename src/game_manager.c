@@ -22,6 +22,7 @@ void draw(world_t *world, player_t *player)
 	hud_update_player_health(player);
     hud_update_nearby_enemies(world, player);
 	hud_update_action_bar(player);
+	hud_update_messages(world, player);
 	room_t *room = &world->room[player->global_x][player->global_y];
 	for(int i = 0; i < ROOM_HEIGHT; i++) {
 		for(int j = 0; j < ROOM_WIDTH; j++) {
@@ -159,6 +160,40 @@ void manage_input(char c, world_t *world, player_t *player)
 			}
 		}
 	}
+}
+
+void display_combat_message(world_t *world, player_t *player, const char *str) {
+	if(MAX_MESSAGE_LENGTH < strlen(str)) return;
+	int current_size = world->messages_size;
+	if(current_size >= world->max_message_storage) {
+		world->max_message_storage*=2;
+		char **tmp = realloc(world->messages, world->max_message_storage * sizeof(char *));
+		if(tmp) {
+			for(int i = world->max_message_storage/2; i < world->max_message_storage; i++) {
+					tmp[i] = calloc(MAX_MESSAGE_LENGTH, sizeof(char));
+			}
+			world->messages = tmp;
+		}
+	}
+	strncpy(world->messages[current_size], str, MAX_MESSAGE_LENGTH-1);
+	world->messages_size++;
+}
+
+void display_world_message(world_t *world, player_t *player, const char *str) {
+	if(MAX_MESSAGE_LENGTH < strlen(str)) return;
+	int current_size = world->messages_size;
+	if(current_size >= world->max_message_storage) {
+		world->max_message_storage*=2;
+		char **tmp = realloc(world->messages, world->max_message_storage * sizeof(char *));
+		if(tmp) {
+			for(int i = world->max_message_storage/2; i < world->max_message_storage; i++) {
+				tmp[i] = calloc(MAX_MESSAGE_LENGTH, sizeof(char));
+			}
+			world->messages = tmp;
+		}
+	}
+	strncpy(world->messages[current_size], str, MAX_MESSAGE_LENGTH-1);
+	world->messages_size++;
 }
 
 void end_game(world_t *world, player_t *player) {

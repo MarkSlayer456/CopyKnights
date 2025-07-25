@@ -6,8 +6,7 @@
 extern WINDOW *hud;
 extern WINDOW *action_bar;
 
-void hud_update_player_health(player_t *player)
-{
+void hud_update_player_health(player_t *player) {
 	wmove(hud, 0, 0);
 	wprintw(hud, "Player Status");
 	int y = 1;
@@ -30,22 +29,21 @@ void hud_update_player_health(player_t *player)
 	wprintw(hud, str2);
 }
 
-void hud_update_nearby_enemies(world_t *world, player_t *player)
-{
+void hud_update_nearby_enemies(world_t *world, player_t *player) {
 	int detect_radius = 6;
-    wmove(hud, Y_PLAYER_HEALTH_OFFSET, 0);
+    wmove(hud, PLAYER_STATS_HUD_SPACE, 0);
 	room_t *room = &world->room[player->global_x][player->global_y];
 	for(int i = 0; i < MAX_ENEMIES_PER_LEVEL; i++) {
 		if(!room->enemies[i]) break;
 		if(room->enemies[i]->x > player->x[0]-detect_radius && room->enemies[i]->x < player->x[0]+detect_radius &&
 			room->enemies[i]->y > player->y[0]-(detect_radius) && room->enemies[i]->y < player->y[0]+(detect_radius)) {
-			wmove(hud, Y_PLAYER_HEALTH_OFFSET+i+1, 0);
+			wmove(hud, PLAYER_STATS_HUD_SPACE+i+1, 0);
 			char *name = malloc(32);
 			snprintf(name, 32, "%s", room->enemies[i]->name);
 			wprintw(hud, name);
-			mvwaddch(hud, Y_PLAYER_HEALTH_OFFSET+i+1, strlen(name), ':');
+			mvwaddch(hud, PLAYER_STATS_HUD_SPACE+i+1, strlen(name), ':');
 			char *str = malloc(8);
-			wmove(hud, Y_PLAYER_HEALTH_OFFSET+i+1, strlen(name)+1);
+			wmove(hud, PLAYER_STATS_HUD_SPACE+i+1, strlen(name)+1);
 			snprintf(str, 8, "%d", room->enemies[i]->health);
 			wprintw(hud, str);
 		}
@@ -54,8 +52,7 @@ void hud_update_nearby_enemies(world_t *world, player_t *player)
         // create a cords system so you can give there location so players know what they're looking at
 }
 
-void hud_update_action_bar(player_t *player)
-{
+void hud_update_action_bar(player_t *player) {
 	wclear(action_bar);
 	wmove(action_bar, 0, 0);
 	if(player->action_bar.inv_open) {
@@ -92,15 +89,34 @@ void hud_update_action_bar(player_t *player)
 	
 }
 
-void hud_update_all(world_t *world, player_t *player)
-{
+void hud_update_messages(world_t *world, player_t *player) {
+	int start_y = PLAYER_STATS_HUD_SPACE+ENEMY_STATS_HUD_SPACE+MESSAGE_HUD_SPACE-1;
+	wmove(hud, start_y, 0);
+	int printed_messages = 0;
+	for(int i = world->messages_size-1; i > -1; i--) {
+		if(printed_messages == MESSAGE_HUD_SPACE) return;
+		if(world->messages[i] != NULL) {
+			int y, x;
+			getyx(hud, y, x);
+			wmove(hud, y-1, 0);
+			char *clear = calloc(HUD_LENGTH, sizeof(char));
+			wprintw(hud, clear);
+			wmove(hud, y-1, 0);
+			wprintw(hud, world->messages[i]);
+		} else {
+			DEBUG_LOG("hud.c: hud_update_messages: world->messages[i] is null!");
+		}
+		printed_messages++;
+	}
+}
+
+void hud_update_all(world_t *world, player_t *player) {
 	// TODO
 }
 
 //TODO this is a testing function not intended for anything else!
-void display_error_message(const char *str) 
-{
-	wmove(hud, Y_PLAYER_HEALTH_OFFSET, 0);
+void display_error_message(const char *str) {
+	wmove(hud, PLAYER_STATS_HUD_SPACE, 0);
 	char *message = malloc(128);
 	snprintf(message, 128, "%s", str);
 	wprintw(hud, message);

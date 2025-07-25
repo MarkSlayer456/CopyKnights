@@ -48,6 +48,9 @@
 
 
 #define MAX_ITEM_NAME_LENGTH		32
+#define DEFAULT_MAX_MESSAGE_STORAGE			1000
+#define MAX_MESSAGE_LENGTH			128
+//TODO maybe add max prefix length then add prefixes to messages
 
 #define DEBUG_LOG(fmt, ...) \
 do { \
@@ -143,10 +146,17 @@ typedef struct world {
 	int isPlayerTurn;
 	unsigned int seed;
 	enemy_data_t *enemy_data;
+	char **messages;
+	int max_message_storage;
+	int messages_size;
 } world_t;
 
 void draw(world_t *world, player_t *player);
 void manage_input(char c, world_t *world, player_t *player);
+
+void display_world_message(world_t *world, player_t *player, const char *str);
+
+void display_combat_message(world_t *world, player_t *player, const char *str);
 
 void end_game(world_t *world, player_t *player);
 
