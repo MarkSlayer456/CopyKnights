@@ -43,9 +43,9 @@ room_t generate_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data)
 room_t load_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data)
 {
 	int room_num = (rand_r(seed) % ROOM_COUNT)+1;
+	unsigned int enemy_seed = (x*ENEMY_X_PRIME) + (y*ENEMY_Y_PRIME);
 	DEBUG_LOG("room_num: %d", room_num);
-	DEBUG_LOG("room_count: %d", ROOM_COUNT);
-	DEBUG_LOG("room_count: %d", rand_r(seed) % ROOM_COUNT);
+	DEBUG_LOG("(x,y): (%d,%d)", x, y);
 	room_t room;
 	room.is_created = true;
 	room.layout = calloc(20, sizeof(char *));
@@ -79,7 +79,7 @@ room_t load_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data)
 			//TODO make this a chance not a 100%
 			switch(room.layout[i][j]) {
 				case POTENTIAL_ENEMY_SPAWN_CHAR:
-					room.enemies[room.current_enemy_count] = enemy_spawn(enemy_generate_type(seed), enemy_data, j, i);
+					room.enemies[room.current_enemy_count] = enemy_spawn(enemy_generate_type(&enemy_seed), enemy_data, j, i);
 					room.layout[i][j] = EMPTY;
 					room.current_enemy_count++;
 					break;

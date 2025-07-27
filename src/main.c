@@ -12,6 +12,7 @@
 #include "player.h"
 #include "items.h"
 #include "enemy.h"
+#include "hud.h"
 
 /*
 	
@@ -37,9 +38,9 @@ int main(int argc, char *argv[]) {
     WINDOW *win;
 
     initscr();
-    win = newwin(21, 25, 0, 0);
-    hud = newwin(40, 50, 0, 23);
-	action_bar = newwin(5, 21, 25, 0);
+    win = newwin(20, 20, 0, 0);
+    hud = newwin(HUD_HEIGHT, HUD_WIDTH, 0, 21);
+	action_bar = newwin(5, 21, 21, 0);
     error = newwin(25, 25, 51, 30);
     
     refresh();
@@ -47,11 +48,12 @@ int main(int argc, char *argv[]) {
     wrefresh(hud);
     wrefresh(error);
     
-    noecho();
-    nodelay(stdscr, FALSE);
-    keypad(stdscr, FALSE);
-    scrollok(win, FALSE);
-    raw();
+	noecho();
+	nodelay(stdscr, FALSE);
+	keypad(stdscr, FALSE);
+	scrollok(win, FALSE);
+	raw();
+	
 	if(argc == 1) {
 		//game starts
 	} else {
@@ -120,9 +122,13 @@ int main(int argc, char *argv[]) {
 	player->global_y = 0;
 	player->attack[0] = 25;
 	player->defense[0] = 25;
+	player->speed = 25;
+	player->action_points = 0;
 
 	world->isPlayerTurn = 1;
 
+	world->turn_order = calloc(MAX_ENEMIES_PER_LEVEL+1, sizeof(int));
+	world->turn_order_size = 0;
 	world->room = calloc(100, sizeof(room_t *));
 	for(int i = 0; i < 100; i++) {
 		world->room[i] = calloc(100, sizeof(room_t));
@@ -134,25 +140,44 @@ int main(int argc, char *argv[]) {
 	room_t first = setup_first_room(&world->seed, 0, 0, world->enemy_data);
 	first.enemies = calloc(MAX_ENEMIES_PER_LEVEL, sizeof(enemy_t *));
 	first.enemies[0] = enemy_spawn(SLIME, world->enemy_data, 1, 1);
-	first.enemies[0]->global_x = 0;
-	first.enemies[0]->global_y = 0;
 	
 	first.current_enemy_count++;
 	
 	world->room[0][0] = first;
 	world->win = win;
-    for(;;) {
+    world->turn_order_size = 0;
+	memset(world->turn_order, 0, (MAX_ENEMIES_PER_LEVEL+1) * sizeof(int));
+	for(;;) {
     	draw(world, player);
-    	if(world->isPlayerTurn) {
-			char c = getch();
-        	manage_input(c, world, player);
-        } else {
-        	//TODO remove this and actually do something
-			for(int i = 0; i < world->room[player->global_x][player->global_y].current_enemy_count; i++) {
-				enemy_decide_move(world->room[player->global_x][player->global_y].enemies[i], world, player);
+		
+		if(world->turn_order_size < MAX_ENEMIES_PER_LEVEL/2) {
+			for(int i = 0; i < MAX_ENEMIES_PER_LEVEL/2; i++) {
+				int actor = pick_next_actor(world, player);
+				world->turn_order[world->turn_order_size++] = actor;
 			}
-        	world->isPlayerTurn = 1;
-        }
+		}
+		
+		int turn_index = world->turn_order[0];
+		if(turn_index == PLAYER_TURN_ORDER_INDEX) {
+			display_combat_message(world, player, MESSAGE_IS_PLAYERS_TURN);
+			char c = getch();
+			manage_input(c, world, player);
+		} else {
+			enemy_t *enemy = world->room[player->global_x][player->global_y].enemies[turn_index];
+			if(enemy == NULL) {
+				for(int k = 0; k < world->turn_order_size-1; k++) {
+					world->turn_order[k] = world->turn_order[k + 1];
+				}
+				world->turn_order_size--;
+				continue;
+			}
+			enemy_decide_move(enemy, world, player);
+		}
+		for(int k = 0; k < world->turn_order_size-1; k++) {
+			world->turn_order[k] = world->turn_order[k + 1];
+		}
+		world->turn_order_size--;
+
     }
     endwin();
     exit(0);

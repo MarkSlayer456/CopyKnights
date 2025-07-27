@@ -4,6 +4,8 @@
 #include "enemy.h"
 #include <ncurses.h>
 
+#define MESSAGE_IS_PLAYERS_TURN			"It is your turn!"
+
 #define WALL 				'#' // a wall
 #define VISUAL_OBJECT		'$' // can walk through
 #define EMPTY				'.'
@@ -20,6 +22,9 @@
 
 #define MAX_KNIGHTS 			1
 #define MAX_ENEMIES_PER_LEVEL	16
+#define PLAYER_TURN_ORDER_INDEX		-1
+
+#define DOOR_BLOCKED_MESSAGE			"This door won't seem to budge!"
 
 #define ARROW_KEY_MOD	1000
 #define DOWN_ARROW		ARROW_KEY_MOD + 66
@@ -30,7 +35,9 @@
 #define ENTER_KEY	10
 #define ESC_KEY		27
 
-#define TEST_SEED	1510192
+#define TEST_SEED	596231
+#define ENEMY_X_PRIME		19349663u
+#define ENEMY_Y_PRIME		73856093u
 
 #define KEY_A       97
 #define KEY_B		98
@@ -44,12 +51,15 @@
 
 #define ENEMY_CHAR      'E' // used when finding enemies on the map
 
-#define ACTION_BAR_SELECTOR_COUNT	2
+#define ACTION_BAR_SELECTOR_COUNT				2
+
+#define TIME_TO_ACT								50
 
 
-#define MAX_ITEM_NAME_LENGTH		32
-#define DEFAULT_MAX_MESSAGE_STORAGE			1000
-#define MAX_MESSAGE_LENGTH			128
+#define MAX_ITEM_NAME_LENGTH					32
+#define DEFAULT_MAX_MESSAGE_STORAGE				1000
+#define MAX_MESSAGE_LENGTH						59
+#define MAX_MESSAGE_LENGTH_WITHOUT_PREFIX		47
 //TODO maybe add max prefix length then add prefixes to messages
 
 #define DEBUG_LOG(fmt, ...) \
@@ -124,6 +134,7 @@ typedef struct player {
 	int dexterity;
 	int intelligence;
 	int constitution;
+	int speed;
 	int *x; // each knight has it's only pos
 	int *y; // each knight has it's only pos
 	int global_x; // pos on the map
@@ -131,6 +142,7 @@ typedef struct player {
 	item_t *inventory; // list of items in players inventory
 	int *mana; // amount of player currently has
 	int *max_mana;
+	int action_points;
 	
 	action_bar_t action_bar;
 } player_t;
@@ -149,6 +161,8 @@ typedef struct world {
 	char **messages;
 	int max_message_storage;
 	int messages_size;
+	int *turn_order; // -1 for player, index for enemies
+	int turn_order_size;
 } world_t;
 
 void draw(world_t *world, player_t *player);
@@ -157,6 +171,10 @@ void manage_input(char c, world_t *world, player_t *player);
 void display_world_message(world_t *world, player_t *player, const char *str);
 
 void display_combat_message(world_t *world, player_t *player, const char *str);
+
+int pick_next_actor(world_t *world, player_t *player);
+
+void turn_order_enter_new_room(world_t *world, player_t *player);
 
 void end_game(world_t *world, player_t *player);
 

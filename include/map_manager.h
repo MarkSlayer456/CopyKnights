@@ -19,6 +19,7 @@ struct room {
 	int current_enemy_count;
 	char **layout; // what the floor looks like
 	bool is_created;
+	int global_time;
 };
 //TODO these should return pointers not room_t this causes lots of copying that pointers don't
 

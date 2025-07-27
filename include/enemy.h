@@ -2,16 +2,28 @@
 
 #define ENEMY_H_
 
-#define MAX_ENEMIES					100
+#define MAX_ENEMIES							100
 
 
-#define ENEMY_TYPE_COUNT			5
-#define MAX_ENEMY_NAME_LENGTH		32
-#define SLIME_ENEMY_NAME 			"Slime"
-#define BAT_ENEMY_NAME				"Bat"
-#define RAT_ENEMY_NAME				"Rat"
-#define SKELETON_ENEMY_NAME			"Skeleton"
-#define DRAGON_ENEMY_NAME			"Dragon"
+#define ENEMY_TYPE_COUNT					17
+#define MAX_ENEMY_NAME_LENGTH				32
+#define SLIME_ENEMY_NAME 					"Slime"
+#define BAT_ENEMY_NAME						"Bat"
+#define RAT_ENEMY_NAME						"Rat"
+#define SKELETON_ENEMY_NAME					"Skeleton"
+#define DRAGON_ENEMY_NAME					"Dragon"
+#define BABY_DRAGON_ENEMY_NAME				"Baby Dragon"
+#define GOLBIN_ENEMY_NAME					"Goblin"
+#define GHOST_ENEMY_NAME					"Ghost"
+#define LOOT_GOBLIN_ENEMY_NAME				"Loot Goblin"
+#define MOSS_BEAST_ENEMY_NAME				"Moss Beast"
+#define JESTER_ENEMY_NAME					"Jester"
+#define VOIDLING_ENEMY_NAME					"Voidling"
+#define MARROW_CRAWLER_ENEMY_NAME			"Marrow Crawler"
+#define VOID_MAW_ENEMY_NAME					"Void Maw"
+#define MARROW_LEECH_ENEMY_NAME				"Marrow Leech"
+#define MUD_CRAWLER_ENEMY_NAME				"Mud Crawler"
+#define BOG_LURKER_ENEMY_NAME				"Bog Lurker"
 
 typedef struct world world_t;
 typedef struct player player_t;
@@ -27,7 +39,19 @@ typedef enum enemy_type {
 	BAT,
 	SKELETON,
 	RAT,
-	DRAGON
+	DRAGON,
+	BABY_DRAGON,
+	GOBLIN,
+	GHOST,
+	LOOT_GOBLIN,
+	MOSS_BEAST,
+	JESTER,
+	VOIDLING,
+	MARROW_CRAWLER,
+	VOID_MAW,
+	MARROW_LEECH,
+	MUD_CRAWLER,
+	BOG_LURKER
 } enemy_type_t;
 
 typedef struct enemy {
@@ -36,6 +60,7 @@ typedef struct enemy {
 	int dexterity;
 	int intelligence;
 	int constitution;
+	int speed;
 	int world;
 	int x; // room pos
 	int y; // room pos
@@ -43,6 +68,7 @@ typedef struct enemy {
 	int global_y; // map pos
 	enemy_type_t type;
 	char name[MAX_ENEMY_NAME_LENGTH]; // name will be the type of enemy
+	int action_points;
 	// and the first letter will be the letter to represent them
 	trait_t trait;
 } enemy_t;
@@ -53,6 +79,7 @@ typedef struct enemy_data {
 	int dexterity;
 	int intelligence;
 	int constitution;
+	int speed;
 } enemy_data_t;
 
 typedef struct enemy_type_map {

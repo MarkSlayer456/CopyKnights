@@ -27,14 +27,15 @@ void player_move_left(player_t *player, world_t *world)
 			if(player_get_current_pos(player, world) == DOOR) {
 				if(player->global_x - 1 < 0) {
 					player->x[i] += 1;
-					// TODO display message to player
+					display_world_message(world, player, DOOR_BLOCKED_MESSAGE);
 					return;
 				}
 				player->global_x--;
+				turn_order_enter_new_room(world, player);
 				if(!world->room[player->global_x][player->global_y].is_created) {
 					world->room[player->global_x][player->global_y] = generate_room(&world->seed, player->global_x, player->global_y, world->enemy_data);
 				}
-				player->x[0] = ROOM_WIDTH-1;
+				player->x[0] = ROOM_WIDTH-2;
 			}
 		}
 	}
@@ -48,10 +49,11 @@ void player_move_right(player_t *player, world_t *world)
 			player->x[i] += 1;
 			if(player_get_current_pos(player, world) == DOOR) {
 				player->global_x++;
+				turn_order_enter_new_room(world, player);
 				if(!world->room[player->global_x][player->global_y].is_created) {
 					world->room[player->global_x][player->global_y] = generate_room(&world->seed, player->global_x, player->global_y, world->enemy_data);
 				}
-				player->x[0] = 0;
+				player->x[0] = 1;
 			}
 		}
 	}	
@@ -65,10 +67,11 @@ void player_move_down(player_t *player, world_t *world)
 			player->y[i] += 1;
 			if(player_get_current_pos(player, world) == DOOR) {
 				player->global_y++;
+				turn_order_enter_new_room(world, player);
 				if(!world->room[player->global_x][player->global_y].is_created) {
 					world->room[player->global_x][player->global_y] = generate_room(&world->seed, player->global_x, player->global_y, world->enemy_data);
 				}
-				player->y[0] = 0;
+				player->y[0] = 1;
 			}
 		}
 	}	
@@ -83,10 +86,11 @@ void player_move_up(player_t *player, world_t *world)
 			if(player_get_current_pos(player, world) == DOOR) {
 				if(player->global_y - 1 < 0) return;
 				player->global_y--;
+				turn_order_enter_new_room(world, player);
 				if(!world->room[player->global_x][player->global_y].is_created) {
 					world->room[player->global_x][player->global_y] = generate_room(&world->seed, player->global_x, player->global_y, world->enemy_data);
 				}
-				player->y[0] = ROOM_HEIGHT-1;
+				player->y[0] = ROOM_HEIGHT-2;
 			}
 		}
 	}
@@ -97,6 +101,7 @@ char player_check_left(player_t *player, world_t *world, int knightNum)
 {
 	room_t *room = &world->room[player->global_x][player->global_y];
     for(int i = 0; i < room->current_enemy_count; i++) {
+		if(room->enemies[i] == NULL) continue;
 		if(player->x[knightNum] - 1 == room->enemies[i]->x && player->y[knightNum] == room->enemies[i]->y) {
             return ENEMY_CHAR;
         }  
@@ -112,6 +117,7 @@ char player_check_right(player_t *player, world_t *world, int knightNum)
 {
 	room_t *room = &world->room[player->global_x][player->global_y];
     for(int i = 0; i < room->current_enemy_count; i++) {
+		if(room->enemies[i] == NULL) continue;
         if(player->x[knightNum] + 1 == room->enemies[i]->x && player->y[knightNum] == room->enemies[i]->y) {
             return ENEMY_CHAR;
         }  
@@ -127,6 +133,7 @@ char player_check_down(player_t *player, world_t *world, int knightNum)
 {
 	room_t *room = &world->room[player->global_x][player->global_y];
     for(int i = 0; i < room->current_enemy_count; i++) {
+		if(room->enemies[i] == NULL) continue;
         if(player->y[knightNum] + 1 == room->enemies[i]->y && player->x[knightNum] == room->enemies[i]->x) {
             return ENEMY_CHAR;
         }  
@@ -142,6 +149,7 @@ char player_check_up(player_t *player, world_t *world, int knightNum)
 {
 	room_t *room = &world->room[player->global_x][player->global_y];
     for(int i = 0; i < room->current_enemy_count; i++) {
+		if(room->enemies[i] == NULL) continue;
 		if(player->y[knightNum] - 1 == room->enemies[i]->y && player->x[knightNum] == room->enemies[i]->x) {
             return ENEMY_CHAR;
         }  
@@ -203,7 +211,7 @@ int player_can_move_up(player_t *player, world_t *world, int knightNum)
 
 void player_wait(player_t *player, world_t *world)
 {
-	display_combat_message(world, player, "You stand still!");
+	display_world_message(world, player, "You stand still!");
     world->isPlayerTurn = 0;
 }
 
@@ -231,6 +239,7 @@ void player_increase_health(player_t *player, int amount)
 enemy_t *player_get_left_enemy(player_t *player, world_t *world, int knightNum) {
 	room_t *room = &world->room[player->global_x][player->global_y];
     for(int i = 0; i < room->current_enemy_count; i++) {
+		if(room->enemies[i] == NULL) continue;
 		if(player->x[knightNum] - 1 == room->enemies[i]->x && player->y[knightNum] == room->enemies[i]->y) {
             return room->enemies[i];
         }  
@@ -241,6 +250,7 @@ enemy_t *player_get_left_enemy(player_t *player, world_t *world, int knightNum) 
 enemy_t *player_get_right_enemy(player_t *player, world_t *world, int knightNum) {
 	room_t *room = &world->room[player->global_x][player->global_y];
     for(int i = 0; i < room->current_enemy_count; i++) {
+		if(room->enemies[i] == NULL) continue;
 		if(player->x[knightNum] + 1 == room->enemies[i]->x && player->y[knightNum] == room->enemies[i]->y) {
             return room->enemies[i];
         }  
@@ -251,6 +261,7 @@ enemy_t *player_get_right_enemy(player_t *player, world_t *world, int knightNum)
 enemy_t *player_get_down_enemy(player_t *player, world_t *world, int knightNum) {
 	room_t *room = &world->room[player->global_x][player->global_y];
     for(int i = 0; i < room->current_enemy_count; i++) {
+		if(room->enemies[i] == NULL) continue;
 		if(player->y[knightNum] + 1 == room->enemies[i]->y && player->x[knightNum] == room->enemies[i]->x) {
             return room->enemies[i];
         }  
@@ -261,6 +272,7 @@ enemy_t *player_get_down_enemy(player_t *player, world_t *world, int knightNum) 
 enemy_t *player_get_up_enemy(player_t *player, world_t *world, int knightNum) {
 	room_t *room = &world->room[player->global_x][player->global_y];
     for(int i = 0; i < room->current_enemy_count; i++) {
+		if(room->enemies[i] == NULL) continue;
 		if(player->y[knightNum] - 1 == room->enemies[i]->y && player->x[knightNum] == room->enemies[i]->x) {
             return room->enemies[i];
         }  

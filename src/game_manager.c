@@ -30,6 +30,7 @@ void draw(world_t *world, player_t *player)
 			int playerIsThere = 0;
 			wmove(world->win, i, j);
 			for(int u = 0; u < room->current_enemy_count; u++) {
+				if(room->enemies[u] == NULL) continue;
 				if(room->enemies[u]->x == j && room->enemies[u]->y == i) {
 					waddch(world->win, room->enemies[u]->name[0]);
 					enemyIsThere = 1;
@@ -175,12 +176,13 @@ void display_combat_message(world_t *world, player_t *player, const char *str) {
 			world->messages = tmp;
 		}
 	}
-	strncpy(world->messages[current_size], str, MAX_MESSAGE_LENGTH-1);
+	// strncpy(world->messages[current_size], str, MAX_MESSAGE_LENGTH-1);
+	snprintf(world->messages[current_size], MAX_MESSAGE_LENGTH, "[Combat] %s", str);
 	world->messages_size++;
 }
 
 void display_world_message(world_t *world, player_t *player, const char *str) {
-	if(MAX_MESSAGE_LENGTH < strlen(str)) return;
+	if(MAX_MESSAGE_LENGTH_WITHOUT_PREFIX < strlen(str)) return;
 	int current_size = world->messages_size;
 	if(current_size >= world->max_message_storage) {
 		world->max_message_storage*=2;
@@ -192,8 +194,54 @@ void display_world_message(world_t *world, player_t *player, const char *str) {
 			world->messages = tmp;
 		}
 	}
-	strncpy(world->messages[current_size], str, MAX_MESSAGE_LENGTH-1);
+	// strncpy(world->messages[current_size], str, MAX_MESSAGE_LENGTH-1);
+	snprintf(world->messages[current_size], MAX_MESSAGE_LENGTH, "[World] %s", str);
 	world->messages_size++;
+}
+
+
+int pick_next_actor(world_t *world, player_t *player) {
+	int idx = 100; // TODO need a number that won't appear???
+	int fastest = 0;
+	while(true) {
+		player->action_points += player->speed;
+		if(player->action_points >= TIME_TO_ACT) {
+			fastest = player->action_points;
+			idx = PLAYER_TURN_ORDER_INDEX;
+		}
+		
+		for(int i = 0; i < world->room[player->global_x][player->global_y].current_enemy_count; i++) {
+			enemy_t *enemy = world->room[player->global_x][player->global_y].enemies[i];
+			if(enemy == NULL) continue;
+			enemy->action_points += enemy->speed;
+			if(enemy->action_points >= TIME_TO_ACT) {
+				if(fastest < enemy->action_points) {
+					fastest = enemy->action_points;
+					idx = i;
+				}
+			}
+		}
+		
+		if(idx == 100) continue;
+		
+		if(idx == PLAYER_TURN_ORDER_INDEX) {
+			player->action_points -= TIME_TO_ACT;
+		} else {
+			enemy_t *enemy = world->room[player->global_x][player->global_y].enemies[idx];
+			enemy->action_points -= TIME_TO_ACT;
+		}
+		if(idx != 100) break;
+	}
+	return idx;
+}
+
+void turn_order_enter_new_room(world_t *world, player_t *player) {
+	memset(world->turn_order, 0, (MAX_ENEMIES_PER_LEVEL+1) * sizeof(int));
+	world->turn_order_size = 0;
+	player->action_points = 0;
+	for(int i = 0; i < world->room[player->global_x][player->global_y].current_enemy_count; i++) {
+		world->room[player->global_x][player->global_y].enemies[i]->action_points = 0;
+	}
 }
 
 void end_game(world_t *world, player_t *player) {

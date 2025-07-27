@@ -2,9 +2,12 @@
 #define HUD_H_
 #include "game_manager.h"
 
-#define PLAYER_STATS_HUD_SPACE		10
-#define ENEMY_STATS_HUD_SPACE		10
-#define MESSAGE_HUD_SPACE			20
+#define HUD_WIDTH					59
+#define HUD_HEIGHT					24
+
+#define PLAYER_STATS_HUD_SPACE		7
+#define ENEMY_STATS_HUD_SPACE		7
+#define MESSAGE_HUD_SPACE			10
 #define HUD_LENGTH					50
 
 
