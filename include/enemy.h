@@ -27,6 +27,7 @@
 
 typedef struct world world_t;
 typedef struct player player_t;
+typedef enum direction direction_t;
 
 typedef enum trait {
 	PASSIVE = 80000,
@@ -70,6 +71,7 @@ typedef struct enemy {
 	char name[MAX_ENEMY_NAME_LENGTH]; // name will be the type of enemy
 	int action_points;
 	// and the first letter will be the letter to represent them
+	char symbol;
 	trait_t trait;
 } enemy_t;
 
@@ -80,11 +82,13 @@ typedef struct enemy_data {
 	int intelligence;
 	int constitution;
 	int speed;
+	char symbol;
+	trait_t trait;
 } enemy_data_t;
 
 typedef struct enemy_type_map {
 	const char *name;
-	trait_t value;
+	enemy_type_t value;
 } enemy_type_map_t;
 
 //TODO need move functions and check functions so enemies don't leave the map
@@ -102,21 +106,15 @@ void load_enemy_data(enemy_data_t *enemy_data);
 
 void enemy_kill(enemy_t *enemy, world_t *world, player_t *player);
 
-void enemy_decrease_health(enemy_t *enemy, world_t *world, player_t *player, int knightNum);
+void enemy_decrease_health(enemy_t *enemy, world_t *world, player_t *player);
 
-void enemy_attack(enemy_t *enemy, player_t *player, world_t *world, int knightNum);
+void enemy_attack(enemy_t *enemy, player_t *player, world_t *world);
 
 void enemy_decide_move(enemy_t *enemy, world_t *world, player_t *player);
 
-char enemy_check_right(enemy_t *enemy, world_t *world, player_t *player);
-char enemy_check_left(enemy_t *enemy, world_t *world, player_t *player);
-char enemy_check_up(enemy_t *enemy, world_t *world, player_t *player);
-char enemy_check_down(enemy_t *enemy, world_t *world, player_t *player);
+char enemy_check_dir(enemy_t *enemy, world_t *world, player_t *player, direction_t dir);
 
-int enemy_can_move_right(enemy_t *enemy, world_t *world, player_t *player);
-int enemy_can_move_left(enemy_t *enemy, world_t *world, player_t *player);
-int enemy_can_move_up(enemy_t *enemy, world_t *world, player_t *player);
-int enemy_can_move_down(enemy_t *enemy, world_t *world, player_t *player);
+int enemy_can_move_dir(enemy_t *enemy, world_t *world, player_t *player, direction_t dir);
 
 enemy_t *enemy_create_temp(world_t *world);
 

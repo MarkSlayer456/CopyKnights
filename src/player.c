@@ -14,29 +14,25 @@ extern char walk_chars[WALK_CHAR_LENGTH];
 
 char player_get_current_pos(player_t *player, world_t *world)
 {
-	for(int i = 0; i < MAX_KNIGHTS; i++) {
-		return world->room[player->global_x][player->global_y].layout[player->y[i]][player->x[i]];
-	}
+	return world->room[player->global_x][player->global_y].layout[player->y][player->x];
 }
 
 void player_move_left(player_t *player, world_t *world)
 {
-	for(int i = 0; i < MAX_KNIGHTS; i++) {
-		if(player_can_move_left(player, world, i)) {
-			player->x[i] -= 1;
-			if(player_get_current_pos(player, world) == DOOR) {
-				if(player->global_x - 1 < 0) {
-					player->x[i] += 1;
-					display_world_message(world, player, DOOR_BLOCKED_MESSAGE);
-					return;
-				}
-				player->global_x--;
-				turn_order_enter_new_room(world, player);
-				if(!world->room[player->global_x][player->global_y].is_created) {
-					world->room[player->global_x][player->global_y] = generate_room(&world->seed, player->global_x, player->global_y, world->enemy_data);
-				}
-				player->x[0] = ROOM_WIDTH-2;
+	if(player_can_move_dir(player, world, LEFT)) {
+		player->x -= 1;
+		if(player_get_current_pos(player, world) == DOOR) {
+			if(player->global_x - 1 < 0) {
+				player->x += 1;
+				display_world_message(world, player, DOOR_BLOCKED_MESSAGE);
+				return;
 			}
+			player->global_x--;
+			turn_order_enter_new_room(world, player);
+			if(!world->room[player->global_x][player->global_y].is_created) {
+				world->room[player->global_x][player->global_y] = generate_room(&world->seed, player->global_x, player->global_y, world->enemy_data);
+			}
+			player->x = ROOM_WIDTH-2;
 		}
 	}
 	world->isPlayerTurn = 0;
@@ -44,163 +40,77 @@ void player_move_left(player_t *player, world_t *world)
 
 void player_move_right(player_t *player, world_t *world)
 {
-	for(int i = 0; i < MAX_KNIGHTS; i++) {
-		if(player_can_move_right(player, world, i)) {
-			player->x[i] += 1;
-			if(player_get_current_pos(player, world) == DOOR) {
-				player->global_x++;
-				turn_order_enter_new_room(world, player);
-				if(!world->room[player->global_x][player->global_y].is_created) {
-					world->room[player->global_x][player->global_y] = generate_room(&world->seed, player->global_x, player->global_y, world->enemy_data);
-				}
-				player->x[0] = 1;
+	if(player_can_move_dir(player, world, RIGHT)) {
+		player->x += 1;
+		if(player_get_current_pos(player, world) == DOOR) {
+			player->global_x++;
+			turn_order_enter_new_room(world, player);
+			if(!world->room[player->global_x][player->global_y].is_created) {
+				world->room[player->global_x][player->global_y] = generate_room(&world->seed, player->global_x, player->global_y, world->enemy_data);
 			}
+			player->x = 1;
 		}
-	}	
+	}
 	world->isPlayerTurn = 0;
 }
 
 void player_move_down(player_t *player, world_t *world)
 {
-	for(int i = 0; i < MAX_KNIGHTS; i++) {
-		if(player_can_move_down(player, world, i)) {
-			player->y[i] += 1;
-			if(player_get_current_pos(player, world) == DOOR) {
-				player->global_y++;
-				turn_order_enter_new_room(world, player);
-				if(!world->room[player->global_x][player->global_y].is_created) {
-					world->room[player->global_x][player->global_y] = generate_room(&world->seed, player->global_x, player->global_y, world->enemy_data);
-				}
-				player->y[0] = 1;
+	if(player_can_move_dir(player, world, DOWN)) {
+		player->y += 1;
+		if(player_get_current_pos(player, world) == DOOR) {
+			player->global_y++;
+			turn_order_enter_new_room(world, player);
+			if(!world->room[player->global_x][player->global_y].is_created) {
+				world->room[player->global_x][player->global_y] = generate_room(&world->seed, player->global_x, player->global_y, world->enemy_data);
 			}
+			player->y = 1;
 		}
-	}	
+	}
 	world->isPlayerTurn = 0;
 }
 
 void player_move_up(player_t *player, world_t *world)
 {
-	for(int i = 0; i < MAX_KNIGHTS; i++) {
-		if(player_can_move_up(player, world, i)) {
-			player->y[i] -= 1;
-			if(player_get_current_pos(player, world) == DOOR) {
-				if(player->global_y - 1 < 0) return;
-				player->global_y--;
-				turn_order_enter_new_room(world, player);
-				if(!world->room[player->global_x][player->global_y].is_created) {
-					world->room[player->global_x][player->global_y] = generate_room(&world->seed, player->global_x, player->global_y, world->enemy_data);
-				}
-				player->y[0] = ROOM_HEIGHT-2;
+	if(player_can_move_dir(player, world, UP)) {
+		player->y -= 1;
+		if(player_get_current_pos(player, world) == DOOR) {
+			if(player->global_y - 1 < 0) return;
+			player->global_y--;
+			turn_order_enter_new_room(world, player);
+			if(!world->room[player->global_x][player->global_y].is_created) {
+				world->room[player->global_x][player->global_y] = generate_room(&world->seed, player->global_x, player->global_y, world->enemy_data);
 			}
+			player->y = ROOM_HEIGHT-2;
 		}
 	}
 	world->isPlayerTurn = 0;
 }
 
-char player_check_left(player_t *player, world_t *world, int knightNum)
-{
+char player_check_dir(player_t *player, world_t *world, direction_t dir) {
+	int x = player->x;
+	int y = player->y;
+	if(dir == LEFT) x--;
+	if(dir == RIGHT) x++;
+	if(dir == DOWN) y++;
+	if(dir == UP) y--;
+	
 	room_t *room = &world->room[player->global_x][player->global_y];
-    for(int i = 0; i < room->current_enemy_count; i++) {
+	for(int i = 0; i < room->current_enemy_count; i++) {
 		if(room->enemies[i] == NULL) continue;
-		if(player->x[knightNum] - 1 == room->enemies[i]->x && player->y[knightNum] == room->enemies[i]->y) {
-            return ENEMY_CHAR;
-        }  
-    }
-	if(player->x[knightNum] - 1 >= 0) {
-		return room->layout[player->y[knightNum]][player->x[knightNum]-1];
+		if(y == room->enemies[i]->y && x == room->enemies[i]->x) {
+			return ENEMY_CHAR;
+		}  
+	}
+	if(y <= ROOM_HEIGHT && x <= ROOM_WIDTH) {
+		return room->layout[y][x];
 	} else {
 		return ' ';
 	}
 }
 
-char player_check_right(player_t *player, world_t *world, int knightNum)
-{
-	room_t *room = &world->room[player->global_x][player->global_y];
-    for(int i = 0; i < room->current_enemy_count; i++) {
-		if(room->enemies[i] == NULL) continue;
-        if(player->x[knightNum] + 1 == room->enemies[i]->x && player->y[knightNum] == room->enemies[i]->y) {
-            return ENEMY_CHAR;
-        }  
-    }
-	if(player->x[knightNum] + 1 <= ROOM_WIDTH) {
-		return room->layout[player->y[knightNum]][player->x[knightNum]+1];
-	} else {
-		return ' ';
-	}
-}
-
-char player_check_down(player_t *player, world_t *world, int knightNum)
-{
-	room_t *room = &world->room[player->global_x][player->global_y];
-    for(int i = 0; i < room->current_enemy_count; i++) {
-		if(room->enemies[i] == NULL) continue;
-        if(player->y[knightNum] + 1 == room->enemies[i]->y && player->x[knightNum] == room->enemies[i]->x) {
-            return ENEMY_CHAR;
-        }  
-    }
-	if(player->y[knightNum] + 1 <= ROOM_HEIGHT) {
-		return room->layout[player->y[knightNum] + 1][player->x[knightNum]];
-	} else {
-		return ' ';
-	}
-}
-
-char player_check_up(player_t *player, world_t *world, int knightNum)
-{
-	room_t *room = &world->room[player->global_x][player->global_y];
-    for(int i = 0; i < room->current_enemy_count; i++) {
-		if(room->enemies[i] == NULL) continue;
-		if(player->y[knightNum] - 1 == room->enemies[i]->y && player->x[knightNum] == room->enemies[i]->x) {
-            return ENEMY_CHAR;
-        }  
-    }
-	if(player->y[knightNum] - 1 >= 0) {
-		return room->layout[player->y[knightNum]-1][player->x[knightNum]];
-	} else {
-		return ' ';
-	}
-}
-
-int player_can_move_left(player_t *player, world_t *world, int knightNum)
-{
-	
-	char a = player_check_left(player, world, knightNum);
-	for(int i = 0; i < WALK_CHAR_LENGTH; i++) {
-		if(a == walk_chars[i]) { // the space is open
-			return 1;
-		}
-	}
-	return 0;
-}
-
-int player_can_move_right(player_t *player, world_t *world, int knightNum)
-{
-	
-	char a = player_check_right(player, world, knightNum);
-	for(int i = 0; i < WALK_CHAR_LENGTH; i++) {
-		if(a == walk_chars[i]) { // the space is open
-			return 1;
-		}
-	}
-	return 0;
-}
-
-int player_can_move_down(player_t *player, world_t *world, int knightNum)
-{
-	
-	char a = player_check_down(player, world, knightNum);
-	for(int i = 0; i < WALK_CHAR_LENGTH; i++) {
-		if(a == walk_chars[i]) { // the space is open
-			return 1;
-		}
-	}
-	return 0;
-}
-
-int player_can_move_up(player_t *player, world_t *world, int knightNum)
-{
-	
-	char a = player_check_up(player, world, knightNum);
+int player_can_move_dir(player_t *player, world_t *world, direction_t dir) {
+	char a = player_check_dir(player, world, dir);
 	for(int i = 0; i < WALK_CHAR_LENGTH; i++) {
 		if(a == walk_chars[i]) { // the space is open
 			return 1;
@@ -215,65 +125,37 @@ void player_wait(player_t *player, world_t *world)
     world->isPlayerTurn = 0;
 }
 
-void player_decrease_health(player_t *player, world_t *world, int attack, int knightNum)
+void player_decrease_health(player_t *player, world_t *world, int attack)
 {
 	display_combat_message(world, player, "The player was hit!");
-    player->health[knightNum] -= attack;
-    if(player->health[knightNum] <= 0) {
+    player->health -= attack;
+    if(player->health <= 0) {
         end_game(world, player);
     }
 }
 
 void player_increase_health(player_t *player, int amount)
 {
-	for(int i = 0; i < MAX_KNIGHTS; i++) {
-		if(player->health[i] + amount > player->max_health[i]) {
-			player->health[i] = player->max_health[i];
-		} else {
-			player->health[i] += amount;
-		}
+	if(player->health + amount > player->max_health) {
+		player->health = player->max_health;
+	} else {
+		player->health += amount;
 	}
 }
 
 
-enemy_t *player_get_left_enemy(player_t *player, world_t *world, int knightNum) {
+enemy_t *player_get_dir_enemy(player_t *player, world_t *world, direction_t dir) {
+	int x = player->x;
+	int y = player->y;
+	if(dir == LEFT) x--;
+	if(dir == RIGHT) x++;
+	if(dir == DOWN) y++;
+	if(dir == UP) y--;
+	
 	room_t *room = &world->room[player->global_x][player->global_y];
     for(int i = 0; i < room->current_enemy_count; i++) {
 		if(room->enemies[i] == NULL) continue;
-		if(player->x[knightNum] - 1 == room->enemies[i]->x && player->y[knightNum] == room->enemies[i]->y) {
-            return room->enemies[i];
-        }  
-    }
-    return NULL;
-}
-
-enemy_t *player_get_right_enemy(player_t *player, world_t *world, int knightNum) {
-	room_t *room = &world->room[player->global_x][player->global_y];
-    for(int i = 0; i < room->current_enemy_count; i++) {
-		if(room->enemies[i] == NULL) continue;
-		if(player->x[knightNum] + 1 == room->enemies[i]->x && player->y[knightNum] == room->enemies[i]->y) {
-            return room->enemies[i];
-        }  
-    }
-    return NULL;
-}
-
-enemy_t *player_get_down_enemy(player_t *player, world_t *world, int knightNum) {
-	room_t *room = &world->room[player->global_x][player->global_y];
-    for(int i = 0; i < room->current_enemy_count; i++) {
-		if(room->enemies[i] == NULL) continue;
-		if(player->y[knightNum] + 1 == room->enemies[i]->y && player->x[knightNum] == room->enemies[i]->x) {
-            return room->enemies[i];
-        }  
-    }
-    return NULL;
-}
-
-enemy_t *player_get_up_enemy(player_t *player, world_t *world, int knightNum) {
-	room_t *room = &world->room[player->global_x][player->global_y];
-    for(int i = 0; i < room->current_enemy_count; i++) {
-		if(room->enemies[i] == NULL) continue;
-		if(player->y[knightNum] - 1 == room->enemies[i]->y && player->x[knightNum] == room->enemies[i]->x) {
+		if(x == room->enemies[i]->x && y == room->enemies[i]->y) {
             return room->enemies[i];
         }  
     }
@@ -283,32 +165,31 @@ enemy_t *player_get_up_enemy(player_t *player, world_t *world, int knightNum) {
 /**
  * This function looks at all knights and will pick the weakest enemy for the knight to attack
  * then call the given attack function
+ * TODO redo this whole function it sucks
  */
 void player_attack(player_t *player, world_t *world) {
-    for(int i = 0; i < MAX_KNIGHTS; i++) {
-		enemy_t *enL = player_get_left_enemy(player, world, i);
-		enemy_t *enR = player_get_right_enemy(player, world, i);
-		enemy_t *enD = player_get_down_enemy(player, world, i);
-		enemy_t *enU = player_get_up_enemy(player, world, i);
-		if(!enL) enL = enemy_create_temp(world);
-		if(!enR) enR = enemy_create_temp(world);
-		if(!enD) enD = enemy_create_temp(world);
-		if(!enU) enU = enemy_create_temp(world);
-		if(enL->health == 1000000 && enR->health == 1000000 &&
-			enD->health == 1000000 && enU->health == 1000000) {
-			continue;
-		}
-		int res = compare4(enL->health, enR->health, enD->health, enU->health);
-        if(res == enL->health) {
-            enemy_decrease_health(enL, world, player, i);
-        } else if(res == enR->health) {
-			enemy_decrease_health(enR, world, player, i);
-        } else if(res == enD->health) {
-			enemy_decrease_health(enD, world, player, i);
-        } else if(res == enU->health) {
-			enemy_decrease_health(enU, world, player, i);
-        }
-    }
+	enemy_t *enL = player_get_dir_enemy(player, world, LEFT);
+	enemy_t *enR = player_get_dir_enemy(player, world, RIGHT);
+	enemy_t *enD = player_get_dir_enemy(player, world, DOWN);
+	enemy_t *enU = player_get_dir_enemy(player, world, UP);
+	if(!enL) enL = enemy_create_temp(world);
+	if(!enR) enR = enemy_create_temp(world);
+	if(!enD) enD = enemy_create_temp(world);
+	if(!enU) enU = enemy_create_temp(world);
+	if(enL->health == 1000000 && enR->health == 1000000 &&
+		enD->health == 1000000 && enU->health == 1000000) {
+		return;
+	}
+	int res = compare4(enL->health, enR->health, enD->health, enU->health);
+	if(res == enL->health) {
+		enemy_decrease_health(enL, world, player);
+	} else if(res == enR->health) {
+		enemy_decrease_health(enR, world, player);
+	} else if(res == enD->health) {
+		enemy_decrease_health(enD, world, player);
+	} else if(res == enU->health) {
+		enemy_decrease_health(enU, world, player);
+	}
     world->isPlayerTurn = 0;
 }
 

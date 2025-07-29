@@ -79,44 +79,12 @@ enemy_t *enemy_spawn(enemy_type_t type, const enemy_data_t *enemy_data, int x, i
 
 const char *enemy_get_name(enemy_type_t type)
 {
-    switch(type) {
-        case SLIME:
-            return SLIME_ENEMY_NAME;
-        case BAT:
-            return BAT_ENEMY_NAME;
-        case RAT:
-            return RAT_ENEMY_NAME;
-        case SKELETON:
-            return SKELETON_ENEMY_NAME;
-        case DRAGON:
-            return DRAGON_ENEMY_NAME;
-        case BABY_DRAGON:
-            return BABY_DRAGON_ENEMY_NAME;
-        case GOBLIN:
-            return GOLBIN_ENEMY_NAME;
-        case GHOST:
-            return GHOST_ENEMY_NAME;
-        case LOOT_GOBLIN:
-            return LOOT_GOBLIN_ENEMY_NAME;
-        case MOSS_BEAST:
-            return MOSS_BEAST_ENEMY_NAME;
-        case JESTER:
-            return JESTER_ENEMY_NAME;
-        case VOIDLING:
-            return VOIDLING_ENEMY_NAME;
-        case MARROW_CRAWLER:
-            return MARROW_CRAWLER_ENEMY_NAME;
-        case VOID_MAW:
-            return VOID_MAW_ENEMY_NAME;
-        case MARROW_LEECH:
-            return MARROW_LEECH_ENEMY_NAME;
-        case MUD_CRAWLER:
-            return MUD_CRAWLER_ENEMY_NAME;
-        case BOG_LURKER:
-            return BOG_LURKER_ENEMY_NAME;
-        default:
-            return RAT_ENEMY_NAME;
+    for(int i = 0; i < type_map_len; i++) {
+        if(type_map[i].value == type) {
+            return type_map[i].name;
+        }
     }
+    return NULL;
 }
 
 enemy_type_t enemy_get_type(const char *name)
@@ -175,13 +143,21 @@ void load_enemy_data(enemy_data_t *enemy_data) {
                 case 5:
                     enemy_data[row].speed = atoi(token);
                     break;
+                case 6:
+                    // TODO
+                    // enemy_data[row].trait = atoi(token);
+                    break;
+                case 7:
+                    enemy_data[row].symbol = atoi(token);
+                    break;
+                    
             }
             token = strtok(NULL, ",");
             col++;
         }
-        DEBUG_LOG("Loaded Enemy Data: %d, %d, %d, %d, %d, %d", enemy_data[row].type, 
+        DEBUG_LOG("Loaded Enemy Data: %d, %d, %d, %d, %d, %d, %d", enemy_data[row].type, 
                   enemy_data[row].strength, enemy_data[row].dexterity, enemy_data[row].intelligence,
-                  enemy_data[row].constitution, enemy_data[row].speed);
+                  enemy_data[row].constitution, enemy_data[row].speed, enemy_data[row].symbol);
         col = 0;
         row++;
     }
@@ -203,17 +179,17 @@ void enemy_kill(enemy_t *enemy, world_t *world, player_t *player)
 	// room->current_enemy_count--;
 }
 
-void enemy_decrease_health(enemy_t *enemy, world_t *world, player_t *player, int knightNum)
+void enemy_decrease_health(enemy_t *enemy, world_t *world, player_t *player)
 {
-    enemy->health -= player->attack[knightNum];
+    enemy->health -= player->strength;
 	if(enemy->health <= 0) {
 		enemy_kill(enemy, world, player);
 	}
 }
 
-void enemy_attack(enemy_t *enemy, player_t *player, world_t *world, int knightNum)
+void enemy_attack(enemy_t *enemy, player_t *player, world_t *world)
 {
-    player_decrease_health(player, world, enemy->strength, knightNum);
+    player_decrease_health(player, world, enemy->strength);
 }
 
 void enemy_decide_move(enemy_t *enemy, world_t *world, player_t *player) 
@@ -224,32 +200,32 @@ void enemy_decide_move(enemy_t *enemy, world_t *world, player_t *player)
     switch(enemy->trait) {
 		case PASSIVE:
             DEBUG_LOG("passive");
-			if(player->x[0] < enemy->x) {
-                if(enemy_can_move_left(enemy, world, player) && (enemy->x-1 != player->x[0] || enemy->y != player->y[0])) {
+			if(player->x < enemy->x) {
+                if(enemy_can_move_dir(enemy, world, player, LEFT) && (enemy->x-1 != player->x || enemy->y != player->y)) {
                     enemy->x-=1;
-                } else if(enemy->x-1 == player->x[0] && enemy->y == player->y[0]) {
-                    enemy_attack(enemy, player, world, 0);
+                } else if(enemy->x-1 == player->x && enemy->y == player->y) {
+                    enemy_attack(enemy, player, world);
                 }
-			} else if(player->x[0] > enemy->x) {
-                if(enemy_can_move_right(enemy, world, player) && (enemy->x+1 != player->x[0] || enemy->y != player->y[0])) {
+			} else if(player->x > enemy->x) {
+                if(enemy_can_move_dir(enemy, world, player, RIGHT) && (enemy->x+1 != player->x || enemy->y != player->y)) {
                     enemy->x+=1;
-                } else if(enemy->x+1 == player->x[0] && enemy->y == player->y[0]) {
-                    enemy_attack(enemy, player, world, 0);
+                } else if(enemy->x+1 == player->x && enemy->y == player->y) {
+                    enemy_attack(enemy, player, world);
                 }
-			} else if(player->y[0] < enemy->y) {
-                if(enemy_can_move_up(enemy, world, player) && (enemy->y-1 != player->y[0] || enemy->x != player->x[0])) {
+			} else if(player->y < enemy->y) {
+                if(enemy_can_move_dir(enemy, world, player, UP) && (enemy->y-1 != player->y || enemy->x != player->x)) {
                     enemy->y-=1;
-                } else if(enemy->y-1 == player->y[0] && enemy->x == player->x[0]) {
-                    enemy_attack(enemy, player, world, 0);
+                } else if(enemy->y-1 == player->y && enemy->x == player->x) {
+                    enemy_attack(enemy, player, world);
                 }
-			} else if(player->y[0] > enemy->y) {
-                if(enemy_can_move_down(enemy, world, player) && (enemy->y+1 != player->y[0] || enemy->x != player->x[0])) {
+			} else if(player->y > enemy->y) {
+                if(enemy_can_move_dir(enemy, world, player, DOWN) && (enemy->y+1 != player->y || enemy->x != player->x)) {
                     enemy->y+=1;
-                } else if(enemy->y+1 == player->y[0] && enemy->x == player->x[0]) {
-                    enemy_attack(enemy, player, world, 0);
+                } else if(enemy->y+1 == player->y && enemy->x == player->x) {
+                    enemy_attack(enemy, player, world);
                 }
 			} else {
-                enemy_attack(enemy, player, world, 0);
+                enemy_attack(enemy, player, world);
             }
 			break;
 		case AGRESSIVE:
@@ -259,46 +235,22 @@ void enemy_decide_move(enemy_t *enemy, world_t *world, player_t *player)
 	}
 }
 
-char enemy_check_right(enemy_t *enemy, world_t *world, player_t *player)
-{
-	room_t *room = &world->room[player->global_x][player->global_y];
-    if(enemy->x + 1 > 0) {
-      return room->layout[enemy->y][enemy->x + 1];
+char enemy_check_dir(enemy_t *enemy, world_t *world, player_t *player, direction_t dir) {
+    int x = enemy->x;
+    int y = enemy->y;
+    if(dir == LEFT) x--;
+    if(dir == RIGHT) x++;
+    if(dir == DOWN) y++;
+    if(dir == UP) y--;
+    room_t *room = &world->room[player->global_x][player->global_y];
+    if(x > 0 && y > 0) {
+        return room->layout[y][x];
     }
     return ' ';
 }
 
-char enemy_check_left(enemy_t *enemy, world_t *world, player_t *player)
-{
-	room_t room = world->room[player->global_x][player->global_y];
-    if(enemy->x - 1 > 0) {
-      return room.layout[enemy->y][enemy->x - 1];
-    }
-    return ' ';
-}
-
-char enemy_check_up(enemy_t *enemy, world_t *world, player_t *player)
-{
-	room_t *room = &world->room[player->global_x][player->global_y];
-    if(enemy->y - 1 > 0) {
-      return room->layout[enemy->y - 1][enemy->x];
-    }
-    return ' ';
-}
-
-char enemy_check_down(enemy_t *enemy, world_t *world, player_t *player)
-{
-	room_t room = world->room[player->global_x][player->global_y];
-    if(enemy->y + 1 > 0) {
-      return room.layout[enemy->y + 1][enemy->x];
-    }
-    return ' ';
-}
-
-
-int enemy_can_move_right(enemy_t *enemy, world_t *world, player_t *player)
-{
-    char a = enemy_check_right(enemy, world, player);
+int enemy_can_move_dir(enemy_t *enemy, world_t *world, player_t *player, direction_t dir) {
+    char a = enemy_check_dir(enemy, world, player, dir);
     for(int i = 0; i < WALK_CHAR_LENGTH; i++) {
         if(a == walk_chars[i]) {
             return 1;
@@ -306,39 +258,3 @@ int enemy_can_move_right(enemy_t *enemy, world_t *world, player_t *player)
     }
     return 0;
 }
-
-int enemy_can_move_left(enemy_t *enemy, world_t *world, player_t *player)
-{
-    char a = enemy_check_left(enemy, world, player);
-    for(int i = 0; i < WALK_CHAR_LENGTH; i++) {
-        if(a == walk_chars[i]) {
-            return 1;
-        }
-    }
-    return 0;
-}
-
-int enemy_can_move_up(enemy_t *enemy, world_t *world, player_t *player)
-{
-    char a = enemy_check_up(enemy, world, player);
-    for(int i = 0; i < WALK_CHAR_LENGTH; i++) {
-        if(a == walk_chars[i]) {
-            return 1;
-        }
-    }
-    return 0;
-}
-
-int enemy_can_move_down(enemy_t *enemy, world_t *world, player_t *player)
-{
-    char a = enemy_check_down(enemy, world, player);
-    for(int i = 0; i < WALK_CHAR_LENGTH; i++) {
-        if(a == walk_chars[i]) {
-            return 1;
-        }
-    }
-    return 0;
-}
-
-
-

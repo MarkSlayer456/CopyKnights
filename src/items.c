@@ -62,8 +62,8 @@ int use_item(player_t *player)
 
 int use_teleport_scroll(player_t *player)
 {
-	player->x[0] = TELEPORT_SCROLL_TELEPORT_LOCATION.x;
-	player->y[0] = TELEPORT_SCROLL_TELEPORT_LOCATION.x;
+	player->x = TELEPORT_SCROLL_TELEPORT_LOCATION.x;
+	player->y = TELEPORT_SCROLL_TELEPORT_LOCATION.x;
 	player->global_x = TELEPORT_SCROLL_TELEPORT_LOCATION.global_x;
 	player->global_y = TELEPORT_SCROLL_TELEPORT_LOCATION.global_y;
 	return 0;

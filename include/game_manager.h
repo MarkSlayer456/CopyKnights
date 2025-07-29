@@ -20,7 +20,6 @@
 #define COPYSIX				'6'
 #define COPYSEVEN			'7'
 
-#define MAX_KNIGHTS 			1
 #define MAX_ENEMIES_PER_LEVEL	16
 #define PLAYER_TURN_ORDER_INDEX		-1
 
@@ -71,6 +70,13 @@ do { \
 	} \
 } while (0)
 // EXAMPLE: DEBUG_LOG("Constitution: %d", enemy_data[row].constitution);
+
+typedef enum direction {
+	LEFT,
+	RIGHT,
+	UP,
+	DOWN
+} direction_t;
 
 // names should be limited to 32 characters
 typedef enum item_ids {
@@ -125,18 +131,15 @@ typedef struct action_bar {
 } action_bar_t;
 
 typedef struct player {
-	int knights;
-	int *health;
-	int *max_health;
-	int *attack;
-	int *defense;
+	int health;
+	int max_health;
 	int strength;
 	int dexterity;
 	int intelligence;
 	int constitution;
 	int speed;
-	int *x; // each knight has it's only pos
-	int *y; // each knight has it's only pos
+	int x; // each knight has it's only pos
+	int y; // each knight has it's only pos
 	int global_x; // pos on the map
 	int global_y; // pos on the map
 	item_t *inventory; // list of items in players inventory

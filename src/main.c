@@ -75,55 +75,39 @@ int main(int argc, char *argv[]) {
 	load_enemy_data(world->enemy_data);
 	
 	player_t *player = malloc(sizeof(player_t));
-	player->x = malloc(MAX_KNIGHTS * sizeof(int));
-	player->y = malloc(MAX_KNIGHTS * sizeof(int));
-	player->health = malloc(MAX_KNIGHTS * sizeof(int));
-	player->max_health = malloc(MAX_KNIGHTS * sizeof(int));
-	player->attack = malloc(MAX_KNIGHTS * sizeof(int));
-	player->defense = malloc(MAX_KNIGHTS * sizeof(int));
+	
+	action_bar_t action = {0, 0, NOT_OPEN, 0, 0, ITEM};
+	
+	player->action_bar = action;
+	player->health = 1000;
+	player->max_health = 1000;
+	player->x = 1;
+	player->y = 10;
+	player->strength = 10;
+	player->dexterity = 10;
+	player->intelligence = 10;
+	player->constitution = 10;
+	player->speed = 10;
 	player->global_x = 0;
 	player->global_y = 0;
+	player->action_points = 0;
 	
 	player->inventory = malloc(INV_SIZE * sizeof(item_t));
 	
 	item_t blank = {BLANK_NAME, BLANK, 0};
+	item_t test_item1 = {HEALTH_POTION_NAME, HEALTH_POTION, 16};
+	item_t test_item2 = {APPLE_NAME, APPLE, 3};
+	item_t test_item3 = {TELEPORT_SCROLL_NAME, TELEPORT_SCROLL, 1};
 	
 	for(int i = 0; i < INV_SIZE; i++) {
 		player->inventory[i] = blank;
 	}
-	
-	item_t test_item1 = {HEALTH_POTION_NAME, HEALTH_POTION, 16};
-	item_t test_item2 = {APPLE_NAME, APPLE, 3};
-	item_t test_item3 = {TELEPORT_SCROLL_NAME, TELEPORT_SCROLL, 1};
 	
 	player->inventory[0] = test_item1;
 	
 	player->inventory[1] = test_item2;
 	
 	player->inventory[2] = test_item3;
-	
-	//TODO should set the others to a negative number
-	for(int i = 0; i < MAX_KNIGHTS; i++) {
-		player->x[i] = -1000;
-		player->y[i] = -1000;
-		player->health[i] = 0;
-		player->max_health[i] = 0;
-		player->attack[i] = 0;
-		player->defense[i] = 0;
-		player->knights++;
-	}
-	action_bar_t action = {0, 0, NOT_OPEN, 0, 0, ITEM};
-	player->action_bar = action;
-	player->health[0] = 1000;
-	player->max_health[0] = 1000;
-	player->x[0] = 1;
-	player->y[0] = 10;
-	player->global_x = 0;
-	player->global_y = 0;
-	player->attack[0] = 25;
-	player->defense[0] = 25;
-	player->speed = 25;
-	player->action_points = 0;
 
 	world->isPlayerTurn = 1;
 

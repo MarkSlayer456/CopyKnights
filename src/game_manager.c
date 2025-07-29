@@ -37,16 +37,9 @@ void draw(world_t *world, player_t *player)
 					break;
 				}
 			}
-			for(int k = 0; k < MAX_KNIGHTS; k++) {
-				if(player->x[k] == j && player->y[k] == i) {
-					if(k == 0) {
-						waddch(world->win, PLAYER);
-					} else {
-						waddch(world->win, k);
-					}
-					playerIsThere = 1;
-					break;
-				}
+			if(player->x == j && player->y == i) {
+				waddch(world->win, PLAYER);
+				playerIsThere = 1;
 			}
 			if(!playerIsThere && !enemyIsThere) {
 				waddch(world->win, room->layout[i][j]);

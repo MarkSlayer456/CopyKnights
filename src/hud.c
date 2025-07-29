@@ -17,7 +17,7 @@ void hud_update_player_health(player_t *player) {
 	waddch(hud, ' ');
 	
 	char *str = malloc(8);
-	snprintf(str, 8, "%d", player->health[0]);
+	snprintf(str, 8, "%d", player->health);
 	wprintw(hud, str);
 	
 	waddch(hud, ' ');
@@ -25,7 +25,7 @@ void hud_update_player_health(player_t *player) {
 	waddch(hud, ' ');
 	
 	char *str2 = malloc(8);
-	snprintf(str2, 8, "%d", player->max_health[0]);
+	snprintf(str2, 8, "%d", player->max_health);
 	wprintw(hud, str2);
 }
 
@@ -35,8 +35,8 @@ void hud_update_nearby_enemies(world_t *world, player_t *player) {
 	room_t *room = &world->room[player->global_x][player->global_y];
 	for(int i = 0; i < MAX_ENEMIES_PER_LEVEL; i++) {
 		if(!room->enemies[i]) continue;
-		if(room->enemies[i]->x > player->x[0]-detect_radius && room->enemies[i]->x < player->x[0]+detect_radius &&
-			room->enemies[i]->y > player->y[0]-(detect_radius) && room->enemies[i]->y < player->y[0]+(detect_radius)) {
+		if(room->enemies[i]->x > player->x-detect_radius && room->enemies[i]->x < player->x+detect_radius &&
+			room->enemies[i]->y > player->y-(detect_radius) && room->enemies[i]->y < player->y+(detect_radius)) {
 			wmove(hud, PLAYER_STATS_HUD_SPACE+i+1, 0);
 			char *name = malloc(32);
 			snprintf(name, 32, "%s", room->enemies[i]->name);
