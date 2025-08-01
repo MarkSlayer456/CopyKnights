@@ -1,6 +1,11 @@
 #ifndef PLAYER_H_
 #define PLAYER_H_
 #include "game_manager.h"
+#define BASE_STRENGTH					10
+#define BASE_DEXTERITY					10
+#define BASE_INTELLIGENCE				10
+#define BASE_CONSTITUTION				10
+#define BASE_SPEED						10
 
 void player_wait(player_t *player, world_t *world);
 
@@ -27,6 +32,12 @@ int player_can_move_dir(player_t *player, world_t *world, direction_t dir);
 enemy_t *player_get_dir_enemy(player_t *player, world_t *world, direction_t dir);
 
 void player_attack(player_t *player, world_t *world);
+
+int xp_to_level_up(int level);
+
+void player_add_xp(player_t *player, int amount);
+
+void player_check_level_up(player_t *player);
 
 void player_open_action_bar(player_t *player);
 void player_close_action_bar(player_t *player);

@@ -4,6 +4,7 @@
 #include "enemy.h"
 #include "hud.h"
 #include "items.h"
+#include "math.h"
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
@@ -180,17 +181,46 @@ void player_attack(player_t *player, world_t *world) {
 		enD->health == 1000000 && enU->health == 1000000) {
 		return;
 	}
+	enemy_type_t killed = ENEMY_NONE;
 	int res = compare4(enL->health, enR->health, enD->health, enU->health);
 	if(res == enL->health) {
-		enemy_decrease_health(enL, world, player);
+		killed = enemy_decrease_health(enL, world, player);
 	} else if(res == enR->health) {
-		enemy_decrease_health(enR, world, player);
+		killed = enemy_decrease_health(enR, world, player);
 	} else if(res == enD->health) {
-		enemy_decrease_health(enD, world, player);
+		killed = enemy_decrease_health(enD, world, player);
 	} else if(res == enU->health) {
-		enemy_decrease_health(enU, world, player);
+		killed = enemy_decrease_health(enU, world, player);
+	}
+	if(killed != ENEMY_NONE) {
+		//TODO each enemy type needs different xp it gives
+		player_add_xp(player, 10);
 	}
     world->isPlayerTurn = 0;
+}
+
+int xp_to_level_up(int level) {
+	return 50 * level + (level * level * 10);
+}
+
+void player_check_level_up(player_t *player) {
+	int level = player->level;
+	int level_xp = xp_to_level_up(level);
+	if(player->xp >= level_xp) {
+		//TODO classes are going to change this alot probably
+		player->xp -= xp_to_level_up(level);
+		player->strength = BASE_STRENGTH + ((int)(2 * sqrt(level)));
+		player->dexterity = BASE_DEXTERITY + ((int)(2 * sqrt(level)));;
+		player->intelligence = BASE_INTELLIGENCE + ((int)(2 * sqrt(level)));;
+		player->constitution = BASE_CONSTITUTION + ((int)(2 * sqrt(level)));;
+		player->speed = BASE_SPEED + ((int)(2 * sqrt(level)));;
+		player->level++;
+	}
+}
+
+void player_add_xp(player_t *player, int amount) {
+	player->xp += amount;
+	player_check_level_up(player);
 }
 
 void player_open_action_bar(player_t *player)

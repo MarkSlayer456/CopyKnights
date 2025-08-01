@@ -1,6 +1,7 @@
 #include "hud.h"
 #include "game_manager.h"
 #include "items.h"
+#include "player.h"
 #include <stdlib.h>
 #include <string.h>
 extern WINDOW *hud;
@@ -15,8 +16,8 @@ void hud_update_player_health(player_t *player) {
 	waddch(hud, PLAYER);
 	waddch(hud, ':');
 	waddch(hud, ' ');
-	
-	char *str = malloc(8);
+	//TODO rename all strings in this function
+	char str[8];
 	snprintf(str, 8, "%d", player->health);
 	wprintw(hud, str);
 	
@@ -24,15 +25,49 @@ void hud_update_player_health(player_t *player) {
 	waddch(hud, '/');
 	waddch(hud, ' ');
 	
-	char *str2 = malloc(8);
+	char str2[8];
 	snprintf(str2, 8, "%d", player->max_health);
 	wprintw(hud, str2);
+	
+	getyx(hud, y, x);
+	wmove(hud, y+1, 0);
+	char str3[32];
+	snprintf(str3, 32, "Level: %d | XP: %d / %d", player->level, player->xp, xp_to_level_up(player->level));
+	wprintw(hud, str3);
+	
+	// this will break if any stats are over 3 digits
+	getyx(hud, y, x);
+	wmove(hud, y+1, 0);
+	char str4[32];
+	snprintf(str4, 32, "Str: %d | Dex: %d | Int: %d", player->strength, player->dexterity, player->intelligence);
+	wprintw(hud, str4);
+	
+	getyx(hud, y, x);
+	wmove(hud, y+1, 0);
+	char str5[32];
+	snprintf(str5, 32, "Constitution: %d | Speed: %d", player->constitution, player->speed);
+	wprintw(hud, str5);
 }
 
 void hud_update_nearby_enemies(world_t *world, player_t *player) {
 	int detect_radius = 6;
-    wmove(hud, PLAYER_STATS_HUD_SPACE, 0);
 	room_t *room = &world->room[player->global_x][player->global_y];
+	
+	wmove(hud, PLAYER_STATS_HUD_SPACE, 0);
+	char str6[128];
+	int pos = snprintf(str6, 128, "Turn Order: ");
+	for(int i = 0; i < world->turn_order_size; i++) {
+		if(world->turn_order[i] == PLAYER_TURN_ORDER_INDEX) {
+			pos += snprintf(str6 + pos, sizeof(str6)-pos, "[%c] ", PLAYER);
+			continue;
+		}
+		//TODO crashed when i added the ->symbol to this line
+		if(room->enemies[world->turn_order[i]] != NULL) {
+			pos += snprintf(str6 + pos, sizeof(str6)-pos, "[%c] ", room->enemies[world->turn_order[i]]->symbol);
+		}	
+	}
+	wprintw(hud, "%s", str6);
+	
 	for(int i = 0; i < MAX_ENEMIES_PER_LEVEL; i++) {
 		if(!room->enemies[i]) continue;
 		if(room->enemies[i]->x > player->x-detect_radius && room->enemies[i]->x < player->x+detect_radius &&
@@ -53,7 +88,6 @@ void hud_update_nearby_enemies(world_t *world, player_t *player) {
 }
 
 void hud_update_action_bar(player_t *player) {
-	wclear(action_bar);
 	wmove(action_bar, 0, 0);
 	if(player->action_bar.inv_open) {
 		int add_size = 8;

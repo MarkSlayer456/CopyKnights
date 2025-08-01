@@ -38,7 +38,8 @@ int main(int argc, char *argv[]) {
     WINDOW *win;
 
     initscr();
-    win = newwin(20, 20, 0, 0);
+    curs_set(0);
+	win = newwin(20, 20, 0, 0);
     hud = newwin(HUD_HEIGHT, HUD_WIDTH, 0, 21);
 	action_bar = newwin(5, 21, 21, 0);
     error = newwin(25, 25, 51, 30);
@@ -83,14 +84,16 @@ int main(int argc, char *argv[]) {
 	player->max_health = 1000;
 	player->x = 1;
 	player->y = 10;
-	player->strength = 10;
-	player->dexterity = 10;
-	player->intelligence = 10;
-	player->constitution = 10;
-	player->speed = 10;
+	player->strength = BASE_STRENGTH;
+	player->dexterity = BASE_DEXTERITY;
+	player->intelligence = BASE_INTELLIGENCE;
+	player->constitution = BASE_CONSTITUTION;
+	player->speed = BASE_SPEED;
 	player->global_x = 0;
 	player->global_y = 0;
 	player->action_points = 0;
+	player->level = 1;
+	player->xp = 0;
 	
 	player->inventory = malloc(INV_SIZE * sizeof(item_t));
 	
@@ -117,7 +120,7 @@ int main(int argc, char *argv[]) {
 	for(int i = 0; i < 100; i++) {
 		world->room[i] = calloc(100, sizeof(room_t));
 		for(int j = 0; j < 100; j++) {
-			world->room[i][j].is_created = false;
+			world->room[i][j].is_created = false; // TODO what is this?
 		}
 	}
 	world->seed = TEST_SEED;
@@ -128,40 +131,43 @@ int main(int argc, char *argv[]) {
 	first.current_enemy_count++;
 	
 	world->room[0][0] = first;
+	
 	world->win = win;
     world->turn_order_size = 0;
 	memset(world->turn_order, 0, (MAX_ENEMIES_PER_LEVEL+1) * sizeof(int));
 	for(;;) {
+		calculate_light(world, player);
     	draw(world, player);
 		
-		if(world->turn_order_size < MAX_ENEMIES_PER_LEVEL/2) {
-			for(int i = 0; i < MAX_ENEMIES_PER_LEVEL/2; i++) {
+		if(world->turn_order_size < MAX_ENEMIES_PER_LEVEL) {
+			for(int i = world->turn_order_size; i < MAX_ENEMIES_PER_LEVEL; i++) {
 				int actor = pick_next_actor(world, player);
 				world->turn_order[world->turn_order_size++] = actor;
 			}
 		}
 		
-		int turn_index = world->turn_order[0];
-		if(turn_index == PLAYER_TURN_ORDER_INDEX) {
-			display_combat_message(world, player, MESSAGE_IS_PLAYERS_TURN);
-			char c = getch();
-			manage_input(c, world, player);
-		} else {
-			enemy_t *enemy = world->room[player->global_x][player->global_y].enemies[turn_index];
-			if(enemy == NULL) {
-				for(int k = 0; k < world->turn_order_size-1; k++) {
-					world->turn_order[k] = world->turn_order[k + 1];
+		if(world->turn_order > 0) {
+			int turn_index = world->turn_order[0];
+			if(turn_index == PLAYER_TURN_ORDER_INDEX) {
+				display_combat_message(world, player, MESSAGE_IS_PLAYERS_TURN);
+				char c = getch();
+				manage_input(c, world, player);
+			} else {
+				enemy_t *enemy = world->room[player->global_x][player->global_y].enemies[turn_index];
+				if(enemy == NULL) {
+					for(int k = 0; k < world->turn_order_size-1; k++) {
+						world->turn_order[k] = world->turn_order[k + 1];
+					}
+					world->turn_order_size--;
+					continue;
 				}
-				world->turn_order_size--;
-				continue;
+				enemy_decide_move(enemy, world, player);
 			}
-			enemy_decide_move(enemy, world, player);
+			for(int k = 0; k < world->turn_order_size-1; k++) {
+				world->turn_order[k] = world->turn_order[k + 1];
+			}
+			world->turn_order_size--;
 		}
-		for(int k = 0; k < world->turn_order_size-1; k++) {
-			world->turn_order[k] = world->turn_order[k + 1];
-		}
-		world->turn_order_size--;
-
     }
     endwin();
     exit(0);

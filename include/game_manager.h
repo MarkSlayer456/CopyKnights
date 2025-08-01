@@ -20,7 +20,7 @@
 #define COPYSIX				'6'
 #define COPYSEVEN			'7'
 
-#define MAX_ENEMIES_PER_LEVEL	16
+#define MAX_ENEMIES_PER_LEVEL	12
 #define PLAYER_TURN_ORDER_INDEX		-1
 
 #define DOOR_BLOCKED_MESSAGE			"This door won't seem to budge!"
@@ -131,6 +131,8 @@ typedef struct action_bar {
 } action_bar_t;
 
 typedef struct player {
+	int level;
+	int xp;
 	int health;
 	int max_health;
 	int strength;
@@ -174,6 +176,14 @@ void manage_input(char c, world_t *world, player_t *player);
 void display_world_message(world_t *world, player_t *player, const char *str);
 
 void display_combat_message(world_t *world, player_t *player, const char *str);
+
+bool is_opaque(room_t *room, int x, int y);
+
+void mark_has_light(room_t *room, int x, int y);
+
+void cast_light_check(world_t *world, player_t *player, int x0, int y0, float angle);
+
+void calculate_light(world_t *world, player_t *player);
 
 int pick_next_actor(world_t *world, player_t *player);
 

@@ -7,6 +7,7 @@
 
 #define ENEMY_TYPE_COUNT					17
 #define MAX_ENEMY_NAME_LENGTH				32
+#define NULL_ENEMY_NAME						"NULL"
 #define SLIME_ENEMY_NAME 					"Slime"
 #define BAT_ENEMY_NAME						"Bat"
 #define RAT_ENEMY_NAME						"Rat"
@@ -36,6 +37,7 @@ typedef enum trait {
 } trait_t;
 
 typedef enum enemy_type {
+	ENEMY_NONE = -1,
 	SLIME,
 	BAT,
 	SKELETON,
@@ -52,7 +54,7 @@ typedef enum enemy_type {
 	VOID_MAW,
 	MARROW_LEECH,
 	MUD_CRAWLER,
-	BOG_LURKER
+	BOG_LURKER,
 } enemy_type_t;
 
 typedef struct enemy {
@@ -106,7 +108,7 @@ void load_enemy_data(enemy_data_t *enemy_data);
 
 void enemy_kill(enemy_t *enemy, world_t *world, player_t *player);
 
-void enemy_decrease_health(enemy_t *enemy, world_t *world, player_t *player);
+enemy_type_t enemy_decrease_health(enemy_t *enemy, world_t *world, player_t *player);
 
 void enemy_attack(enemy_t *enemy, player_t *player, world_t *world);
 

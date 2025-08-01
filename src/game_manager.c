@@ -4,6 +4,7 @@
 #include "items.h"
 #include "map_manager.h"
 #include "enemy.h"
+#include "math.h"
 #include <ncurses.h>
 #include <stdlib.h>
 #include <string.h>
@@ -12,11 +13,12 @@
 //waddch(win, char);
 extern WINDOW *hud;
 extern WINDOW *action_bar;
+extern char walk_chars[WALK_CHAR_LENGTH];
 
-void draw(world_t *world, player_t *player) 
-{
+void draw(world_t *world, player_t *player) {
 	werase(world->win);
 	werase(hud);
+	werase(action_bar);
 	// draw stuff...
     // TODO add just a hud_update() function so you don't have to call a bunch of different functions
 	hud_update_player_health(player);
@@ -26,13 +28,16 @@ void draw(world_t *world, player_t *player)
 	room_t *room = &world->room[player->global_x][player->global_y];
 	for(int i = 0; i < ROOM_HEIGHT; i++) {
 		for(int j = 0; j < ROOM_WIDTH; j++) {
+			if(room->has_light[i][j] == false) {
+				continue;
+			}
 			int enemyIsThere = 0;
 			int playerIsThere = 0;
 			wmove(world->win, i, j);
 			for(int u = 0; u < room->current_enemy_count; u++) {
 				if(room->enemies[u] == NULL) continue;
 				if(room->enemies[u]->x == j && room->enemies[u]->y == i) {
-					waddch(world->win, room->enemies[u]->name[0]);
+					waddch(world->win, room->enemies[u]->symbol);
 					enemyIsThere = 1;
 					break;
 				}
@@ -46,9 +51,14 @@ void draw(world_t *world, player_t *player)
 			}
 		}
 	}
-	wrefresh(world->win);
-	wrefresh(hud);
-	wrefresh(action_bar);
+	wnoutrefresh(world->win);
+	wnoutrefresh(hud);
+	wnoutrefresh(action_bar);
+	
+	doupdate();
+	// wrefresh(world->win);
+	// wrefresh(hud);
+	// wrefresh(action_bar);
 }
 
 void manage_input(char c, world_t *world, player_t *player) 
@@ -192,6 +202,57 @@ void display_world_message(world_t *world, player_t *player, const char *str) {
 	world->messages_size++;
 }
 
+bool is_opaque(room_t *room, int x, int y) {
+	char a = room->layout[y][x];
+	for(int i = 0; i < WALK_CHAR_LENGTH; i++) {
+		if(a == walk_chars[i] || a == PLAYER) { // the space is open
+			return false;
+		}
+	}
+	return true;
+}
+
+void mark_has_light(room_t *room, int x, int y) {
+	room->has_light[y][x] = true;
+}
+
+void cast_light_check(world_t *world, player_t *player, int x0, int y0, float angle) {
+	float dx = cos(angle);
+	float dy = sin(angle);
+	float x = x0 + 0.3f;
+	float y = y0 + 0.3f;
+	int max_distance = 5; // this will be a value from the player later
+	
+	for(int i = 0; i < max_distance; i++) {
+		int tile_x = (int)x;
+		int tile_y = (int)y;
+		
+		if(tile_x > ROOM_WIDTH-1 || tile_y > ROOM_HEIGHT-1 || tile_y < 0 || tile_x < 0) {
+			break;
+		}
+		room_t *room = &world->room[player->global_x][player->global_y];
+		
+		mark_has_light(room, tile_x, tile_y);
+		
+		if(is_opaque(room, tile_x, tile_y)) {
+			break;
+		}
+		
+		x += dx;
+		y += dy;
+	}
+}
+
+void calculate_light(world_t *world, player_t *player) {
+	for(int i = 0; i < ROOM_HEIGHT; i++) {
+		for(int j = 0; j < ROOM_WIDTH; j++) {
+			world->room[player->global_x][player->global_y].has_light[i][j] = false;
+		}
+	}
+	for(float a = 0; a < 2 * M_PI; a += 0.03f) {
+		cast_light_check(world, player, player->x, player->y, a);
+	}
+}
 
 int pick_next_actor(world_t *world, player_t *player) {
 	int idx = 100; // TODO need a number that won't appear???

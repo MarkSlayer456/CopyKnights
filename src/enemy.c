@@ -9,6 +9,7 @@
 extern char walk_chars[WALK_CHAR_LENGTH];
 
 enemy_type_map_t type_map[] = {
+    {NULL_ENEMY_NAME, ENEMY_NONE},
     {RAT_ENEMY_NAME, RAT},
     {BAT_ENEMY_NAME, BAT},
     {SLIME_ENEMY_NAME, SLIME},
@@ -25,7 +26,7 @@ enemy_type_map_t type_map[] = {
     {VOID_MAW_ENEMY_NAME, VOID_MAW},
     {MARROW_LEECH_ENEMY_NAME, MARROW_LEECH},
     {MUD_CRAWLER_ENEMY_NAME, MUD_CRAWLER},
-    {BOG_LURKER_ENEMY_NAME, BOG_LURKER}
+    {BOG_LURKER_ENEMY_NAME, BOG_LURKER},
 };
 
 const int type_map_len = sizeof(type_map) / sizeof(type_map[0]);
@@ -70,6 +71,7 @@ enemy_t *enemy_spawn(enemy_type_t type, const enemy_data_t *enemy_data, int x, i
         e->x = x;
         e->y = y;
         e->trait = PASSIVE;
+        e->symbol = enemy_data[i].symbol;
         e->action_points = 0;
         strcpy(e->name, enemy_get_name(type));
         return e;
@@ -148,7 +150,7 @@ void load_enemy_data(enemy_data_t *enemy_data) {
                     // enemy_data[row].trait = atoi(token);
                     break;
                 case 7:
-                    enemy_data[row].symbol = atoi(token);
+                    enemy_data[row].symbol = token[0];
                     break;
                     
             }
@@ -179,12 +181,15 @@ void enemy_kill(enemy_t *enemy, world_t *world, player_t *player)
 	// room->current_enemy_count--;
 }
 
-void enemy_decrease_health(enemy_t *enemy, world_t *world, player_t *player)
+enemy_type_t enemy_decrease_health(enemy_t *enemy, world_t *world, player_t *player)
 {
     enemy->health -= player->strength;
 	if(enemy->health <= 0) {
+        enemy_type_t type = enemy_get_type(enemy->name);
 		enemy_kill(enemy, world, player);
+        return type;
 	}
+	return ENEMY_NONE;
 }
 
 void enemy_attack(enemy_t *enemy, player_t *player, world_t *world)
@@ -196,10 +201,8 @@ void enemy_decide_move(enemy_t *enemy, world_t *world, player_t *player)
 {
 	// TODO need to check which knight is the closest
     // TODO move the player check to enemy_can_move functions; just makes more sense, also need loop for them
-	DEBUG_LOG("switch");
     switch(enemy->trait) {
 		case PASSIVE:
-            DEBUG_LOG("passive");
 			if(player->x < enemy->x) {
                 if(enemy_can_move_dir(enemy, world, player, LEFT) && (enemy->x-1 != player->x || enemy->y != player->y)) {
                     enemy->x-=1;
