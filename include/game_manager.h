@@ -4,49 +4,42 @@
 #include "enemy.h"
 #include <ncurses.h>
 
-#define MESSAGE_IS_PLAYERS_TURN			"It is your turn!"
+#define MESSAGE_IS_PLAYERS_TURN					"It is your turn!"
 
 #define WALL 				'#' // a wall
 #define VISUAL_OBJECT		'$' // can walk through
 #define EMPTY				'.'
 #define DOOR				'/'
 #define CHEST				'$'
-#define PLAYER				'P'
-#define COPYONE				'1'
-#define COPYTWO				'2'
-#define COPYTHREE			'3'
-#define COPYFOUR			'4'
-#define COPYFIVE			'5'
-#define COPYSIX				'6'
-#define COPYSEVEN			'7'
+#define PLAYER				'@'
 
-#define MAX_ENEMIES_PER_LEVEL	12
-#define PLAYER_TURN_ORDER_INDEX		-1
+#define PLAYER_TURN_ORDER_INDEX					-1
+#define INVALID_ACTOR_INDEX						999999999
 
-#define DOOR_BLOCKED_MESSAGE			"This door won't seem to budge!"
+#define DOOR_BLOCKED_MESSAGE					"This door won't seem to budge!"
 
-#define ARROW_KEY_MOD	1000
-#define DOWN_ARROW		ARROW_KEY_MOD + 66
-#define UP_ARROW		ARROW_KEY_MOD + 65
-#define RIGHT_ARROW		ARROW_KEY_MOD + 67
-#define LEFT_ARROW		ARROW_KEY_MOD + 68
-#define KEY_I		105
-#define ENTER_KEY	10
-#define ESC_KEY		27
+#define ARROW_KEY_MOD							1000
+#define DOWN_ARROW								ARROW_KEY_MOD + 66
+#define UP_ARROW								ARROW_KEY_MOD + 65
+#define RIGHT_ARROW								ARROW_KEY_MOD + 67
+#define LEFT_ARROW								ARROW_KEY_MOD + 68
+#define KEY_I									105
+#define ENTER_KEY								10
+#define ESC_KEY									27
 
-#define TEST_SEED	596231
-#define ENEMY_X_PRIME		19349663u
-#define ENEMY_Y_PRIME		73856093u
+#define TEST_SEED								596231
+#define ENEMY_X_PRIME							19349663u
+#define ENEMY_Y_PRIME							73856093u
 
-#define KEY_A       97
-#define KEY_B		98
-#define KEY_S       115
+#define KEY_A      								97
+#define KEY_B									98
+#define KEY_S       							115
 
-#define CTRL_Q			17
+#define CTRL_Q									17
 
 //TODO add more ...
 
-#define WALK_CHAR_LENGTH	16
+#define WALK_CHAR_LENGTH						16
 
 #define ENEMY_CHAR      'E' // used when finding enemies on the map
 

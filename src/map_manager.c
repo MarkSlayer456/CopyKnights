@@ -54,7 +54,7 @@ room_t load_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data)
 		room.layout[i] = calloc(ROOM_WIDTH+1, sizeof(char));
 		room.has_light[i] = calloc(ROOM_WIDTH, sizeof(bool));
 	}
-	room.enemies = calloc(ROOM_ENEMY_MAX, sizeof(enemy_t *));
+	room.enemies = calloc(MAX_ENEMIES_PER_LEVEL, sizeof(enemy_t *));
 	room.current_enemy_count = 0;
 
 	char *file = calloc(64, sizeof(char));
@@ -76,8 +76,7 @@ room_t load_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data)
 
 	char *tok = strtok(buf, "\n");
 	while(tok != NULL) {
-		DEBUG_LOG("tok = %s, i = %d", tok, i);
-		DEBUG_LOG("tok (len %zu): '%s'", strlen(tok), tok);
+		DEBUG_LOG("tok = %s | i = %d", tok, i);
 		strcpy(room.layout[i], tok);
 		for(int j = 0; j < strlen(room.layout[i]); j++) {
 			//TODO make this a chance not a 100%
@@ -96,6 +95,7 @@ room_t load_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data)
 		tok = strtok(NULL, "\n");
 		i++;
 	}
+	close(fd);
 
 	return room;
 }

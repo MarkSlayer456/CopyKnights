@@ -59,6 +59,7 @@ typedef enum enemy_type {
 
 typedef struct enemy {
 	int health;
+	int level;
 	int strength;
 	int dexterity;
 	int intelligence;
@@ -84,6 +85,7 @@ typedef struct enemy_data {
 	int intelligence;
 	int constitution;
 	int speed;
+	int level;
 	char symbol;
 	trait_t trait;
 } enemy_data_t;

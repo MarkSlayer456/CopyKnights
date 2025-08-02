@@ -5,6 +5,7 @@
 #include "map_manager.h"
 #include "enemy.h"
 #include "math.h"
+#include <assert.h>
 #include <ncurses.h>
 #include <stdlib.h>
 #include <string.h>
@@ -167,7 +168,7 @@ void manage_input(char c, world_t *world, player_t *player)
 }
 
 void display_combat_message(world_t *world, player_t *player, const char *str) {
-	if(MAX_MESSAGE_LENGTH < strlen(str)) return;
+	if(MAX_MESSAGE_LENGTH_WITHOUT_PREFIX < strlen(str)) return;
 	int current_size = world->messages_size;
 	if(current_size >= world->max_message_storage) {
 		world->max_message_storage*=2;
@@ -255,7 +256,7 @@ void calculate_light(world_t *world, player_t *player) {
 }
 
 int pick_next_actor(world_t *world, player_t *player) {
-	int idx = 100; // TODO need a number that won't appear???
+	int idx = INVALID_ACTOR_INDEX;
 	int fastest = 0;
 	while(true) {
 		player->action_points += player->speed;
@@ -276,7 +277,7 @@ int pick_next_actor(world_t *world, player_t *player) {
 			}
 		}
 		
-		if(idx == 100) continue;
+		if(idx == INVALID_ACTOR_INDEX) continue;
 		
 		if(idx == PLAYER_TURN_ORDER_INDEX) {
 			player->action_points -= TIME_TO_ACT;
@@ -284,16 +285,18 @@ int pick_next_actor(world_t *world, player_t *player) {
 			enemy_t *enemy = world->room[player->global_x][player->global_y].enemies[idx];
 			enemy->action_points -= TIME_TO_ACT;
 		}
-		if(idx != 100) break;
+		if(idx != INVALID_ACTOR_INDEX) break;
 	}
 	return idx;
 }
 
 void turn_order_enter_new_room(world_t *world, player_t *player) {
 	memset(world->turn_order, 0, (MAX_ENEMIES_PER_LEVEL+1) * sizeof(int));
-	world->turn_order_size = 0;
+	world->turn_order_size = 1; // the player hasn't finished his turn yet, so this needs to be 1 not 0
 	player->action_points = 0;
+	assert(world->room[player->global_x][player->global_y].is_created);
 	for(int i = 0; i < world->room[player->global_x][player->global_y].current_enemy_count; i++) {
+		if(world->room[player->global_x][player->global_y].enemies[i] == NULL) continue;
 		world->room[player->global_x][player->global_y].enemies[i]->action_points = 0;
 	}
 }

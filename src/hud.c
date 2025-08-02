@@ -61,7 +61,6 @@ void hud_update_nearby_enemies(world_t *world, player_t *player) {
 			pos += snprintf(str6 + pos, sizeof(str6)-pos, "[%c] ", PLAYER);
 			continue;
 		}
-		//TODO crashed when i added the ->symbol to this line
 		if(room->enemies[world->turn_order[i]] != NULL) {
 			pos += snprintf(str6 + pos, sizeof(str6)-pos, "[%c] ", room->enemies[world->turn_order[i]]->symbol);
 		}	

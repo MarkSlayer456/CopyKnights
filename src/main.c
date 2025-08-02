@@ -7,6 +7,7 @@
 #include <signal.h>
 #include <string.h>
 #include <time.h>
+#include <assert.h>
 #include "map_manager.h"
 #include "game_manager.h"
 #include "player.h"
@@ -15,17 +16,7 @@
 #include "hud.h"
 
 /*
-	
-	
-	top down single player game where you start
-	as a lonely knight and you slowly gain more
-	knights that copy all your actions, probably
-	have a max of like 16 or 8 (feel like 8 is to small)
-	
-	kinda turnbased, each time player moves the next "turn"
-	happens so the ai makes a move after the player "reacts"
-	
-	
+	Top down dungeon crawler
 */
 
 WINDOW *hud; // gives player useful information
@@ -36,7 +27,7 @@ char walk_chars[WALK_CHAR_LENGTH] = {EMPTY, 0, DOOR}; // characters entites can 
 
 int main(int argc, char *argv[]) {
     WINDOW *win;
-
+	
     initscr();
     curs_set(0);
 	win = newwin(20, 20, 0, 0);
@@ -45,7 +36,6 @@ int main(int argc, char *argv[]) {
     error = newwin(25, 25, 51, 30);
     
     refresh();
-    //wmove(hud, 0, 0);
     wrefresh(hud);
     wrefresh(error);
     
@@ -55,12 +45,9 @@ int main(int argc, char *argv[]) {
 	scrollok(win, FALSE);
 	raw();
 	
-	if(argc == 1) {
-		//game starts
-	} else {
+	if(argc != 1) {
 		fprintf(stderr, "No arguments required!\n");
 	}
-
 
 	world_t *world = malloc(sizeof(world_t));
 	world->isPlayerTurn = 1;
@@ -134,40 +121,39 @@ int main(int argc, char *argv[]) {
 	
 	world->win = win;
     world->turn_order_size = 0;
-	memset(world->turn_order, 0, (MAX_ENEMIES_PER_LEVEL+1) * sizeof(int));
+	// memset(world->turn_order, 0, (MAX_ENEMIES_PER_LEVEL+1) * sizeof(int));
 	for(;;) {
 		calculate_light(world, player);
     	draw(world, player);
 		
-		if(world->turn_order_size < MAX_ENEMIES_PER_LEVEL) {
-			for(int i = world->turn_order_size; i < MAX_ENEMIES_PER_LEVEL; i++) {
-				int actor = pick_next_actor(world, player);
-				world->turn_order[world->turn_order_size++] = actor;
-			}
+		assert(world->turn_order_size >= 0);
+		while(world->turn_order_size < MAX_ENEMIES_PER_LEVEL) {
+			int actor = pick_next_actor(world, player);
+			assert(actor != INVALID_ACTOR_INDEX);
+			world->turn_order[world->turn_order_size++] = actor;
 		}
 		
-		if(world->turn_order > 0) {
-			int turn_index = world->turn_order[0];
-			if(turn_index == PLAYER_TURN_ORDER_INDEX) {
-				display_combat_message(world, player, MESSAGE_IS_PLAYERS_TURN);
-				char c = getch();
-				manage_input(c, world, player);
-			} else {
-				enemy_t *enemy = world->room[player->global_x][player->global_y].enemies[turn_index];
-				if(enemy == NULL) {
-					for(int k = 0; k < world->turn_order_size-1; k++) {
-						world->turn_order[k] = world->turn_order[k + 1];
-					}
-					world->turn_order_size--;
-					continue;
+		int turn_index = world->turn_order[0];
+		assert(turn_index >= PLAYER_TURN_ORDER_INDEX);
+		if(turn_index == PLAYER_TURN_ORDER_INDEX) {
+			display_combat_message(world, player, MESSAGE_IS_PLAYERS_TURN);
+			char c = getch();
+			manage_input(c, world, player);
+		} else {
+			enemy_t *enemy = world->room[player->global_x][player->global_y].enemies[turn_index];
+			if(enemy == NULL) {
+				for(int k = 0; k < world->turn_order_size-1; k++) {
+					world->turn_order[k] = world->turn_order[k + 1];
 				}
-				enemy_decide_move(enemy, world, player);
+				world->turn_order_size--;
+				continue;
 			}
-			for(int k = 0; k < world->turn_order_size-1; k++) {
-				world->turn_order[k] = world->turn_order[k + 1];
-			}
-			world->turn_order_size--;
+			enemy_decide_move(enemy, world, player);
 		}
+		for(int k = 0; k < world->turn_order_size-1; k++) {
+			world->turn_order[k] = world->turn_order[k + 1];
+		}
+		world->turn_order_size--;
     }
     endwin();
     exit(0);

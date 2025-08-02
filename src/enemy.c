@@ -66,7 +66,7 @@ enemy_t *enemy_spawn(enemy_type_t type, const enemy_data_t *enemy_data, int x, i
         e->constitution = enemy_data[i].constitution;
         DEBUG_LOG("con: %d", e->constitution);
         e->health = enemy_data[i].constitution; // TODO some calculation to determine health
-        e->speed = enemy_data[i].speed; // TODO implement speed
+        e->speed = enemy_data[i].speed;
         DEBUG_LOG("speed: %d", e->speed);
         e->x = x;
         e->y = y;
@@ -74,6 +74,7 @@ enemy_t *enemy_spawn(enemy_type_t type, const enemy_data_t *enemy_data, int x, i
         e->symbol = enemy_data[i].symbol;
         e->action_points = 0;
         strcpy(e->name, enemy_get_name(type));
+        i++;
         return e;
     }
     return NULL;
@@ -194,12 +195,14 @@ enemy_type_t enemy_decrease_health(enemy_t *enemy, world_t *world, player_t *pla
 
 void enemy_attack(enemy_t *enemy, player_t *player, world_t *world)
 {
+    char *message = calloc(MAX_MESSAGE_LENGTH_WITHOUT_PREFIX, sizeof(char));
+    snprintf(message, MAX_MESSAGE_LENGTH_WITHOUT_PREFIX, "%s attacked for %d", enemy->name, enemy->strength);
+    display_combat_message(world, player, message);
     player_decrease_health(player, world, enemy->strength);
 }
 
 void enemy_decide_move(enemy_t *enemy, world_t *world, player_t *player) 
 {
-	// TODO need to check which knight is the closest
     // TODO move the player check to enemy_can_move functions; just makes more sense, also need loop for them
     switch(enemy->trait) {
 		case PASSIVE:

@@ -6,7 +6,7 @@
 #define ROOM_COUNT			3
 #define ROOM_WIDTH			20
 #define ROOM_HEIGHT			20
-#define ROOM_ENEMY_MAX		20
+#define MAX_ENEMIES_PER_LEVEL	12
 
 #define POTENTIAL_ENEMY_SPAWN_CHAR		'*'
 #define POTENTIAL_CHEST_SPAWN_CHAR		'$'

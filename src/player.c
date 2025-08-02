@@ -29,10 +29,10 @@ void player_move_left(player_t *player, world_t *world)
 				return;
 			}
 			player->global_x--;
-			turn_order_enter_new_room(world, player);
 			if(!world->room[player->global_x][player->global_y].is_created) {
 				world->room[player->global_x][player->global_y] = generate_room(&world->seed, player->global_x, player->global_y, world->enemy_data);
 			}
+			turn_order_enter_new_room(world, player);
 			player->x = ROOM_WIDTH-2;
 		}
 	}
@@ -45,10 +45,10 @@ void player_move_right(player_t *player, world_t *world)
 		player->x += 1;
 		if(player_get_current_pos(player, world) == DOOR) {
 			player->global_x++;
-			turn_order_enter_new_room(world, player);
 			if(!world->room[player->global_x][player->global_y].is_created) {
 				world->room[player->global_x][player->global_y] = generate_room(&world->seed, player->global_x, player->global_y, world->enemy_data);
 			}
+			turn_order_enter_new_room(world, player);
 			player->x = 1;
 		}
 	}
@@ -61,10 +61,10 @@ void player_move_down(player_t *player, world_t *world)
 		player->y += 1;
 		if(player_get_current_pos(player, world) == DOOR) {
 			player->global_y++;
-			turn_order_enter_new_room(world, player);
 			if(!world->room[player->global_x][player->global_y].is_created) {
 				world->room[player->global_x][player->global_y] = generate_room(&world->seed, player->global_x, player->global_y, world->enemy_data);
 			}
+			turn_order_enter_new_room(world, player);
 			player->y = 1;
 		}
 	}
@@ -78,10 +78,10 @@ void player_move_up(player_t *player, world_t *world)
 		if(player_get_current_pos(player, world) == DOOR) {
 			if(player->global_y - 1 < 0) return;
 			player->global_y--;
-			turn_order_enter_new_room(world, player);
 			if(!world->room[player->global_x][player->global_y].is_created) {
 				world->room[player->global_x][player->global_y] = generate_room(&world->seed, player->global_x, player->global_y, world->enemy_data);
 			}
+			turn_order_enter_new_room(world, player);
 			player->y = ROOM_HEIGHT-2;
 		}
 	}
@@ -128,7 +128,6 @@ void player_wait(player_t *player, world_t *world)
 
 void player_decrease_health(player_t *player, world_t *world, int attack)
 {
-	display_combat_message(world, player, "The player was hit!");
     player->health -= attack;
     if(player->health <= 0) {
         end_game(world, player);
