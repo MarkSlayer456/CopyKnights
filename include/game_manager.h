@@ -2,6 +2,7 @@
 #define GAME_MANAGER_H_
 #include "map_manager.h"
 #include "enemy.h"
+#include "player.h"
 #include <ncurses.h>
 
 #define MESSAGE_IS_PLAYERS_TURN					"It is your turn!"
@@ -63,6 +64,9 @@ do { \
 	} \
 } while (0)
 // EXAMPLE: DEBUG_LOG("Constitution: %d", enemy_data[row].constitution);
+
+typedef struct class_data class_data_t;
+typedef enum class_type class_type_t;
 
 typedef enum direction {
 	LEFT,
@@ -141,6 +145,7 @@ typedef struct player {
 	int *mana; // amount of player currently has
 	int *max_mana;
 	int action_points;
+	class_type_t player_class;
 	
 	action_bar_t action_bar;
 } player_t;
@@ -156,6 +161,7 @@ typedef struct world {
 	int isPlayerTurn;
 	unsigned int seed;
 	enemy_data_t *enemy_data;
+	class_data_t *class_data;
 	char **messages;
 	int max_message_storage;
 	int messages_size;

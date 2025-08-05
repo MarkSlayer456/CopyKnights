@@ -65,7 +65,7 @@ enemy_t *enemy_spawn(enemy_type_t type, const enemy_data_t *enemy_data, int x, i
         DEBUG_LOG("int: %d", e->intelligence);
         e->constitution = enemy_data[i].constitution;
         DEBUG_LOG("con: %d", e->constitution);
-        e->health = enemy_data[i].constitution; // TODO some calculation to determine health
+        e->health = enemy_data[i].constitution * 10;
         e->speed = enemy_data[i].speed;
         DEBUG_LOG("speed: %d", e->speed);
         e->x = x;

@@ -52,6 +52,7 @@ int main(int argc, char *argv[]) {
 	world_t *world = malloc(sizeof(world_t));
 	world->isPlayerTurn = 1;
 	world->enemy_data = calloc(MAX_ENEMIES, sizeof(enemy_data_t *));
+	world->class_data = calloc(MAX_CLASSES, sizeof(enemy_data_t *));
 	
 	world->max_message_storage = DEFAULT_MAX_MESSAGE_STORAGE;
 	world->messages_size = 0;
@@ -61,21 +62,34 @@ int main(int argc, char *argv[]) {
 	}
 	
 	load_enemy_data(world->enemy_data);
+	load_class_data(world->class_data);
 	
 	player_t *player = malloc(sizeof(player_t));
 	
 	action_bar_t action = {0, 0, NOT_OPEN, 0, 0, ITEM};
 	
 	player->action_bar = action;
-	player->health = 1000;
-	player->max_health = 1000;
 	player->x = 1;
 	player->y = 10;
-	player->strength = BASE_STRENGTH;
-	player->dexterity = BASE_DEXTERITY;
-	player->intelligence = BASE_INTELLIGENCE;
-	player->constitution = BASE_CONSTITUTION;
-	player->speed = BASE_SPEED;
+	player->player_class = SWORDSMAN;
+	for(int i = 0; i < MAX_CLASSES; i++) {
+		if(world->class_data[i].type == player->player_class) {
+			int base_strength = world->class_data[i].base_strength;
+			int base_dexterity = world->class_data[i].base_dexterity;
+			int base_intelligence = world->class_data[i].base_intelligence;
+			int base_constitution = world->class_data[i].base_constitution;
+			int base_speed = world->class_data[i].base_speed;
+			
+			player->strength = base_strength;
+			player->dexterity = base_dexterity;
+			player->intelligence = base_intelligence;
+			player->constitution = base_constitution;
+			player->speed = base_speed;
+			break;
+		}
+	}
+	player->health = player->constitution * 10;
+	player->max_health = player->constitution * 10;
 	player->global_x = 0;
 	player->global_y = 0;
 	player->action_points = 0;
@@ -85,7 +99,7 @@ int main(int argc, char *argv[]) {
 	player->inventory = malloc(INV_SIZE * sizeof(item_t));
 	
 	item_t blank = {BLANK_NAME, BLANK, 0};
-	item_t test_item1 = {HEALTH_POTION_NAME, HEALTH_POTION, 16};
+	item_t test_item1 = {HEALTH_POTION_NAME, HEALTH_POTION, 5};
 	item_t test_item2 = {APPLE_NAME, APPLE, 3};
 	item_t test_item3 = {TELEPORT_SCROLL_NAME, TELEPORT_SCROLL, 1};
 	

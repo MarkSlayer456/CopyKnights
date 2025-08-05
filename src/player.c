@@ -13,6 +13,96 @@
 
 extern char walk_chars[WALK_CHAR_LENGTH];
 
+class_type_map_t class_type_map[] = {
+	{NULL_CLASS_NAME, CLASS_NONE},
+	{SWORDSMAN_CLASS_NAME, SWORDSMAN},
+	{BARBARIAN_CLASS_NAME, BARBARIAN},
+	{SPEARMAN_CLASS_NAME, SPEARMAN},
+	{ARCHER_CLASS_NAME, ARCHER},
+	{WIZARD_CLASS_NAME, WIZARD},
+	{MERCHANT_CLASS_NAME, MERCHANT},
+};
+
+const int class_type_map_len = sizeof(class_type_map) / sizeof(class_type_map[0]);
+
+class_type_t class_get_type(const char *name) {
+	for(int i = 0; i < class_type_map_len; i++) {
+		if(strcasecmp(name, class_type_map[i].name) == 0) {
+			return class_type_map[i].value;
+		}
+	}
+	return CLASS_NONE; // or an INVALID_TRAIT enum
+}
+
+void load_class_data(class_data_t *class_data) {
+	FILE *fp = fopen("./data/classes.csv", "r");
+	if(!fp) {
+		perror("File open failed");
+		return;
+	}
+	
+	char line[2048];
+	
+	if(fgets(line, sizeof(line), fp) == NULL) {
+		fprintf(stderr, "File is empty\n");
+		fclose(fp);
+		return;
+	}
+	
+	int row = 0;
+	while(fgets(line, sizeof(line), fp)) {
+		line[strcspn(line, "\n")] = '\0';
+		int col = 0;
+		char *token = strtok(line, ",");
+		while(token) {
+			switch(col) {
+				case 0:
+					class_data[row].type = class_get_type(token);
+					break;
+				case 1:
+					class_data[row].base_strength = atoi(token);
+					break;
+				case 2:
+					class_data[row].base_dexterity = atoi(token);
+					break;
+				case 3:
+					class_data[row].base_intelligence = atoi(token);
+					break;
+				case 4:
+					class_data[row].base_constitution = atoi(token);
+					break;
+				case 5:
+					class_data[row].base_speed = atoi(token);
+					break;
+				case 6:
+					class_data[row].growth_strength = atof(token);
+					break;
+				case 7:
+					class_data[row].growth_dexterity = atof(token);
+					break;
+				case 8:
+					class_data[row].growth_intelligence = atof(token);
+					break;
+				case 9:
+					class_data[row].growth_constitution = atof(token);
+					break;
+				case 10:
+					class_data[row].growth_speed = atof(token);
+					break;
+			}
+			token = strtok(NULL, ",");
+			col++;
+		}
+		DEBUG_LOG("Loaded Class Data: %d, %d, %d, %d, %d, %d, %f, %f, %f, %f, %f", class_data[row].type, 
+			class_data[row].base_strength, class_data[row].base_dexterity, class_data[row].base_intelligence,
+			class_data[row].base_constitution, class_data[row].base_speed, class_data[row].growth_strength, 
+			class_data[row].growth_dexterity, class_data[row].growth_intelligence,
+			class_data[row].growth_constitution, class_data[row].growth_speed);
+		col = 0;
+		row++;
+	}
+}
+
 char player_get_current_pos(player_t *player, world_t *world)
 {
 	return world->room[player->global_x][player->global_y].layout[player->y][player->x];
@@ -193,7 +283,7 @@ void player_attack(player_t *player, world_t *world) {
 	}
 	if(killed != ENEMY_NONE) {
 		//TODO each enemy type needs different xp it gives
-		player_add_xp(player, 10);
+		player_add_xp(player, 100, world->class_data);
 	}
     world->isPlayerTurn = 0;
 }
@@ -202,24 +292,39 @@ int xp_to_level_up(int level) {
 	return 50 * level + (level * level * 10);
 }
 
-void player_check_level_up(player_t *player) {
+void player_check_level_up(player_t *player, const class_data_t *class_data) {
 	int level = player->level;
 	int level_xp = xp_to_level_up(level);
 	if(player->xp >= level_xp) {
-		//TODO classes are going to change this alot probably
 		player->xp -= xp_to_level_up(level);
-		player->strength = BASE_STRENGTH + ((int)(2 * sqrt(level)));
-		player->dexterity = BASE_DEXTERITY + ((int)(2 * sqrt(level)));;
-		player->intelligence = BASE_INTELLIGENCE + ((int)(2 * sqrt(level)));;
-		player->constitution = BASE_CONSTITUTION + ((int)(2 * sqrt(level)));;
-		player->speed = BASE_SPEED + ((int)(2 * sqrt(level)));;
 		player->level++;
+		for(int i = 0; i < MAX_CLASSES; i++) {
+			if(class_data[i].type == player->player_class) {
+				int base_strength = class_data[i].base_strength;
+				int base_dexterity = class_data[i].base_dexterity;
+				int base_intelligence = class_data[i].base_intelligence;
+				int base_constitution = class_data[i].base_constitution;
+				int base_speed = class_data[i].base_speed;
+				
+				float growth_strength = class_data[i].growth_strength;
+				float growth_dexterity = class_data[i].growth_dexterity;
+				float growth_intelligence = class_data[i].growth_intelligence;
+				float growth_constitution = class_data[i].growth_constitution;
+				float growth_speed = class_data[i].growth_speed;
+				player->strength = base_strength + ((int)(growth_strength * level));
+				player->dexterity = base_dexterity + ((int)(growth_dexterity * level));
+				player->intelligence = base_intelligence + ((int)(growth_intelligence * level));
+				player->constitution = base_constitution + ((int)(growth_constitution * level));
+				player->speed = base_speed + ((int)(growth_speed * level));
+				break;
+			}
+		}
 	}
 }
 
-void player_add_xp(player_t *player, int amount) {
+void player_add_xp(player_t *player, int amount, const class_data_t *class_data) {
 	player->xp += amount;
-	player_check_level_up(player);
+	player_check_level_up(player, class_data);
 }
 
 void player_open_action_bar(player_t *player)

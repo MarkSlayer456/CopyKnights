@@ -4,7 +4,6 @@
 
 #define MAX_ENEMIES							100
 
-
 #define ENEMY_TYPE_COUNT					17
 #define MAX_ENEMY_NAME_LENGTH				32
 #define NULL_ENEMY_NAME						"NULL"
