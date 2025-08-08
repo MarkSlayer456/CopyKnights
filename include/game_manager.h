@@ -4,6 +4,7 @@
 #include "enemy.h"
 #include "player.h"
 #include <ncurses.h>
+#include <stdbool.h>
 
 #define MESSAGE_IS_PLAYERS_TURN					"It is your turn!"
 
@@ -118,8 +119,9 @@ typedef struct object {
 } wall_t;
 
 typedef struct action_bar {
-	int inv_open; // is inventory open
-	int spells_open; // is options open
+	bool inv_open; // is inventory open
+	bool spells_open; // is options open
+	bool loot_open; // is a loot tile open
 	action_bar_selector_t selector; // which item is the selector on
 	
 	int spells_selector; // current spell you are selected on

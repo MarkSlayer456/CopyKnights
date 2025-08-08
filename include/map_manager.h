@@ -26,6 +26,9 @@
 #include "enemy.h"
 #include <stdbool.h>
 
+typedef struct item item_t;
+typedef enum item_ids item_ids_t;
+
 typedef enum biome {
 	BIOME_NULL = -1,
 	CAVE,
@@ -35,6 +38,13 @@ typedef enum biome {
 	ARCANE_LABYRINTH,
 	VOID_HOLLOW
 } biome_t;
+
+typedef struct tile {
+	char floor; // what the floor tile is
+	bool has_light; // does this tile have light
+	enemy_t *enemies; // enemies on this tile
+	item_t *items; // list of items on this tile
+} tile_t;
 
 typedef struct room room_t;
 

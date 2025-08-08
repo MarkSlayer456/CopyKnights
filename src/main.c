@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
 	
 	player_t *player = malloc(sizeof(player_t));
 	
-	action_bar_t action = {0, 0, NOT_OPEN, 0, 0, ITEM};
+	action_bar_t action = {false, false, false, NOT_OPEN, 0, 0, ITEM};
 	
 	player->action_bar = action;
 	player->x = 1;

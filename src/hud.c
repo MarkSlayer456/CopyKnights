@@ -103,6 +103,8 @@ void hud_update_action_bar(player_t *player) {
 		// TODO display player's inventory
 	} else if(player->action_bar.spells_open) {
 		// TODO display player's spells
+	} else if(player->action_bar.loot_open) { 
+		// TODO
 	} else {
 		char inv[12] = "inventory";
 		char spells[9] = "spells";
