@@ -2,11 +2,25 @@
 #include "enemy.h"
 #include "player.h"
 #include "hud.h"
+#include "map_manager.h"
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <assert.h>
 
 extern char walk_chars[WALK_CHAR_LENGTH];
+enemy_type_map_t biome_type_map[] = {
+    {NULL_ENEMY_NAME, ENEMY_NONE},
+    {CAVE_NAME, CAVE},
+    {CATACOMBS_NAME, CATACOMBS},
+    {BOG_NAME, BOG},
+    {ANCIENT_CITY_NAME, ANCIENT_CITY},
+    {ARCANE_LABYRINTH_NAME, ARCANE_LABYRINTH},
+    {VOID_HOLLOW_NAME, VOID_HOLLOW},
+};
+
+const int biome_type_map_len = sizeof(biome_type_map) / sizeof(biome_type_map[0]);
 
 enemy_type_map_t type_map[] = {
     {NULL_ENEMY_NAME, ENEMY_NONE},
@@ -75,9 +89,70 @@ enemy_t *enemy_spawn(enemy_type_t type, const enemy_data_t *enemy_data, int x, i
         e->action_points = 0;
         strcpy(e->name, enemy_get_name(type));
         i++;
+        
         return e;
     }
     return NULL;
+}
+
+void load_biome_data(enemy_data_t *enemy_data) {
+    FILE *fp = fopen("./data/biome_spawns.csv", "r");
+    if(!fp) {
+        perror("File open failed");
+        return;
+    }
+    
+    char line[2048];
+    
+    if(fgets(line, sizeof(line), fp) == NULL) {
+        fclose(fp);
+        return;
+    }
+    
+    int row = 0;
+    while(fgets(line, sizeof(line), fp)) {
+        line[strcspn(line, "\n")] = '\0';
+        char *biome_str = strtok(line, ",");
+        char *enemy_str = strtok(NULL, ",");
+        char *min_str = strtok(NULL, ",");
+        char *max_str = strtok(NULL, ",");
+        
+        if(!biome_str || !enemy_str || !min_str || !max_str) {
+            continue;
+        }
+        
+        biome_t biome = get_biome(biome_str);
+        if(biome == BIOME_NULL) {
+            continue;
+        }
+        
+        enemy_type_t enemy_type = enemy_get_type(enemy_str);
+        int min_level = atoi(min_str);
+        int max_level = atoi(max_str);
+        
+        int i = 0;
+        while(i < MAX_ENEMIES) {
+            if(enemy_data[i].type != enemy_type) {
+                i++;
+                continue;
+            }
+            enemy_data[i].can_spawn[biome] = true;
+            enemy_data[i].highest_level[biome] = max_level;
+            enemy_data[i].lowest_level[biome] = min_level;
+            break;
+        }
+        
+        row++;
+    }
+}
+
+biome_t get_biome(const char *name) {
+    for(int i = 0; i < biome_type_map_len; i++) {
+        if(strcasecmp(name, biome_type_map[i].name) == 0) {
+            return biome_type_map[i].value;
+        }
+    }
+    return BIOME_NULL; // or an INVALID_TRAIT enum
 }
 
 const char *enemy_get_name(enemy_type_t type)
@@ -100,10 +175,18 @@ enemy_type_t enemy_get_type(const char *name)
     return -1; // or an INVALID_TRAIT enum
 }
 
-enemy_type_t enemy_generate_type(unsigned int *seed)
+enemy_type_t enemy_generate_type(unsigned int *seed, enemy_data_t *enemy_data, biome_t biome)
 {
-    int random_number = (rand_r(seed) % ENEMY_TYPE_COUNT);
-    return random_number;
+    enemy_type_t enemies[MAX_ENEMIES];
+    int enemies_size = 0;
+    for(int i = 0; i < MAX_ENEMIES; i++) {
+        if(enemy_data[i].can_spawn[biome]) {
+            enemies[enemies_size++] = enemy_data[i].type;
+        }
+    }
+    assert(enemies_size > 0);
+    int random_number = (rand_r(seed) % enemies_size);
+    return enemies[random_number];
 }
 
 void load_enemy_data(enemy_data_t *enemy_data) {
@@ -158,12 +241,15 @@ void load_enemy_data(enemy_data_t *enemy_data) {
             token = strtok(NULL, ",");
             col++;
         }
-        DEBUG_LOG("Loaded Enemy Data: %d, %d, %d, %d, %d, %d, %d", enemy_data[row].type, 
+        DEBUG_LOG("Loaded Enemy Data: %d, %d, %d, %d, %d, %d, %c", enemy_data[row].type, 
                   enemy_data[row].strength, enemy_data[row].dexterity, enemy_data[row].intelligence,
                   enemy_data[row].constitution, enemy_data[row].speed, enemy_data[row].symbol);
         col = 0;
         row++;
     }
+    
+    load_biome_data(enemy_data);
+    
 }
 
 void enemy_kill(enemy_t *enemy, world_t *world, player_t *player) 

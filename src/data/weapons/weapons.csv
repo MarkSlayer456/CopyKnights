@@ -1,0 +1,64 @@
+name,attack,strength requirement,dexterity requirement,intelligence requirement
+Black Stone Sword,5,5,0,0
+Bronze Sword,10,10,0,0
+Iron Sword,15,15,0,0
+Steel Sword,20,20,0,0
+Mithril Sword,25,25,0,0
+Soulcrust Sword,30,30,0,0
+Terracite Sword,35,35,0,0
+Gravemarrow Sword,45,40,0,0
+Voidmarrow Sword,55,45,0,0
+Black Stone Spear,5,0,5,0
+Bronze Spear,10,0,10,0
+Iron Spear,15,0,15,0
+Steel Spear,20,0,20,0
+Mithril Spear,25,0,25,0
+Soulcrust Spear,30,0,30,0
+Terracite Spear,35,0,35,0
+Gravemarrow Spear,45,0,40,0
+Voidmarrow Spear,55,0,45,0
+Black Stone Mace,5,3,2,0
+Bronze Mace,10,6,4,0
+Iron Mace,15,9,6,0
+Steel Mace,20,12,8,0
+Mithril Mace,25,15,10,0
+Soulcrust Mace,30,18,12,0
+Terracite Mace,35,21,14,0
+Gravemarrow Mace,45,24,16,0
+Voidmarrow Mace,55,27,18,0
+Black Stone Axe,5,5,0,0
+Bronze Axe,10,10,0,0
+Iron Axe,15,15,0,0
+Steel Axe,20,20,0,0
+Mithril Axe,25,25,0,0
+Soulcrust Axe,30,30,0,0
+Terracite Axe,35,35,0,0
+Gravemarrow Axe,45,40,0,0
+Voidmarrow Axe,55,45,0,0
+Black Stone Pickaxe,5,5,0,0
+Bronze Pickaxe,10,10,0,0
+Iron Pickaxe,15,15,0,0
+Steel Pickaxe,20,20,0,0
+Mithril Pickaxe,25,25,0,0
+Soulcrust Pickaxe,30,30,0,0
+Terracite Pickaxe,35,35,0,0
+Gravemarrow Pickaxe,45,40,0,0
+Voidmarrow Pickaxe,55,45,0,0
+Black Stone Bow,5,0,5,0
+Bronze Bow,10,0,10,0
+Iron Bow,15,0,15,0
+Steel Bow,20,0,20,0
+Mithril Bow,25,0,25,0
+Soulcrust Bow,30,0,30,0
+Terracite Bow,35,0,35,0
+Gravemarrow Bow,45,0,40,0
+Voidmarrow Bow,55,0,45,0
+Black Stone Staff,5,0,0,5
+Bronze Staff,10,0,0,10
+Iron Staff,15,0,0,15
+Steel Staff,20,0,0,20
+Mithril Staff,25,0,0,25
+Soulcrust Staff,30,0,0,30
+Terracite Staff,35,0,0,35
+Gravemarrow Staff,45,0,0,40
+Voidmarrow Staff,55,0,0,45

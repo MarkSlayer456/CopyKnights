@@ -8,10 +8,11 @@
 #define MESSAGE_IS_PLAYERS_TURN					"It is your turn!"
 
 #define WALL 				'#' // a wall
-#define VISUAL_OBJECT		'$' // can walk through
+#define BOG_WALL			'%'
+#define MUD					'~'
 #define EMPTY				'.'
 #define DOOR				'/'
-#define CHEST				'$'
+#define CHEST				'$' // can walk through
 #define PLAYER				'@'
 
 #define PLAYER_TURN_ORDER_INDEX					-1

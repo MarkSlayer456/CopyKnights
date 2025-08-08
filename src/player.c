@@ -166,7 +166,11 @@ void player_move_up(player_t *player, world_t *world)
 	if(player_can_move_dir(player, world, UP)) {
 		player->y -= 1;
 		if(player_get_current_pos(player, world) == DOOR) {
-			if(player->global_y - 1 < 0) return;
+			if(player->global_y - 1 < 0) {
+				player->y += 1;
+				display_world_message(world, player, DOOR_BLOCKED_MESSAGE);
+				return;
+			}
 			player->global_y--;
 			if(!world->room[player->global_x][player->global_y].is_created) {
 				world->room[player->global_x][player->global_y] = generate_room(&world->seed, player->global_x, player->global_y, world->enemy_data);

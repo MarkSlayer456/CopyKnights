@@ -22,8 +22,7 @@
 WINDOW *hud; // gives player useful information
 WINDOW *action_bar; // player's inventory/spells menu, maybe a help menu in the furture
 WINDOW *error; // USED FOR ERROR CHECKING ONLY
-char walk_chars[WALK_CHAR_LENGTH] = {EMPTY, 0, DOOR}; // characters entites can walk on
-
+char walk_chars[WALK_CHAR_LENGTH] = {EMPTY, 0, DOOR, MUD, CHEST}; // characters entites can walk on
 
 int main(int argc, char *argv[]) {
     WINDOW *win;
@@ -51,8 +50,17 @@ int main(int argc, char *argv[]) {
 
 	world_t *world = malloc(sizeof(world_t));
 	world->isPlayerTurn = 1;
-	world->enemy_data = calloc(MAX_ENEMIES, sizeof(enemy_data_t *));
-	world->class_data = calloc(MAX_CLASSES, sizeof(enemy_data_t *));
+	
+	world->enemy_data = calloc(MAX_ENEMIES, sizeof(enemy_data_t));
+	for(int row = 0; row < MAX_ENEMIES; row++) {
+		for(int i = 0; i < NUMBER_OF_BIOMES; i++) {
+			world->enemy_data[row].can_spawn[i] = false;
+			world->enemy_data[row].lowest_level[i] = -1;
+			world->enemy_data[row].highest_level[i]= -1;
+		}
+	}
+	
+	world->class_data = calloc(MAX_CLASSES, sizeof(class_data_t));
 	
 	world->max_message_storage = DEFAULT_MAX_MESSAGE_STORAGE;
 	world->messages_size = 0;
@@ -88,7 +96,7 @@ int main(int argc, char *argv[]) {
 			break;
 		}
 	}
-	player->health = player->constitution * 10;
+	player->health = player->constitution * 1000;
 	player->max_health = player->constitution * 10;
 	player->global_x = 0;
 	player->global_y = 0;
@@ -127,7 +135,7 @@ int main(int argc, char *argv[]) {
 	world->seed = TEST_SEED;
 	room_t first = setup_first_room(&world->seed, 0, 0, world->enemy_data);
 	first.enemies = calloc(MAX_ENEMIES_PER_LEVEL, sizeof(enemy_t *));
-	first.enemies[0] = enemy_spawn(SLIME, world->enemy_data, 1, 1);
+	first.enemies[0] = enemy_spawn(BAT, world->enemy_data, 1, 1);
 	
 	first.current_enemy_count++;
 	

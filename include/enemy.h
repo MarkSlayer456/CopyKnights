@@ -2,6 +2,9 @@
 
 #define ENEMY_H_
 
+#include "map_manager.h"
+#include <stdbool.h>
+
 #define MAX_ENEMIES							100
 
 #define ENEMY_TYPE_COUNT					17
@@ -28,6 +31,8 @@
 typedef struct world world_t;
 typedef struct player player_t;
 typedef enum direction direction_t;
+
+typedef enum biome biome_t;
 
 typedef enum trait {
 	PASSIVE = 80000,
@@ -87,6 +92,9 @@ typedef struct enemy_data {
 	int level;
 	char symbol;
 	trait_t trait;
+	bool can_spawn[NUMBER_OF_BIOMES];
+	int highest_level[NUMBER_OF_BIOMES];
+	int lowest_level[NUMBER_OF_BIOMES];
 } enemy_data_t;
 
 typedef struct enemy_type_map {
@@ -103,9 +111,13 @@ const char *enemy_get_name(enemy_type_t type);
 
 enemy_type_t enemy_get_type(const char *name);
 
-enemy_type_t enemy_generate_type(unsigned int *seed);
+enemy_type_t enemy_generate_type(unsigned int *seed, enemy_data_t *enemy_data, biome_t biome);
 
 void load_enemy_data(enemy_data_t *enemy_data);
+
+void load_biome_data(enemy_data_t *enemy_data);
+
+biome_t get_biome(const char *name);
 
 void enemy_kill(enemy_t *enemy, world_t *world, player_t *player);
 
