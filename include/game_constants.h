@@ -44,6 +44,7 @@
 
 
 #define MAX_ITEM_NAME_LENGTH					32
+#define MAX_ITEM_STACK							99
 #define DEFAULT_MAX_MESSAGE_STORAGE				1000
 #define MAX_MESSAGE_LENGTH						59
 #define MAX_MESSAGE_LENGTH_WITHOUT_PREFIX		47
@@ -94,7 +95,7 @@
 #define MUD_CRAWLER_ENEMY_NAME				"Mud Crawler"
 #define BOG_LURKER_ENEMY_NAME				"Bog Lurker"
 
-#define INV_SIZE		128
+#define INV_SIZE					128
 
 #define BLANK_NAME					"Blank"
 #define TELEPORT_SCROLL_NAME		"Teleport Scroll"
@@ -132,3 +133,6 @@
 
 #define WORLD_HEIGHT				100
 #define WORLD_WIDTH					100
+
+#define SCREEN_WIDTH				80
+#define SCREEN_HEIGHT				24

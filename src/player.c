@@ -107,7 +107,7 @@ void load_class_data(class_data_t *class_data) {
 
 char player_get_current_pos(player_t *player, world_t *world)
 {
-	return world->room[player->global_x][player->global_y]->layout[player->y][player->x];
+	return world->room[player->global_x][player->global_y]->tiles[player->y][player->x]->floor;
 }
 
 void player_move_left(player_t *player, world_t *world)
@@ -200,7 +200,7 @@ char player_check_dir(player_t *player, world_t *world, direction_t dir) {
 		}  
 	}
 	if(y <= ROOM_HEIGHT && x <= ROOM_WIDTH) {
-		return room->layout[y][x];
+		return room->tiles[y][x]->floor;
 	} else {
 		return ' ';
 	}
@@ -363,14 +363,20 @@ void player_cycle_action_bar_up(player_t *player)
 void player_cycle_inv_selector_up(player_t *player)
 {
 	if(player->action_bar.inv_selector > 0) {
+		if(player->action_bar.inv_selector - player->inv_offset == 0) {
+			player->inv_offset--;
+		}
 		player->action_bar.inv_selector--;
 	}
-		
 }
 
 void player_cycle_inv_selector_down(player_t *player)
 {
+	int visible_item_count = SCREEN_HEIGHT-2;
 	if(player->inventory[player->action_bar.inv_selector+1].id != BLANK) {
+		if(player->action_bar.inv_selector - player->inv_offset >= visible_item_count-1) {
+			player->inv_offset++;
+		}
 		player->action_bar.inv_selector++;
 	}
 }
@@ -378,7 +384,7 @@ void player_cycle_inv_selector_down(player_t *player)
 void player_open_inventory(player_t *player)
 {
 	player->action_bar.inv_open = 1;
-	hud_update_action_bar(player);
+	//hud_update_action_bar(player);
 }
 
 void player_close_inventory(player_t *player)

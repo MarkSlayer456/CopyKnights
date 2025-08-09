@@ -20,17 +20,15 @@ typedef enum biome {
 typedef struct tile {
 	char floor; // what the floor tile is
 	bool has_light; // does this tile have light
-	enemy_t *enemies[MAX_ENEMIES_PER_TILE]; // enemies on this tile
 	item_t *items[MAX_ITEMS_PER_TILE]; // list of items on this tile
 } tile_t;
 
 typedef struct room {
-	enemy_t **enemies;
+	tile_t *tiles[ROOM_WIDTH][ROOM_HEIGHT];
+	enemy_t *enemies[MAX_ENEMIES_PER_LEVEL]; 
 	int current_enemy_count;
-	char **layout; // what the floor looks like
 	bool is_created; // TODO what is this?
 	int global_time;
-	tile_t *tiles[ROOM_WIDTH][ROOM_HEIGHT];
 	biome_t biome;
 } room_t;
 //TODO these should return pointers not room_t this causes lots of copying that pointers don't

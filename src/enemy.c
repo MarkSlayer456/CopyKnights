@@ -337,7 +337,7 @@ char enemy_check_dir(enemy_t *enemy, world_t *world, player_t *player, direction
     if(dir == UP) y--;
     room_t *room = world->room[player->global_x][player->global_y];
     if(x > 0 && y > 0) {
-        return room->layout[y][x];
+        return room->tiles[y][x]->floor;
     }
     return ' ';
 }

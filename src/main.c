@@ -21,8 +21,9 @@
 */
 
 WINDOW *hud; // gives player useful information
-WINDOW *action_bar; // player's inventory/spells menu, maybe a help menu in the furture
+WINDOW *action_bar; // OLG player's inventory/spells menu, maybe a help menu in the furture
 WINDOW *error; // USED FOR ERROR CHECKING ONLY
+WINDOW *inventory_hud; // player's inventory
 char walk_chars[WALK_CHAR_LENGTH] = {EMPTY, 0, DOOR, MUD, CHEST}; // characters entites can walk on
 
 int main(int argc, char *argv[]) {
@@ -31,8 +32,10 @@ int main(int argc, char *argv[]) {
     initscr();
     curs_set(0);
 	win = newwin(20, 20, 0, 0);
+	box(win,0,0);
     hud = newwin(HUD_HEIGHT, HUD_WIDTH, 0, 21);
 	action_bar = newwin(5, 21, 21, 0);
+	inventory_hud = newwin(24, 80, 0, 0);
     error = newwin(25, 25, 51, 30);
     
     refresh();
@@ -104,6 +107,7 @@ int main(int argc, char *argv[]) {
 	player->action_points = 0;
 	player->level = 1;
 	player->xp = 0;
+	player->inv_offset = 0;
 	
 	player->inventory = malloc(INV_SIZE * sizeof(item_t));
 	
@@ -121,6 +125,10 @@ int main(int argc, char *argv[]) {
 	player->inventory[1] = test_item2;
 	
 	player->inventory[2] = test_item3;
+	
+	for(int i = 3; i < INV_SIZE; i++) {
+		player->inventory[i] = test_item3;
+	}
 
 	world->isPlayerTurn = 1;
 
@@ -133,16 +141,18 @@ int main(int argc, char *argv[]) {
 	}
 	world->seed = TEST_SEED;
 	room_t *first = setup_first_room(&world->seed, 0, 0, world->enemy_data);
-	first->enemies = calloc(MAX_ENEMIES_PER_LEVEL, sizeof(enemy_t *));
 	first->enemies[0] = enemy_spawn(BAT, world->enemy_data, 1, 1);
 	
 	first->current_enemy_count++;
 	
+	first->tiles[1][1]->items[0] = calloc(1, sizeof(item_t));
+	strcpy(first->tiles[1][1]->items[0]->name, APPLE_NAME);
+	first->tiles[1][1]->items[0]->stack = 1;
+	first->tiles[1][1]->items[0]->id = APPLE;
 	world->room[0][0] = first;
 	
 	world->win = win;
     world->turn_order_size = 0;
-	// memset(world->turn_order, 0, (MAX_ENEMIES_PER_LEVEL+1) * sizeof(int));
 	for(;;) {
 		calculate_light(world, player);
     	draw(world, player);
@@ -157,7 +167,7 @@ int main(int argc, char *argv[]) {
 		int turn_index = world->turn_order[0];
 		assert(turn_index >= PLAYER_TURN_ORDER_INDEX);
 		if(turn_index == PLAYER_TURN_ORDER_INDEX) {
-			display_combat_message(world, player, MESSAGE_IS_PLAYERS_TURN);
+			//display_combat_message(world, player, MESSAGE_IS_PLAYERS_TURN);
 			char c = getch();
 			manage_input(c, world, player);
 		} else {

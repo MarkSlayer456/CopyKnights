@@ -29,18 +29,14 @@ room_t *load_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data)
 	DEBUG_LOG("(x,y): (%d,%d)", x, y);
 	room_t *room = calloc(1, sizeof(room_t));
 	room->is_created = true;
-	room->layout = calloc(ROOM_HEIGHT, sizeof(char *));
 	for(int y = 0; y < ROOM_HEIGHT; y++) {
 		for(int x = 0; x < ROOM_WIDTH; x++) {
 			room->tiles[y][x] = calloc(1, sizeof(tile_t));
+			for(int i = 0; i < MAX_ITEMS_PER_TILE; i++) {
+				room->tiles[y][x]->items[i] = calloc(1, sizeof(item_t));
+			}
 		}
 	}
-			
-	for(int i = 0; i < ROOM_HEIGHT; i++) {
-		room->layout[i] = calloc(ROOM_WIDTH+1, sizeof(char));
-	}
-	room->enemies = calloc(MAX_ENEMIES_PER_LEVEL, sizeof(enemy_t *));
-	//TODO this is wrong room.tiles.enemies = calloc(MAX_ENEMIES_PER_LEVEL, sizeof(enemy_t *));
 	room->current_enemy_count = 0;
 	int depth = (int) sqrt(x*x + y*y);
 	char folder[32] = "";
@@ -91,23 +87,23 @@ room_t *load_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data)
 	char *tok = strtok(buf, "\n");
 	while(tok != NULL) {
 		DEBUG_LOG("tok = %s | i = %d", tok, i);
-/*		for(int j = 0; j < strlen(tok); j++) {
+		for(int j = 0; j < strlen(tok); j++) {
 			switch(tok[j]) {
 				case POTENTIAL_ENEMY_SPAWN_CHAR:
-					room.tile[i][j].enemies[room.current_enemy_count] = enemy_spawn(enemy_generate_type(&enemy_seed, enemy_data, room.biome), enemy_data, j, i);
-					room.tile[i][j].floor = EMPTY;
-					room.current_enemy_count++;
+					room->enemies[room->current_enemy_count] = enemy_spawn(enemy_generate_type(&enemy_seed, enemy_data, room->biome), enemy_data, j, i);
+					room->tiles[i][j]->floor = EMPTY;
+					room->current_enemy_count++;
 					break;
 				case POTENTIAL_CHEST_SPAWN_CHAR:
 					break;
 				case POTENTIAL_TRAP_SPAWN_CHAR:
 					break;
 				default:
-					room.tile.floor = tok[i];
+					room->tiles[i][j]->floor = tok[j];
 					break;
 			}
-		}*/ // TODO when i delete layout this will be what i use instead
-		strcpy(room->layout[i], tok);
+		}
+		/*strcpy(room->layout[i], tok);
 		for(int j = 0; j < strlen(room->layout[i]); j++) {
 			//TODO make this a chance not a 100%
 			switch(room->layout[i][j]) {
@@ -121,7 +117,7 @@ room_t *load_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data)
 				case POTENTIAL_TRAP_SPAWN_CHAR:
 					break;
 			}
-		}
+		}*/
 		tok = strtok(NULL, "\n");
 		i++;
 	}

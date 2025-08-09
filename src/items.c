@@ -56,6 +56,8 @@ int use_item(player_t *player)
 				success = 0;
 		}
 		remove_item(player);
+		player_close_inventory(player);
+		player_close_action_bar(player);
 	}
 	return success;
 }

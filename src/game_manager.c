@@ -13,50 +13,55 @@
 
 //wmove(win, x, y);
 //waddch(win, char);
-extern WINDOW *hud;
-extern WINDOW *action_bar;
+extern WINDOW *hud, *action_bar, *inventory_hud;
 extern char walk_chars[WALK_CHAR_LENGTH];
 
 void draw(world_t *world, player_t *player) {
 	werase(world->win);
 	werase(hud);
 	werase(action_bar);
+	werase(inventory_hud);
 	// draw stuff...
-    // TODO add just a hud_update() function so you don't have to call a bunch of different functions
-	hud_update_player_health(player);
-    hud_update_nearby_enemies(world, player);
-	hud_update_action_bar(player);
-	hud_update_messages(world, player);
-	room_t *room = world->room[player->global_x][player->global_y];
-	for(int i = 0; i < ROOM_HEIGHT; i++) {
-		for(int j = 0; j < ROOM_WIDTH; j++) {
-			if(room->tiles[i][j]->has_light == false) {
-				continue;
-			}
-			int enemyIsThere = 0;
-			int playerIsThere = 0;
-			wmove(world->win, i, j);
-			for(int u = 0; u < room->current_enemy_count; u++) {
-				if(room->enemies[u] == NULL) continue;
-				if(room->enemies[u]->x == j && room->enemies[u]->y == i) {
-					waddch(world->win, room->enemies[u]->symbol);
-					enemyIsThere = 1;
-					break;
+	if((player->action_bar.inv_open || player->action_bar.spells_open || player->action_bar.loot_open) || player->action_bar.selector != NOT_OPEN) {
+		display_inventory_hud(world, player);
+		wnoutrefresh(inventory_hud);
+	} else {
+		// TODO add just a hud_update() function so you don't have to call a bunch of different functions
+		room_t *room = world->room[player->global_x][player->global_y];
+		hud_update_player_health(player);
+		hud_update_nearby_enemies(world, player);
+		hud_update_action_bar(player, room);
+		hud_update_messages(world, player);
+		for(int i = 0; i < ROOM_HEIGHT; i++) {
+			for(int j = 0; j < ROOM_WIDTH; j++) {
+				if(room->tiles[i][j]->has_light == false) {
+					continue;
+				}
+				int enemyIsThere = 0;
+				int playerIsThere = 0;
+				wmove(world->win, i, j);
+				for(int u = 0; u < room->current_enemy_count; u++) {
+					if(room->enemies[u] == NULL) continue;
+					if(room->enemies[u]->x == j && room->enemies[u]->y == i) {
+						waddch(world->win, room->enemies[u]->symbol);
+						enemyIsThere = 1;
+						break;
+					}
+				}
+				if(player->x == j && player->y == i) {
+					waddch(world->win, PLAYER);
+					playerIsThere = 1;
+				}
+				if(!playerIsThere && !enemyIsThere) {
+					waddch(world->win, room->tiles[i][j]->floor);
 				}
 			}
-			if(player->x == j && player->y == i) {
-				waddch(world->win, PLAYER);
-				playerIsThere = 1;
-			}
-			if(!playerIsThere && !enemyIsThere) {
-				waddch(world->win, room->layout[i][j]);
-			}
 		}
+		wnoutrefresh(inventory_hud); // this has to be first
+		wnoutrefresh(world->win);
+		wnoutrefresh(hud);
+		wnoutrefresh(action_bar);
 	}
-	wnoutrefresh(world->win);
-	wnoutrefresh(hud);
-	wnoutrefresh(action_bar);
-	
 	doupdate();
 	// wrefresh(world->win);
 	// wrefresh(hud);
@@ -119,12 +124,6 @@ void manage_input(char c, world_t *world, player_t *player)
 					break;
 				case ENTER_KEY:
 					use_item(player);
-					//TODO
-// 					if(player->action_bar.selector == INVENTORY) {
-// 						player_open_inventory(player);
-// 					} else if(player->action_bar.selector == SPELLS) {
-// 						player_open_spells(player);
-// 					}
 					break;
 				case KEY_I:
 					//TODO reset defaults
@@ -138,7 +137,7 @@ void manage_input(char c, world_t *world, player_t *player)
 				default:
 					break;
 			}
-			hud_update_action_bar(player);
+			hud_update_action_bar(player, world->room[player->global_x][player->global_y]);
 		} else if(player->action_bar.spells_open) {
 			
 		} else {
@@ -205,7 +204,7 @@ void display_world_message(world_t *world, player_t *player, const char *str) {
 }
 
 bool is_opaque(room_t *room, int x, int y) {
-	char a = room->layout[y][x];
+	char a = room->tiles[y][x]->floor;
 	for(int i = 0; i < WALK_CHAR_LENGTH; i++) {
 		if(a == walk_chars[i] || a == PLAYER) { // the space is open
 			return false;
@@ -308,12 +307,12 @@ void end_game(world_t *world, player_t *player) {
 
 void shutdown(world_t *world) {
 	endwin();
-	for(int i = 0; i < ROOM_WIDTH; i++) {
-		free(world->room[i]);
+	for(int y = 0; y < ROOM_HEIGHT; y++) {
+		for(int x = 0; x < ROOM_WIDTH; x++) {
+			free(world->room[y][x]);
+		}
 	}
-	free(world->room);
 	free(world);
-	printf("too bad nurd, GIT GUD!\n");
 	exit(0);
 }
 

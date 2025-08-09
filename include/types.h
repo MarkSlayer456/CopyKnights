@@ -50,6 +50,7 @@ typedef enum inventory_category {
 } inv_cat_t;
 
 typedef struct action_bar {
+	//TODO these 3 bools should be 1 enum, less juggling just better in every way
 	bool inv_open; // is inventory open
 	bool spells_open; // is options open
 	bool loot_open; // is a loot tile open
@@ -109,6 +110,7 @@ typedef struct player {
 	int *max_mana;
 	int action_points;
 	class_type_t player_class;
+	int inv_offset;
 	
 	action_bar_t action_bar;
 } player_t;

@@ -7,8 +7,7 @@
 #include <string.h>
 #include "types.h"
 
-extern WINDOW *hud;
-extern WINDOW *action_bar;
+extern WINDOW *hud, *action_bar, *inventory_hud;
 
 void hud_update_player_health(player_t *player) {
 	wmove(hud, 0, 0);
@@ -89,7 +88,7 @@ void hud_update_nearby_enemies(world_t *world, player_t *player) {
         // create a cords system so you can give there location so players know what they're looking at
 }
 
-void hud_update_action_bar(player_t *player) {
+void hud_update_action_bar(player_t *player, room_t *room) {
 	wmove(action_bar, 0, 0);
 	if(player->action_bar.inv_open) {
 		int add_size = 8;
@@ -107,6 +106,9 @@ void hud_update_action_bar(player_t *player) {
 	} else if(player->action_bar.spells_open) {
 		// TODO display player's spells
 	} else if(player->action_bar.loot_open) { 
+		for(int i = 0; i < MAX_ITEMS_PER_TILE; i++) {
+			item_t *item = room->tiles[player->y][player->x]->items[i];
+		}
 		// TODO
 	} else {
 		char inv[12] = "inventory";
@@ -160,3 +162,76 @@ void display_error_message(const char *str) {
 	wprintw(hud, message);
 }
 
+void display_inventory_hud(world_t *world, player_t *player) {
+	room_t *room = world->room[player->global_x][player->global_y];
+	box(inventory_hud, 0, 0);
+	char inv_str[32] = "Inventory";
+	mvwprintw(inventory_hud, 0, (39-strlen(inv_str))/2, inv_str);
+	char loot_str[32] = "Nearby Loot";
+	mvwprintw(inventory_hud, 0, SCREEN_WIDTH-(SCREEN_WIDTH/4)-(strlen(loot_str))/2, loot_str);
+	for (int y = 0; y < SCREEN_HEIGHT; y++) {
+		mvwaddch(inventory_hud, y, 39, '|');  // vertical divider at col 39
+	}
+	if(player->action_bar.inv_open) {
+		int add_size = 8;
+		char item_name[MAX_ITEM_NAME_LENGTH+add_size];
+		int visible_item_count = SCREEN_HEIGHT-2;
+		int pos = 1;
+		int loot_pos = 1;
+		
+		int start_y = player->y - 1;
+		int start_x = player->x - 1;
+		int end_y = player->y + 1;
+		int end_x = player->x + 1;
+		
+		if (start_y < 0) start_y = 0;
+		if (start_x < 0) start_x = 0;
+		if (end_y >= ROOM_HEIGHT) end_y = ROOM_HEIGHT - 1;
+		if (end_x >= ROOM_WIDTH) end_x = ROOM_WIDTH - 1;
+		
+		for(int y = start_y; y <= end_y; y++) {
+			for(int x = start_x; x <= end_x; x++) {
+				for(int i = 0; i < MAX_ITEMS_PER_TILE; i++) {
+					item_t *item = room->tiles[y][x]->items[i];
+					if(item->stack == 0) continue; //TODO this should probaly just break
+					snprintf(item_name, MAX_ITEM_NAME_LENGTH+add_size, "%s x%d\0", item->name, item->stack);
+					mvwprintw(inventory_hud, loot_pos++, SCREEN_WIDTH/2, item_name);
+				}
+			}
+		}
+		for(int i = player->inv_offset; i < visible_item_count+player->inv_offset; i++) {
+			if(player->inventory[i].stack == 0) continue; //TODO this should probaly just break
+			if(i == player->action_bar.inv_selector && player->action_bar.inv_open) {
+				snprintf(item_name, MAX_ITEM_NAME_LENGTH+add_size, ">>%s x%d\0", player->inventory[i].name, player->inventory[i].stack);
+			} else {
+				snprintf(item_name, MAX_ITEM_NAME_LENGTH+add_size, "%s x%d\0", player->inventory[i].name, player->inventory[i].stack);
+			}
+			mvwprintw(inventory_hud, pos++, 1, item_name);
+		}
+		// TODO display player's inventory
+	} else if(player->action_bar.spells_open) {
+		// TODO display player's spells
+	} else if(player->action_bar.loot_open) { 
+		
+		for(int i = 0; i < MAX_ITEMS_PER_TILE; i++) {
+			item_t *item = room->tiles[player->y][player->x]->items[i];
+		}
+		// TODO
+	} else {
+		werase(inventory_hud);
+		char inv[12] = "inventory";
+		char spells[9] = "spells";
+		switch(player->action_bar.selector) {
+			case INVENTORY:
+				snprintf(inv, 12, "%s", ">>inventory");
+				break;
+			case SPELLS:
+				snprintf(spells, 9, "%s", ">>spells");
+				break;
+			case NOT_OPEN:
+				break;
+		}
+		mvwprintw(inventory_hud, 1, 1, inv);
+		mvwprintw(inventory_hud, 2, 1, spells);
+	}
+}
