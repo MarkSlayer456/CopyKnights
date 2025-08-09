@@ -8,6 +8,7 @@
 #include <string.h>
 #include <time.h>
 #include <assert.h>
+#include "types.h"
 
 extern char walk_chars[WALK_CHAR_LENGTH];
 enemy_type_map_t biome_type_map[] = {
@@ -254,7 +255,7 @@ void load_enemy_data(enemy_data_t *enemy_data) {
 
 void enemy_kill(enemy_t *enemy, world_t *world, player_t *player) 
 {
-    room_t *room = &world->room[player->global_x][player->global_y];
+    room_t *room = world->room[player->global_x][player->global_y];
 	// int found = 0;
 	for(int i = 0; i < room->current_enemy_count; i++) {
 		if(enemy == room->enemies[i]) {
@@ -334,7 +335,7 @@ char enemy_check_dir(enemy_t *enemy, world_t *world, player_t *player, direction
     if(dir == RIGHT) x++;
     if(dir == DOWN) y++;
     if(dir == UP) y--;
-    room_t *room = &world->room[player->global_x][player->global_y];
+    room_t *room = world->room[player->global_x][player->global_y];
     if(x > 0 && y > 0) {
         return room->layout[y][x];
     }

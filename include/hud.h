@@ -1,15 +1,6 @@
 #ifndef HUD_H_
 #define HUD_H_
-#include "game_manager.h"
-
-#define HUD_WIDTH					59
-#define HUD_HEIGHT					24
-
-#define PLAYER_STATS_HUD_SPACE		7
-#define ENEMY_STATS_HUD_SPACE		7
-#define MESSAGE_HUD_SPACE			10
-#define HUD_LENGTH					50
-
+#include "types.h"
 
 void hud_update_player_health(player_t *player);
 void hud_update_nearby_enemies(world_t *world, player_t *player);

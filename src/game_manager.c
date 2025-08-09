@@ -9,6 +9,7 @@
 #include <ncurses.h>
 #include <stdlib.h>
 #include <string.h>
+#include "types.h"
 
 //wmove(win, x, y);
 //waddch(win, char);
@@ -26,10 +27,10 @@ void draw(world_t *world, player_t *player) {
     hud_update_nearby_enemies(world, player);
 	hud_update_action_bar(player);
 	hud_update_messages(world, player);
-	room_t *room = &world->room[player->global_x][player->global_y];
+	room_t *room = world->room[player->global_x][player->global_y];
 	for(int i = 0; i < ROOM_HEIGHT; i++) {
 		for(int j = 0; j < ROOM_WIDTH; j++) {
-			if(room->has_light[i][j] == false) {
+			if(room->tiles[i][j]->has_light == false) {
 				continue;
 			}
 			int enemyIsThere = 0;
@@ -214,7 +215,7 @@ bool is_opaque(room_t *room, int x, int y) {
 }
 
 void mark_has_light(room_t *room, int x, int y) {
-	room->has_light[y][x] = true;
+	room->tiles[y][x]->has_light = true;
 }
 
 void cast_light_check(world_t *world, player_t *player, int x0, int y0, float angle) {
@@ -231,7 +232,7 @@ void cast_light_check(world_t *world, player_t *player, int x0, int y0, float an
 		if(tile_x > ROOM_WIDTH-1 || tile_y > ROOM_HEIGHT-1 || tile_y < 0 || tile_x < 0) {
 			break;
 		}
-		room_t *room = &world->room[player->global_x][player->global_y];
+		room_t *room = world->room[player->global_x][player->global_y];
 		
 		mark_has_light(room, tile_x, tile_y);
 		
@@ -247,7 +248,7 @@ void cast_light_check(world_t *world, player_t *player, int x0, int y0, float an
 void calculate_light(world_t *world, player_t *player) {
 	for(int i = 0; i < ROOM_HEIGHT; i++) {
 		for(int j = 0; j < ROOM_WIDTH; j++) {
-			world->room[player->global_x][player->global_y].has_light[i][j] = false;
+			world->room[player->global_x][player->global_y]->tiles[i][j]->has_light = false;
 		}
 	}
 	for(float a = 0; a < 2 * M_PI; a += 0.03f) {
@@ -265,8 +266,8 @@ int pick_next_actor(world_t *world, player_t *player) {
 			idx = PLAYER_TURN_ORDER_INDEX;
 		}
 		
-		for(int i = 0; i < world->room[player->global_x][player->global_y].current_enemy_count; i++) {
-			enemy_t *enemy = world->room[player->global_x][player->global_y].enemies[i];
+		for(int i = 0; i < world->room[player->global_x][player->global_y]->current_enemy_count; i++) {
+			enemy_t *enemy = world->room[player->global_x][player->global_y]->enemies[i];
 			if(enemy == NULL) continue;
 			enemy->action_points += enemy->speed;
 			if(enemy->action_points >= TIME_TO_ACT) {
@@ -282,7 +283,7 @@ int pick_next_actor(world_t *world, player_t *player) {
 		if(idx == PLAYER_TURN_ORDER_INDEX) {
 			player->action_points -= TIME_TO_ACT;
 		} else {
-			enemy_t *enemy = world->room[player->global_x][player->global_y].enemies[idx];
+			enemy_t *enemy = world->room[player->global_x][player->global_y]->enemies[idx];
 			enemy->action_points -= TIME_TO_ACT;
 		}
 		if(idx != INVALID_ACTOR_INDEX) break;
@@ -294,10 +295,10 @@ void turn_order_enter_new_room(world_t *world, player_t *player) {
 	memset(world->turn_order, 0, (MAX_ENEMIES_PER_LEVEL+1) * sizeof(int));
 	world->turn_order_size = 1; // the player hasn't finished his turn yet, so this needs to be 1 not 0
 	player->action_points = 0;
-	assert(world->room[player->global_x][player->global_y].is_created);
-	for(int i = 0; i < world->room[player->global_x][player->global_y].current_enemy_count; i++) {
-		if(world->room[player->global_x][player->global_y].enemies[i] == NULL) continue;
-		world->room[player->global_x][player->global_y].enemies[i]->action_points = 0;
+	assert(world->room[player->global_x][player->global_y]->is_created);
+	for(int i = 0; i < world->room[player->global_x][player->global_y]->current_enemy_count; i++) {
+		if(world->room[player->global_x][player->global_y]->enemies[i] == NULL) continue;
+		world->room[player->global_x][player->global_y]->enemies[i]->action_points = 0;
 	}
 }
 

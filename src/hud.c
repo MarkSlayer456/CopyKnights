@@ -1,9 +1,12 @@
 #include "hud.h"
 #include "game_manager.h"
+#include "map_manager.h"
 #include "items.h"
 #include "player.h"
 #include <stdlib.h>
 #include <string.h>
+#include "types.h"
+
 extern WINDOW *hud;
 extern WINDOW *action_bar;
 
@@ -51,7 +54,7 @@ void hud_update_player_health(player_t *player) {
 
 void hud_update_nearby_enemies(world_t *world, player_t *player) {
 	int detect_radius = 6;
-	room_t *room = &world->room[player->global_x][player->global_y];
+	room_t *room = world->room[player->global_x][player->global_y];
 	
 	wmove(hud, PLAYER_STATS_HUD_SPACE, 0);
 	char str6[128];

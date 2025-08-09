@@ -14,6 +14,7 @@
 #include "items.h"
 #include "enemy.h"
 #include "hud.h"
+#include "types.h"
 
 /*
 	Top down dungeon crawler
@@ -125,19 +126,17 @@ int main(int argc, char *argv[]) {
 
 	world->turn_order = calloc(MAX_ENEMIES_PER_LEVEL+1, sizeof(int));
 	world->turn_order_size = 0;
-	world->room = calloc(100, sizeof(room_t *));
-	for(int i = 0; i < 100; i++) {
-		world->room[i] = calloc(100, sizeof(room_t));
-		for(int j = 0; j < 100; j++) {
-			world->room[i][j].is_created = false; // TODO what is this?
+	for(int y = 0; y < WORLD_HEIGHT; y++) {
+		for(int x = 0; x < WORLD_WIDTH; x++) {
+			world->room[y][x] = calloc(1, sizeof(room_t));
 		}
 	}
 	world->seed = TEST_SEED;
-	room_t first = setup_first_room(&world->seed, 0, 0, world->enemy_data);
-	first.enemies = calloc(MAX_ENEMIES_PER_LEVEL, sizeof(enemy_t *));
-	first.enemies[0] = enemy_spawn(BAT, world->enemy_data, 1, 1);
+	room_t *first = setup_first_room(&world->seed, 0, 0, world->enemy_data);
+	first->enemies = calloc(MAX_ENEMIES_PER_LEVEL, sizeof(enemy_t *));
+	first->enemies[0] = enemy_spawn(BAT, world->enemy_data, 1, 1);
 	
-	first.current_enemy_count++;
+	first->current_enemy_count++;
 	
 	world->room[0][0] = first;
 	
@@ -162,7 +161,7 @@ int main(int argc, char *argv[]) {
 			char c = getch();
 			manage_input(c, world, player);
 		} else {
-			enemy_t *enemy = world->room[player->global_x][player->global_y].enemies[turn_index];
+			enemy_t *enemy = world->room[player->global_x][player->global_y]->enemies[turn_index];
 			if(enemy == NULL) {
 				for(int k = 0; k < world->turn_order_size-1; k++) {
 					world->turn_order[k] = world->turn_order[k + 1];

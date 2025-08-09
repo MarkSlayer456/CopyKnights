@@ -1,5 +1,6 @@
 #include "player.h"
 #include "game_manager.h"
+#include "map_manager.h"
 #include "functions.h"
 #include "enemy.h"
 #include "hud.h"
@@ -8,6 +9,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include "types.h"
 
 #define MIN(a,b)       (a < b) ? a : b
 
@@ -105,7 +107,7 @@ void load_class_data(class_data_t *class_data) {
 
 char player_get_current_pos(player_t *player, world_t *world)
 {
-	return world->room[player->global_x][player->global_y].layout[player->y][player->x];
+	return world->room[player->global_x][player->global_y]->layout[player->y][player->x];
 }
 
 void player_move_left(player_t *player, world_t *world)
@@ -119,7 +121,7 @@ void player_move_left(player_t *player, world_t *world)
 				return;
 			}
 			player->global_x--;
-			if(!world->room[player->global_x][player->global_y].is_created) {
+			if(!world->room[player->global_x][player->global_y]->is_created) {
 				world->room[player->global_x][player->global_y] = generate_room(&world->seed, player->global_x, player->global_y, world->enemy_data);
 			}
 			turn_order_enter_new_room(world, player);
@@ -135,7 +137,7 @@ void player_move_right(player_t *player, world_t *world)
 		player->x += 1;
 		if(player_get_current_pos(player, world) == DOOR) {
 			player->global_x++;
-			if(!world->room[player->global_x][player->global_y].is_created) {
+			if(!world->room[player->global_x][player->global_y]->is_created) {
 				world->room[player->global_x][player->global_y] = generate_room(&world->seed, player->global_x, player->global_y, world->enemy_data);
 			}
 			turn_order_enter_new_room(world, player);
@@ -151,7 +153,7 @@ void player_move_down(player_t *player, world_t *world)
 		player->y += 1;
 		if(player_get_current_pos(player, world) == DOOR) {
 			player->global_y++;
-			if(!world->room[player->global_x][player->global_y].is_created) {
+			if(!world->room[player->global_x][player->global_y]->is_created) {
 				world->room[player->global_x][player->global_y] = generate_room(&world->seed, player->global_x, player->global_y, world->enemy_data);
 			}
 			turn_order_enter_new_room(world, player);
@@ -172,7 +174,7 @@ void player_move_up(player_t *player, world_t *world)
 				return;
 			}
 			player->global_y--;
-			if(!world->room[player->global_x][player->global_y].is_created) {
+			if(!world->room[player->global_x][player->global_y]->is_created) {
 				world->room[player->global_x][player->global_y] = generate_room(&world->seed, player->global_x, player->global_y, world->enemy_data);
 			}
 			turn_order_enter_new_room(world, player);
@@ -190,7 +192,7 @@ char player_check_dir(player_t *player, world_t *world, direction_t dir) {
 	if(dir == DOWN) y++;
 	if(dir == UP) y--;
 	
-	room_t *room = &world->room[player->global_x][player->global_y];
+	room_t *room = world->room[player->global_x][player->global_y];
 	for(int i = 0; i < room->current_enemy_count; i++) {
 		if(room->enemies[i] == NULL) continue;
 		if(y == room->enemies[i]->y && x == room->enemies[i]->x) {
@@ -246,7 +248,7 @@ enemy_t *player_get_dir_enemy(player_t *player, world_t *world, direction_t dir)
 	if(dir == DOWN) y++;
 	if(dir == UP) y--;
 	
-	room_t *room = &world->room[player->global_x][player->global_y];
+	room_t *room = world->room[player->global_x][player->global_y];
     for(int i = 0; i < room->current_enemy_count; i++) {
 		if(room->enemies[i] == NULL) continue;
 		if(x == room->enemies[i]->x && y == room->enemies[i]->y) {

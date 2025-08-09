@@ -1,52 +1,7 @@
 #ifndef PLAYER_H_
 #define PLAYER_H_
 
-#define NULL_CLASS_NAME					"NULL"
-#define SWORDSMAN_CLASS_NAME			"Swordsman"
-#define BARBARIAN_CLASS_NAME			"Barbarian"
-#define SPEARMAN_CLASS_NAME				"Spearman"
-#define ARCHER_CLASS_NAME				"Archer"
-#define WIZARD_CLASS_NAME				"Wizard"
-#define MERCHANT_CLASS_NAME				"Merchant"
-
-#define BASE_STRENGTH					10
-#define BASE_DEXTERITY					10
-#define BASE_INTELLIGENCE				10
-#define BASE_CONSTITUTION				10
-#define BASE_SPEED						10
-
-#define MAX_CLASSES						32
-
-typedef enum class_type {
-	CLASS_NONE = -1,
-	SWORDSMAN,
-	BARBARIAN,
-	SPEARMAN,
-	ARCHER,
-	WIZARD,
-	MERCHANT,
-} class_type_t;
-
-typedef struct class_data {
-	class_type_t type;
-	int base_strength;
-	int base_dexterity;
-	int base_intelligence;
-	int base_constitution;
-	int base_speed;
-	float growth_strength;
-	float growth_dexterity;
-	float growth_intelligence;
-	float growth_constitution;
-	float growth_speed;
-} class_data_t;
-
-typedef struct class_type_map {
-	const char *name;
-	class_type_t value;
-} class_type_map_t;
-
-#include "game_manager.h"
+#include "types.h"
 
 class_type_t class_get_type(const char *name);
 

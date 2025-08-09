@@ -2,6 +2,7 @@
 #include <string.h>
 #include "items.h"
 #include "player.h"
+#include "types.h"
 
 // takes an item id and returns it's name
 char *get_item_name(item_ids_t item)
