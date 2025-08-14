@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "types.h"
+#include "lantern.h"
 
 //wmove(win, x, y);
 //waddch(win, char);
@@ -48,10 +49,20 @@ void draw(world_t *world, player_t *player) {
 						break;
 					}
 				}
+				
 				if(player->x == j && player->y == i) {
 					waddch(world->win, PLAYER);
 					playerIsThere = 1;
 				}
+				
+				for(int k = 0; k < MAX_ITEMS_PER_TILE; k++) {
+					if(room->tiles[i][j]->items[k]->stack > 0) {
+						waddch(world->win, ITEM_SYMBOL);
+						enemyIsThere = 1; //TODO
+						break;
+					}
+				}
+				
 				if(!playerIsThere && !enemyIsThere) {
 					waddch(world->win, room->tiles[i][j]->floor);
 				}
@@ -68,10 +79,10 @@ void draw(world_t *world, player_t *player) {
 	// wrefresh(action_bar);
 }
 
-void manage_input(char c, world_t *world, player_t *player) 
+bool manage_input(char c, world_t *world, player_t *player) 
 {
 	if (c == ERR) {
-		return;
+		return true;
 	}
 	int x = c;
 	if(c == 27) {
@@ -101,6 +112,9 @@ void manage_input(char c, world_t *world, player_t *player)
 			case KEY_S:
 				player_attack(player, world);
 				break;
+			case KEY_F_MINE:
+				lantern_increase_power(&player->lantern);
+				break;
 			case CTRL_Q:
 				shutdown(world);
 				break;
@@ -110,6 +124,7 @@ void manage_input(char c, world_t *world, player_t *player)
 			default:
 				break;
 		}	
+		return true;
 	} else {
 		if(player->action_bar.inv_open) {
 			switch(x) {
@@ -138,8 +153,9 @@ void manage_input(char c, world_t *world, player_t *player)
 					break;
 			}
 			hud_update_action_bar(player, world->room[player->global_x][player->global_y]);
+			return false;
 		} else if(player->action_bar.spells_open) {
-			
+			return false; 
 		} else {
 			switch(x) {
 				case UP_ARROW:
@@ -163,6 +179,7 @@ void manage_input(char c, world_t *world, player_t *player)
 				default:
 					break;
 			}
+			return false;
 		}
 	}
 }
@@ -222,7 +239,7 @@ void cast_light_check(world_t *world, player_t *player, int x0, int y0, float an
 	float dy = sin(angle);
 	float x = x0 + 0.3f;
 	float y = y0 + 0.3f;
-	int max_distance = 5; // this will be a value from the player later
+	int max_distance = player->lantern.power > PLAYER_MIN_VISION_RANGE ? player->lantern.power : PLAYER_MIN_VISION_RANGE;
 	
 	for(int i = 0; i < max_distance; i++) {
 		int tile_x = (int)x;
@@ -290,9 +307,48 @@ int pick_next_actor(world_t *world, player_t *player) {
 	return idx;
 }
 
+void generate_turn_order_display(world_t *world, player_t *player) {
+	int projected_enemy_ap[MAX_ENEMIES_PER_LEVEL];
+	int player_projected_ap = player->action_points;
+	world->turn_order_size = 0;
+	room_t *room = world->room[player->global_x][player->global_y];
+	for(int i = 0; i < room->current_enemy_count; i++) {
+		enemy_t *enemy = room->enemies[i];
+		if(enemy == NULL) continue;
+		projected_enemy_ap[i] = enemy->action_points;
+	}
+	while(world->turn_order_size < MAX_ENEMIES_PER_LEVEL) {
+		int largest = 0;
+		int idx = INVALID_ACTOR_INDEX;
+		player_projected_ap += player->speed;
+		if(player_projected_ap >= TIME_TO_ACT && player_projected_ap > largest) {
+			largest = player_projected_ap;
+			idx = PLAYER_TURN_ORDER_INDEX;
+		}
+		
+		room_t *room = world->room[player->global_x][player->global_y];
+		for(int i = 0; i < room->current_enemy_count; i++) {
+			enemy_t *enemy = room->enemies[i];
+			if(enemy == NULL) continue;
+			projected_enemy_ap[i] += enemy->speed;
+			if(projected_enemy_ap[i] >= TIME_TO_ACT && projected_enemy_ap[i] > largest) {
+				largest = projected_enemy_ap[i];
+				idx = i;
+			}
+		}
+		
+		if(idx == INVALID_ACTOR_INDEX) {
+			continue;
+		} else if(idx == PLAYER_TURN_ORDER_INDEX) {
+			player_projected_ap -= TIME_TO_ACT;
+		} else {
+			projected_enemy_ap[idx] -= TIME_TO_ACT;
+		}
+		world->turn_order[world->turn_order_size++] = idx;
+	}
+}
+
 void turn_order_enter_new_room(world_t *world, player_t *player) {
-	memset(world->turn_order, 0, (MAX_ENEMIES_PER_LEVEL+1) * sizeof(int));
-	world->turn_order_size = 1; // the player hasn't finished his turn yet, so this needs to be 1 not 0
 	player->action_points = 0;
 	assert(world->room[player->global_x][player->global_y]->is_created);
 	for(int i = 0; i < world->room[player->global_x][player->global_y]->current_enemy_count; i++) {

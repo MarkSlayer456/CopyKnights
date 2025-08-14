@@ -4,33 +4,45 @@
 #include "player.h"
 #include "types.h"
 
-// takes an item id and returns it's name
-char *get_item_name(item_ids_t item)
-{
-	char *name = calloc(32, sizeof(char));
-	switch(item) {
-		case BLANK:
-			strncpy(name, BLANK_NAME, strlen(BLANK_NAME)+1);
-			break;
-		case TELEPORT_SCROLL:
-			strncpy(name, TELEPORT_SCROLL_NAME, strlen(TELEPORT_SCROLL_NAME)+1);
-			break;
-		case HEALTH_POTION:
-			strncpy(name, HEALTH_POTION_NAME, strlen(HEALTH_POTION_NAME)+1);
-			break;
-		case APPLE:
-			strncpy(name, APPLE_NAME, strlen(APPLE_NAME)+1);
-			break;
-		case CHICKEN_DINNER:
-			strncpy(name, CHICKEN_DINNER_NAME, strlen(CHICKEN_DINNER_NAME)+1);
-			break;
-		default:
-			strncpy(name, BLANK_NAME, strlen(BLANK_NAME)+1);
-			break;
-	}
-	return name;
-}
+item_type_map_t item_type_map[] = {
+    {BLANK_NAME, BLANK},
+    {TELEPORT_SCROLL_NAME, TELEPORT_SCROLL},
+    {HEALTH_POTION_NAME, HEALTH_POTION},
+    {APPLE_NAME, APPLE},
+    {CHICKEN_DINNER_NAME, CHICKEN_DINNER},
+    {BLACKSTONE_ARMOR_NAME, BLACKSTONE_ARMOR},
+    {BRONZE_ARMOR_NAME, BRONZE_ARMOR},
+    {IRON_ARMOR_NAME, IRON_ARMOR},
+    {STEEL_ARMOR_NAME, STEEL_ARMOR},
+    {MITHRIL_ARMOR_NAME, MITHRIL_ARMOR},
+    {SOULCRUST_ARMOR_NAME, SOULCRUST_ARMOR},
+    {TERRACITE_ARMOR_NAME, TERRACITE_ARMOR},
+    {GRAVEMARROW_ARMOR_NAME, GRAVEMARROW_ARMOR},
+    {VOIDMARROW_ARMOR_NAME, VOIDMARROW_ARMOR},
+    {RAT_HIDE_ARMOR_NAME, RAT_HIDE_ARMOR},
+    {SLIME_ARMOR_NAME, SLIME_ARMOR},
+    {BOG_IRON_ARMOR_NAME, BOG_IRON_ARMOR},
+    {BONE_ARMOR_NAME, BONE_ARMOR},
+    {SUNSTEEL_ARMOR_NAME, SUNSTEEL_ARMOR},
+    {FALSE_IRON_ARMOR_NAME, FALSE_IRON_ARMOR},
+    {BARKMAIL_ARMOR_NAME, BARKMAIL_ARMOR},
+    {DRAGON_BONE_ARMOR_NAME, DRAGON_BONE_ARMOR},
+    {CLOAK_NAME, CLOAK},
+    {LEATHER_CLOAK_NAME, LEATHER_CLOAK},
+    {BOGSTICK_VEST_NAME, BOGSTICK_VEST},
+    {VOIDLACE_CLOAK_NAME, VOIDLACE_CLOACK},
+};
 
+const int item_type_map_len = sizeof(item_type_map) / sizeof(item_type_map[0]);
+
+item_ids_t item_get_id(const char *name) {
+	for(int i = 0; i < item_type_map_len; i++) {
+		if(strcasecmp(name, item_type_map[i].name) == 0) {
+			return item_type_map[i].value;
+		}
+	}
+	return BLANK;
+}
 
 // returns 1 on success and 0 on fail
 int use_item(player_t *player)
@@ -98,5 +110,50 @@ void remove_item(player_t *player)
 	}
 }
 
-
+void load_armor_data(world_t *world) {
+	item_data_t *item_data = world->item_data;
+    FILE *fp = fopen("./data/armors.csv", "r");
+    if(!fp) {
+        perror("File open failed");
+        return;
+    }
+    
+    char line[2048];
+    
+    if(fgets(line, sizeof(line), fp) == NULL) {
+        fprintf(stderr, "File is empty\n");
+        fclose(fp);
+        return;
+    }
+    
+    int row = 0;
+    while(fgets(line, sizeof(line), fp)) {
+        line[strcspn(line, "\n")] = '\0';
+        int col = 0;
+        char *token = strtok(line, ",");
+        while(token) {
+            switch(col) {
+                case 0:
+					snprintf(item_data[row].name, sizeof(item_data[row].name), "%s", token);
+                    item_data[row].id = item_get_id(token);
+                    break;
+                case 1:
+                    item_data[row].value_type = VALUE_TYPE_ARMOR;
+                    item_data[row].stat_type.armor.type = HEAVY; //TODO
+                    break;
+                case 2:
+                    item_data[row].stat_type.armor.defense = atoi(token);
+                    break;
+            }
+            token = strtok(NULL, ",");
+            col++;
+        }
+        world->item_data_count++;
+		DEBUG_LOG("Loaded Armor Data: %d, %s, %d", 
+				  item_data[row].id, item_data[row].name, item_data[row].stat_type.armor.defense);
+        col = 0;
+        row++;
+    }
+    // TODO load armor effects next
+}
 

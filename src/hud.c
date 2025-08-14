@@ -19,40 +19,36 @@ void hud_update_player_health(player_t *player) {
 	waddch(hud, ':');
 	waddch(hud, ' ');
 	//TODO rename all strings in this function
-	char str[8];
-	snprintf(str, 8, "%d", player->health);
-	wprintw(hud, str);
+	char buf[64];
+	snprintf(buf, sizeof(buf), "%d", player->health);
+	waddstr(hud, buf);
 	
 	waddch(hud, ' ');
 	waddch(hud, '/');
 	waddch(hud, ' ');
 	
-	char str2[8];
-	snprintf(str2, 8, "%d", player->max_health);
-	wprintw(hud, str2);
+	snprintf(buf, sizeof(buf), "%d", player->max_health);
+	waddstr(hud, buf);
 	
 	getyx(hud, y, x);
 	wmove(hud, y+1, 0);
-	char str3[32];
-	snprintf(str3, 32, "Level: %d | XP: %d / %d", player->level, player->xp, xp_to_level_up(player->level));
-	wprintw(hud, str3);
+	snprintf(buf, sizeof(buf), "Level: %d | XP: %d / %d", player->level, player->xp, xp_to_level_up(player->level));
+	waddstr(hud, buf);
 	
 	// this will break if any stats are over 3 digits
 	getyx(hud, y, x);
 	wmove(hud, y+1, 0);
-	char str4[32];
-	snprintf(str4, 32, "Str: %d | Dex: %d | Int: %d", player->strength, player->dexterity, player->intelligence);
-	wprintw(hud, str4);
+	snprintf(buf, sizeof(buf), "Str: %d | Dex: %d | Int: %d", player->strength, player->dexterity, player->intelligence);
+	waddstr(hud, buf);
 	
 	getyx(hud, y, x);
 	wmove(hud, y+1, 0);
-	char str5[32];
-	snprintf(str5, 32, "Constitution: %d | Speed: %d", player->constitution, player->speed);
-	wprintw(hud, str5);
+	snprintf(buf, sizeof(buf), "Constitution: %d | Speed: %d", player->constitution, player->speed);
+	waddstr(hud, buf);
 }
 
 void hud_update_nearby_enemies(world_t *world, player_t *player) {
-	int detect_radius = 6;
+	int detect_radius = player->lantern.power;
 	room_t *room = world->room[player->global_x][player->global_y];
 	
 	wmove(hud, PLAYER_STATS_HUD_SPACE, 0);
@@ -63,29 +59,32 @@ void hud_update_nearby_enemies(world_t *world, player_t *player) {
 			pos += snprintf(str6 + pos, sizeof(str6)-pos, "[%c] ", PLAYER);
 			continue;
 		}
-		if(room->enemies[world->turn_order[i]] != NULL) {
-			pos += snprintf(str6 + pos, sizeof(str6)-pos, "[%c] ", room->enemies[world->turn_order[i]]->symbol);
+		enemy_t *enemy = room->enemies[world->turn_order[i]];
+		if(enemy != NULL) {
+			if(room->tiles[enemy->y][enemy->x]->has_light) {
+				pos += snprintf(str6 + pos, sizeof(str6)-pos, "[%c] ", enemy->symbol);
+			} else {
+				pos += snprintf(str6 + pos, sizeof(str6)-pos, "[?] ");
+			}
 		}	
 	}
-	wprintw(hud, "%s", str6);
+	waddstr(hud, str6);
 	
 	for(int i = 0; i < MAX_ENEMIES_PER_LEVEL; i++) {
 		if(!room->enemies[i]) continue;
 		if(room->enemies[i]->x > player->x-detect_radius && room->enemies[i]->x < player->x+detect_radius &&
 			room->enemies[i]->y > player->y-(detect_radius) && room->enemies[i]->y < player->y+(detect_radius)) {
 			wmove(hud, PLAYER_STATS_HUD_SPACE+i+1, 0);
-			char *name = malloc(32);
-			snprintf(name, 32, "%s", room->enemies[i]->name);
-			wprintw(hud, name);
+			char name[32];
+			snprintf(name, sizeof(name), "%s", room->enemies[i]->name);
+			waddstr(hud, name);
 			mvwaddch(hud, PLAYER_STATS_HUD_SPACE+i+1, strlen(name), ':');
-			char *str = malloc(8);
+			char str[8];
 			wmove(hud, PLAYER_STATS_HUD_SPACE+i+1, strlen(name)+1);
-			snprintf(str, 8, "%d", room->enemies[i]->health);
-			wprintw(hud, str);
+			snprintf(str, sizeof(str), "%d", room->enemies[i]->health);
+			waddstr(hud, str);
 		}
 	}
-        // this is probably gonna have to be very complex.. or not just check if diff in x and y is less than a given number?
-        // create a cords system so you can give there location so players know what they're looking at
 }
 
 void hud_update_action_bar(player_t *player, room_t *room) {

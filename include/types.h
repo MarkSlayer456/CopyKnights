@@ -4,6 +4,17 @@
 #include <stdbool.h>
 #include <ncurses.h>
 #include "game_constants.h"
+#include "item_types.h"
+
+#define DEBUG_LOG(fmt, ...) \
+do { \
+	FILE *f = fopen("debug.log", "a"); \
+	if (f) { \
+		fprintf(f, fmt "\n", ##__VA_ARGS__); \
+		fclose(f); \
+	} \
+} while (0)
+// EXAMPLE: DEBUG_LOG("Constitution: %d", enemy_data[row].constitution);
 
 typedef struct room room_t;
 
@@ -13,21 +24,6 @@ typedef enum direction {
 	UP,
 	DOWN
 } direction_t;
-
-// names should be limited to 32 characters
-typedef enum item_ids {
-	BLANK,
-	TELEPORT_SCROLL,
-	HEALTH_POTION,
-	APPLE,
-	CHICKEN_DINNER
-} item_ids_t;
-
-typedef struct item {
-	char name[MAX_ITEM_NAME_LENGTH];
-	item_ids_t id;
-	int stack;
-} item_t;
 
 typedef struct location {
 	int x;
@@ -91,6 +87,17 @@ typedef struct class_type_map {
 	class_type_t value;
 } class_type_map_t;
 
+typedef struct lantern {
+	int power;
+	bool is_on;
+	int turns_since_last_dim;
+} lantern_t;
+
+typedef struct equipment {
+	item_t *armor;
+	
+} equipment_t;
+
 typedef struct player {
 	int level;
 	int xp;
@@ -111,6 +118,7 @@ typedef struct player {
 	int action_points;
 	class_type_t player_class;
 	int inv_offset;
+	lantern_t lantern;
 	
 	action_bar_t action_bar;
 } player_t;
@@ -194,6 +202,8 @@ typedef struct world {
 	unsigned int seed;
 	enemy_data_t *enemy_data;
 	class_data_t *class_data;
+	item_data_t *item_data;
+	int item_data_count;
 	char **messages;
 	int max_message_storage;
 	int messages_size;

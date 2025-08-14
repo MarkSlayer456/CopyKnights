@@ -15,6 +15,7 @@
 #include "enemy.h"
 #include "hud.h"
 #include "types.h"
+#include "lantern.h"
 
 /*
 	Top down dungeon crawler
@@ -65,6 +66,7 @@ int main(int argc, char *argv[]) {
 	}
 	
 	world->class_data = calloc(MAX_CLASSES, sizeof(class_data_t));
+	world->item_data = calloc(MAX_ITEMS, sizeof(item_data_t));
 	
 	world->max_message_storage = DEFAULT_MAX_MESSAGE_STORAGE;
 	world->messages_size = 0;
@@ -75,6 +77,7 @@ int main(int argc, char *argv[]) {
 	
 	load_enemy_data(world->enemy_data);
 	load_class_data(world->class_data);
+	load_armor_data(world);
 	
 	player_t *player = malloc(sizeof(player_t));
 	
@@ -100,7 +103,7 @@ int main(int argc, char *argv[]) {
 			break;
 		}
 	}
-	player->health = player->constitution * 1000;
+	player->health = player->constitution * 10;
 	player->max_health = player->constitution * 10;
 	player->global_x = 0;
 	player->global_y = 0;
@@ -129,6 +132,10 @@ int main(int argc, char *argv[]) {
 	for(int i = 3; i < INV_SIZE; i++) {
 		player->inventory[i] = test_item3;
 	}
+	
+	player->lantern.power = 5;
+	player->lantern.is_on = true;
+	player->lantern.turns_since_last_dim = 0;
 
 	world->isPlayerTurn = 1;
 
@@ -146,45 +153,49 @@ int main(int argc, char *argv[]) {
 	first->current_enemy_count++;
 	
 	first->tiles[1][1]->items[0] = calloc(1, sizeof(item_t));
+	first->tiles[1][1]->items[1] = calloc(1, sizeof(item_t));
 	strcpy(first->tiles[1][1]->items[0]->name, APPLE_NAME);
 	first->tiles[1][1]->items[0]->stack = 1;
 	first->tiles[1][1]->items[0]->id = APPLE;
+	strcpy(first->tiles[1][1]->items[1]->name, APPLE_NAME);
+	first->tiles[1][1]->items[1]->stack = 1;
+	first->tiles[1][1]->items[1]->id = APPLE;
+	
+	first->tiles[10][1]->items[0] = calloc(1, sizeof(item_t));
+	item_t *item = first->tiles[10][1]->items[0];
+	strcpy(item->name, world->item_data[0].name);
+	item->stack = 1;
+	item->id = world->item_data[0].id;
+	item->value_type = world->item_data[0].value_type;
+	item->stat_type.armor.type = world->item_data[0].stat_type.armor.type;
+	item->stat_type.armor.defense = world->item_data[0].stat_type.armor.defense;
+	
 	world->room[0][0] = first;
 	
 	world->win = win;
     world->turn_order_size = 0;
 	for(;;) {
 		calculate_light(world, player);
+		generate_turn_order_display(world, player);
     	draw(world, player);
 		
-		assert(world->turn_order_size >= 0);
-		while(world->turn_order_size < MAX_ENEMIES_PER_LEVEL) {
-			int actor = pick_next_actor(world, player);
-			assert(actor != INVALID_ACTOR_INDEX);
-			world->turn_order[world->turn_order_size++] = actor;
-		}
-		
-		int turn_index = world->turn_order[0];
-		assert(turn_index >= PLAYER_TURN_ORDER_INDEX);
-		if(turn_index == PLAYER_TURN_ORDER_INDEX) {
-			//display_combat_message(world, player, MESSAGE_IS_PLAYERS_TURN);
-			char c = getch();
-			manage_input(c, world, player);
-		} else {
-			enemy_t *enemy = world->room[player->global_x][player->global_y]->enemies[turn_index];
-			if(enemy == NULL) {
-				for(int k = 0; k < world->turn_order_size-1; k++) {
-					world->turn_order[k] = world->turn_order[k + 1];
-				}
-				world->turn_order_size--;
-				continue;
+		int actor = pick_next_actor(world, player);
+		assert(actor != INVALID_ACTOR_INDEX);
+		if(actor == PLAYER_TURN_ORDER_INDEX) {
+			lantern_update_dimming(&player->lantern);
+			bool run = false;
+			char c;
+			while(run == false) {
+				c = getch();
+				run = manage_input(c, world, player);
+				draw(world, player);
 			}
-			enemy_decide_move(enemy, world, player);
+		} else if(actor >= 0) {
+			enemy_t *enemy = world->room[player->global_x][player->global_y]->enemies[actor];
+			if(enemy != NULL) {
+				enemy_decide_move(enemy, world, player);
+			}
 		}
-		for(int k = 0; k < world->turn_order_size-1; k++) {
-			world->turn_order[k] = world->turn_order[k + 1];
-		}
-		world->turn_order_size--;
     }
     endwin();
     exit(0);

@@ -1,3 +1,6 @@
+#ifndef GAME_CONSTANTS_H_
+
+#define GAME_CONSTANTS_H_
 #define MESSAGE_IS_PLAYERS_TURN					"It is your turn!"
 
 #define WALL 				'#' // a wall
@@ -7,6 +10,9 @@
 #define DOOR				'/'
 #define CHEST				'$' // can walk through
 #define PLAYER				'@'
+#define ITEM_SYMBOL			'*'
+
+#define MAX_ITEMS								1000
 
 #define PLAYER_TURN_ORDER_INDEX					-1
 #define INVALID_ACTOR_INDEX						999999999
@@ -29,6 +35,7 @@
 #define KEY_A      								97
 #define KEY_B									98
 #define KEY_S       							115
+#define KEY_F_MINE									102
 
 #define CTRL_Q									17
 
@@ -107,6 +114,30 @@
 #define CHICKEN_DINNER_NAME			"Chicken Dinner"
 #define CHICKEN_DINNER_HEAL_AMOUNT	500
 
+#define PLAYER_MIN_VISION_RANGE				2
+
+#define BLACKSTONE_ARMOR_NAME				"Blackstone Armor"
+#define BRONZE_ARMOR_NAME					"Bronze Armor"
+#define IRON_ARMOR_NAME						"Iron Armor"
+#define STEEL_ARMOR_NAME					"Steel Armor"
+#define MITHRIL_ARMOR_NAME					"Mithril Armor"
+#define SOULCRUST_ARMOR_NAME				"Soulcrust Armor"
+#define TERRACITE_ARMOR_NAME				"Terracite Armor"
+#define GRAVEMARROW_ARMOR_NAME				"Gravemarrow Armor"
+#define VOIDMARROW_ARMOR_NAME				"Voidmarrow Armor"
+#define RAT_HIDE_ARMOR_NAME					"Rat Hide Armor"
+#define SLIME_ARMOR_NAME					"Slime Armor"
+#define BOG_IRON_ARMOR_NAME					"Bog Iron Armor"
+#define BONE_ARMOR_NAME						"Bone Armor"
+#define SUNSTEEL_ARMOR_NAME					"Sunsteel Armor"
+#define FALSE_IRON_ARMOR_NAME				"False Iron Armor"
+#define BARKMAIL_ARMOR_NAME					"Barkmail Armor"
+#define DRAGON_BONE_ARMOR_NAME				"Dragon Bone Armor"
+#define CLOAK_NAME							"Cloak"
+#define LEATHER_CLOAK_NAME					"Leather Cloak"
+#define BOGSTICK_VEST_NAME					"Bogstick Vest"
+#define VOIDLACE_CLOAK_NAME					"Voidlace Cloak"
+
 #define NULL_CLASS_NAME					"NULL"
 #define SWORDSMAN_CLASS_NAME			"Swordsman"
 #define BARBARIAN_CLASS_NAME			"Barbarian"
@@ -136,3 +167,13 @@
 
 #define SCREEN_WIDTH				80
 #define SCREEN_HEIGHT				24
+
+// Lantern
+#define LANTERN_MAX_POWER								10
+#define LANTERN_NORMAL_POWER							5
+#define LANTERN_OVER_LOAD_POWER							10
+#define LANTERN_OVER_LOAD_THRESHOLD						4
+#define LANTERN_OVER_LOAD_LOWER_BOUNDS					6
+#define LANTERN_TURNS_TO_DIM							10
+
+#endif
