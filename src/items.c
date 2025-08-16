@@ -3,6 +3,25 @@
 #include "items.h"
 #include "player.h"
 #include "types.h"
+#include "game_constants.h"
+
+stats_map_t stats_map[] = {
+    {STRENGTH_NAME, STRENGTH},
+    {DEXTERITY_NAME, DEXTERITY},
+    {INTELLIGENCE_NAME, INTELLIGENCE},
+    {CONSTITUTION_NAME, CONSTITUTION},
+    {SPEED_NAME, SPEED},
+};
+
+const int stats_map_len = sizeof(stats_map) / sizeof(stats_map[0]);
+
+armor_type_map_t armor_type_map[] = {
+    {ARMOR_TYPE_LIGHT_NAME, LIGHT},
+    {ARMOR_TYPE_MEDIUM_NAME, MEDIUM},
+    {ARMOR_TYPE_HEAVY_NAME, HEAVY},
+};
+
+const int armor_type_map_len = sizeof(armor_type_map) / sizeof(armor_type_map[0]);
 
 item_type_map_t item_type_map[] = {
     {BLANK_NAME, BLANK},
@@ -43,6 +62,25 @@ item_ids_t item_get_id(const char *name) {
 	}
 	return BLANK;
 }
+
+armor_type_t armor_get_type(const char *name) {
+    for(int i = 0; i < armor_type_map_len; i++) {
+        if(strcasecmp(name, armor_type_map[i].name) == 0) {
+            return armor_type_map[i].value;
+        }
+    }
+    return NULL_ARMOR_TYPE;
+}
+
+stats_t get_stat(const char *name) {
+    for(int i = 0; i < stats_map_len; i++) {
+        if(strcasecmp(name, stats_map[i].name) == 0) {
+            return stats_map[i].value;
+        }
+    }
+    return NULL_STAT;
+}
+
 
 // returns 1 on success and 0 on fail
 int use_item(player_t *player)
@@ -110,6 +148,54 @@ void remove_item(player_t *player)
 	}
 }
 
+void load_armor_effects(world_t *world) {
+    item_data_t *item_data = world->item_data;
+    FILE *fp = fopen("./data/armor_effects.csv", "r");
+    if(!fp) {
+        perror("File open failed");
+        return;
+    }
+    
+    char line[2048];
+    
+    if(fgets(line, sizeof(line), fp) == NULL) {
+        fclose(fp);
+        return;
+    }
+    
+    int row = 0;
+    while(fgets(line, sizeof(line), fp)) {
+        line[strcspn(line, "\n")] = '\0';
+        char *armor_name = strtok(line, ",");
+        char *target_stat = strtok(NULL, ",");
+        char *value = strtok(NULL, ",");
+        
+        if(!armor_name || !target_stat || !value) {
+            continue;
+        }
+        
+        armor_type_t armor_type = armor_get_type(armor_name);
+        if(armor_type == NULL_ARMOR_TYPE) {
+            continue;
+        }
+        
+        int i = 0;
+        while(i < MAX_ITEMS) {
+            if(item_data[i].value_type == VALUE_TYPE_ARMOR && item_data[i].stat_type.armor.type != armor_type) {
+                i++;
+                continue;
+            }
+            int idx = item_data[i].stat_type.armor.modifier_count;
+            
+            item_data[i].stat_type.armor.modifier_stats[idx].modifier = atoi(value);
+            item_data[i].stat_type.armor.modifier_stats[idx].stat = get_stat(target_stat);
+            item_data[i].stat_type.armor.modifier_count++;
+            break;
+        }
+        row++;
+    }
+}
+
 void load_armor_data(world_t *world) {
 	item_data_t *item_data = world->item_data;
     FILE *fp = fopen("./data/armors.csv", "r");
@@ -139,7 +225,7 @@ void load_armor_data(world_t *world) {
                     break;
                 case 1:
                     item_data[row].value_type = VALUE_TYPE_ARMOR;
-                    item_data[row].stat_type.armor.type = HEAVY; //TODO
+                    item_data[row].stat_type.armor.type = armor_get_type(token);
                     break;
                 case 2:
                     item_data[row].stat_type.armor.defense = atoi(token);
@@ -149,11 +235,13 @@ void load_armor_data(world_t *world) {
             col++;
         }
         world->item_data_count++;
-		DEBUG_LOG("Loaded Armor Data: %d, %s, %d", 
-				  item_data[row].id, item_data[row].name, item_data[row].stat_type.armor.defense);
+		DEBUG_LOG("Loaded Armor Data: %d, %s, %d, %d", 
+				  item_data[row].id, item_data[row].name, 
+            item_data[row].stat_type.armor.defense, item_data[row].stat_type.armor.type);
         col = 0;
         row++;
     }
-    // TODO load armor effects next
+    load_armor_effects(world);
 }
+
 

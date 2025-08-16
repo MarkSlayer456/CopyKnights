@@ -46,10 +46,17 @@ typedef struct item_type_map {
 typedef enum armor_type {
 	LIGHT,
 	MEDIUM,
-	HEAVY
+	HEAVY,
+	NULL_ARMOR_TYPE
 } armor_type_t;
 
+typedef struct armor_type_map {
+	const char *name;
+	armor_type_t value;
+} armor_type_map_t;
+
 typedef enum stats {
+	NULL_STAT,
 	STRENGTH,
 	DEXTERITY,
 	INTELLIGENCE,
@@ -65,13 +72,16 @@ typedef enum value_type {
 	VALUE_TYPE_SCROLL
 } value_type_t;
 
+typedef struct stat_modifier {
+	int modifier;
+	stats_t stat;
+} stat_modifier_t;
+
 typedef struct armor_stats {
 	armor_type_t type;
 	int defense;
-	stats_t stat_one;
-	int modifier_one;
-	stats_t stat_two;
-	int modifier_two;
+	stat_modifier_t modifier_stats[MAX_ARMOR_MODIFIERS];
+	int modifier_count;
 } armor_stats_t;
 
 typedef struct weapon_stats {
@@ -88,6 +98,11 @@ typedef struct food_stats {
 typedef struct scroll_stats {
 	// TODO 
 } scroll_stats_t;
+
+typedef struct stats_map {
+	const char *name;
+	item_ids_t value;
+} stats_map_t;
 
 typedef struct item {
 	char name[MAX_ITEM_NAME_LENGTH];

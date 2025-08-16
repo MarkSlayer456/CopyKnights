@@ -138,6 +138,18 @@
 #define BOGSTICK_VEST_NAME					"Bogstick Vest"
 #define VOIDLACE_CLOAK_NAME					"Voidlace Cloak"
 
+#define ARMOR_TYPE_LIGHT_NAME				"light"
+#define ARMOR_TYPE_MEDIUM_NAME				"medium"
+#define ARMOR_TYPE_HEAVY_NAME				"heavy"
+
+#define MAX_ARMOR_MODIFIERS					4
+
+#define STRENGTH_NAME						"Strength"
+#define DEXTERITY_NAME						"Dexterity"
+#define INTELLIGENCE_NAME					"Intelligence"
+#define CONSTITUTION_NAME					"Constitution"
+#define SPEED_NAME							"Speed"
+
 #define NULL_CLASS_NAME					"NULL"
 #define SWORDSMAN_CLASS_NAME			"Swordsman"
 #define BARBARIAN_CLASS_NAME			"Barbarian"
