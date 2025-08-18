@@ -372,7 +372,7 @@ void player_cycle_inv_selector_up(player_t *player)
 
 void player_cycle_inv_selector_down(player_t *player)
 {
-	int visible_item_count = SCREEN_HEIGHT-2;
+	int visible_item_count = INVENTORY_HEIGHT-2;
 	if(player->inventory[player->action_bar.inv_selector+1].id != BLANK) {
 		if(player->action_bar.inv_selector - player->inv_offset >= visible_item_count-1) {
 			player->inv_offset++;
@@ -408,7 +408,7 @@ void player_organize_inv(player_t *player, int loc)
 	for(int i = loc; i < INV_SIZE-1; i++) {
 		player->inventory[i] = player->inventory[i + 1];
 	}
-	item_t blank = {BLANK_NAME, BLANK, 0};
+	item_t blank = {BLANK_NAME, "does nothing", BLANK, 0};
 	player->inventory[INV_SIZE-1] = blank;
 	while(player->inventory[player->action_bar.inv_selector].id == BLANK && player->action_bar.inv_selector > 0) {
 		player_cycle_inv_selector_up(player);

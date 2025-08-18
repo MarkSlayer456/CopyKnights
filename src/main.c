@@ -25,6 +25,7 @@ WINDOW *hud; // gives player useful information
 WINDOW *action_bar; // OLG player's inventory/spells menu, maybe a help menu in the furture
 WINDOW *error; // USED FOR ERROR CHECKING ONLY
 WINDOW *inventory_hud; // player's inventory
+WINDOW *inventory_desc_hud; // player's description in the inventory
 char walk_chars[WALK_CHAR_LENGTH] = {EMPTY, 0, DOOR, MUD, CHEST}; // characters entites can walk on
 
 int main(int argc, char *argv[]) {
@@ -36,7 +37,8 @@ int main(int argc, char *argv[]) {
 	box(win,0,0);
     hud = newwin(HUD_HEIGHT, HUD_WIDTH, 0, 21);
 	action_bar = newwin(5, 21, 21, 0);
-	inventory_hud = newwin(24, 80, 0, 0);
+	inventory_hud = newwin(INVENTORY_HEIGHT, INVENTORY_WIDTH, 0, 0);
+	inventory_desc_hud = newwin(INVENTORY_HEIGHT, INVENTORY_WIDTH, INVENTORY_HEIGHT, 0);
     error = newwin(25, 25, 51, 30);
     
     refresh();
@@ -114,10 +116,10 @@ int main(int argc, char *argv[]) {
 	
 	player->inventory = malloc(INV_SIZE * sizeof(item_t));
 	
-	item_t blank = {BLANK_NAME, BLANK, 0};
-	item_t test_item1 = {HEALTH_POTION_NAME, HEALTH_POTION, 5};
-	item_t test_item2 = {APPLE_NAME, APPLE, 3};
-	item_t test_item3 = {TELEPORT_SCROLL_NAME, TELEPORT_SCROLL, 1};
+	item_t blank = {BLANK_NAME, "does nothing", BLANK, 0};
+	item_t test_item1 = {HEALTH_POTION_NAME, "heals player", HEALTH_POTION, 5};
+	item_t test_item2 = {APPLE_NAME, "heals player", APPLE, 3};
+	item_t test_item3 = {TELEPORT_SCROLL_NAME, "teleports player", TELEPORT_SCROLL, 1};
 	
 	for(int i = 0; i < INV_SIZE; i++) {
 		player->inventory[i] = blank;

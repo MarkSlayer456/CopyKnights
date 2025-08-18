@@ -51,6 +51,7 @@
 
 
 #define MAX_ITEM_NAME_LENGTH					32
+#define MAX_ITEM_DESC_LEN						128
 #define MAX_ITEM_STACK							99
 #define DEFAULT_MAX_MESSAGE_STORAGE				1000
 #define MAX_MESSAGE_LENGTH						59
@@ -184,6 +185,9 @@
 
 #define SCREEN_WIDTH				80
 #define SCREEN_HEIGHT				24
+
+#define INVENTORY_HEIGHT			SCREEN_HEIGHT/2
+#define INVENTORY_WIDTH				SCREEN_WIDTH
 
 // Lantern
 #define LANTERN_MAX_POWER								10

@@ -66,7 +66,8 @@ typedef struct lantern {
 
 typedef struct equipment {
 	item_t *armor;
-	
+	item_t *main_hand;
+	item_t *off_hand;
 } equipment_t;
 
 typedef struct player {
@@ -90,6 +91,7 @@ typedef struct player {
 	class_type_t player_class;
 	int inv_offset;
 	lantern_t lantern;
+	equipment_t equipment;
 	
 	action_bar_t action_bar;
 } player_t;

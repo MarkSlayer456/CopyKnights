@@ -316,6 +316,8 @@ void load_armor_data(world_t *world) {
 		DEBUG_LOG("Loaded Armor Data: %d, %s, %d, %d", 
 				  item_data[row].id, item_data[row].name, 
             item_data[row].stat_type.armor.defense, item_data[row].stat_type.armor.type);
+        
+        snprintf(item_data[row].desc, MAX_ITEM_DESC_LEN, "+%d defense", item_data[row].stat_type.armor.defense);
         col = 0;
         row++;
     }

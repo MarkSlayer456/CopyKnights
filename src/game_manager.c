@@ -14,7 +14,7 @@
 
 //wmove(win, x, y);
 //waddch(win, char);
-extern WINDOW *hud, *action_bar, *inventory_hud;
+extern WINDOW *hud, *action_bar, *inventory_hud, *inventory_desc_hud;
 extern char walk_chars[WALK_CHAR_LENGTH];
 
 void draw(world_t *world, player_t *player) {
@@ -22,10 +22,13 @@ void draw(world_t *world, player_t *player) {
 	werase(hud);
 	werase(action_bar);
 	werase(inventory_hud);
+	werase(inventory_desc_hud);
 	// draw stuff...
 	if((player->action_bar.inv_open || player->action_bar.spells_open || player->action_bar.loot_open) || player->action_bar.selector != NOT_OPEN) {
 		display_inventory_hud(world, player);
+		display_inventory_desc_hud(world, player);
 		wnoutrefresh(inventory_hud);
+		wnoutrefresh(inventory_desc_hud);
 	} else {
 		// TODO add just a hud_update() function so you don't have to call a bunch of different functions
 		room_t *room = world->room[player->global_x][player->global_y];
@@ -69,6 +72,7 @@ void draw(world_t *world, player_t *player) {
 			}
 		}
 		wnoutrefresh(inventory_hud); // this has to be first
+		wnoutrefresh(inventory_desc_hud); // this has to be first
 		wnoutrefresh(world->win);
 		wnoutrefresh(hud);
 		wnoutrefresh(action_bar);

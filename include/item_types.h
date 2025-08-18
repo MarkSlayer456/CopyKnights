@@ -38,6 +38,7 @@ typedef struct scroll_stats {
 
 typedef struct item {
 	char name[MAX_ITEM_NAME_LENGTH];
+	char desc[MAX_ITEM_DESC_LEN];
 	item_ids_t id;
 	int stack;
 	value_type_t value_type;
@@ -51,6 +52,7 @@ typedef struct item {
 
 typedef struct item_data {
 	char name[MAX_ITEM_NAME_LENGTH];
+	char desc[MAX_ITEM_DESC_LEN];
 	item_ids_t id;
 	value_type_t value_type;
 	rarity_t rarity;

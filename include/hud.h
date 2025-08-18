@@ -14,4 +14,7 @@ void hud_update_all(world_t *world, player_t *player);
 void display_error_message(const char *str);
 
 void display_inventory_hud(world_t *world, player_t *player);
+
+void display_inventory_desc_hud(world_t *world, player_t *player);
+
 #endif

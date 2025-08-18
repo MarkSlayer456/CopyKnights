@@ -7,7 +7,7 @@
 #include <string.h>
 #include "types.h"
 
-extern WINDOW *hud, *action_bar, *inventory_hud;
+extern WINDOW *hud, *action_bar, *inventory_hud, *inventory_desc_hud;
 
 void hud_update_player_health(player_t *player) {
 	wmove(hud, 0, 0);
@@ -167,14 +167,14 @@ void display_inventory_hud(world_t *world, player_t *player) {
 	char inv_str[32] = "Inventory";
 	mvwprintw(inventory_hud, 0, (39-strlen(inv_str))/2, inv_str);
 	char loot_str[32] = "Nearby Loot";
-	mvwprintw(inventory_hud, 0, SCREEN_WIDTH-(SCREEN_WIDTH/4)-(strlen(loot_str))/2, loot_str);
-	for (int y = 0; y < SCREEN_HEIGHT; y++) {
+	mvwprintw(inventory_hud, 0, INVENTORY_WIDTH-(INVENTORY_WIDTH/4)-(strlen(loot_str))/2, loot_str);
+	for (int y = 0; y < INVENTORY_HEIGHT; y++) {
 		mvwaddch(inventory_hud, y, 39, '|');  // vertical divider at col 39
 	}
 	if(player->action_bar.inv_open) {
 		int add_size = 8;
 		char item_name[MAX_ITEM_NAME_LENGTH+add_size];
-		int visible_item_count = SCREEN_HEIGHT-2;
+		int visible_item_count = INVENTORY_HEIGHT-2;
 		int pos = 1;
 		int loot_pos = 1;
 		
@@ -193,17 +193,17 @@ void display_inventory_hud(world_t *world, player_t *player) {
 				for(int i = 0; i < MAX_ITEMS_PER_TILE; i++) {
 					item_t *item = room->tiles[y][x]->items[i];
 					if(item->stack == 0) continue; //TODO this should probaly just break
-					snprintf(item_name, MAX_ITEM_NAME_LENGTH+add_size, "%s x%d\0", item->name, item->stack);
-					mvwprintw(inventory_hud, loot_pos++, SCREEN_WIDTH/2, item_name);
+					snprintf(item_name, MAX_ITEM_NAME_LENGTH+add_size, "%s x%d", item->name, item->stack);
+					mvwprintw(inventory_hud, loot_pos++, INVENTORY_WIDTH/2, item_name);
 				}
 			}
 		}
 		for(int i = player->inv_offset; i < visible_item_count+player->inv_offset; i++) {
 			if(player->inventory[i].stack == 0) continue; //TODO this should probaly just break
 			if(i == player->action_bar.inv_selector && player->action_bar.inv_open) {
-				snprintf(item_name, MAX_ITEM_NAME_LENGTH+add_size, ">>%s x%d\0", player->inventory[i].name, player->inventory[i].stack);
+				snprintf(item_name, MAX_ITEM_NAME_LENGTH+add_size, ">>%s x%d", player->inventory[i].name, player->inventory[i].stack);
 			} else {
-				snprintf(item_name, MAX_ITEM_NAME_LENGTH+add_size, "%s x%d\0", player->inventory[i].name, player->inventory[i].stack);
+				snprintf(item_name, MAX_ITEM_NAME_LENGTH+add_size, "%s x%d", player->inventory[i].name, player->inventory[i].stack);
 			}
 			mvwprintw(inventory_hud, pos++, 1, item_name);
 		}
@@ -217,7 +217,7 @@ void display_inventory_hud(world_t *world, player_t *player) {
 		}
 		// TODO
 	} else {
-		werase(inventory_hud);
+		werase(inventory_hud); // TODO this is unoptimal we should check for this case first and not draw if we don't need to
 		char inv[12] = "inventory";
 		char spells[9] = "spells";
 		switch(player->action_bar.selector) {
@@ -232,5 +232,24 @@ void display_inventory_hud(world_t *world, player_t *player) {
 		}
 		mvwprintw(inventory_hud, 1, 1, inv);
 		mvwprintw(inventory_hud, 2, 1, spells);
+	}
+}
+void display_inventory_desc_hud(world_t *world, player_t *player) {
+	if(player->action_bar.inv_open) {
+		box(inventory_desc_hud, 0, 0);
+		int visible_item_count = INVENTORY_HEIGHT-2;
+		char desc_title_inv[32] = "Description";
+		mvwprintw(inventory_desc_hud, 0, (39-strlen(desc_title_inv))/2, desc_title_inv);
+		mvwprintw(inventory_desc_hud, 0, INVENTORY_WIDTH-(INVENTORY_WIDTH/4)-(strlen(desc_title_inv))/2, desc_title_inv);
+		for (int y = 0; y < INVENTORY_HEIGHT; y++) {
+			mvwaddch(inventory_desc_hud, y, 39, '|');
+		}
+		for(int i = player->inv_offset; i < visible_item_count+player->inv_offset; i++) {
+			if(i == player->action_bar.inv_selector) {
+				mvwprintw(inventory_desc_hud, 1, 1,  player->inventory[i].desc);
+			}
+		}
+	} else {
+		werase(inventory_desc_hud);
 	}
 }
