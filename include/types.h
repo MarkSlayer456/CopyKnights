@@ -5,6 +5,7 @@
 #include <ncurses.h>
 #include "game_constants.h"
 #include "item_types.h"
+#include "enums.h"
 
 #define DEBUG_LOG(fmt, ...) \
 do { \
@@ -18,32 +19,12 @@ do { \
 
 typedef struct room room_t;
 
-typedef enum direction {
-	LEFT,
-	RIGHT,
-	UP,
-	DOWN
-} direction_t;
-
 typedef struct location {
 	int x;
 	int y;
 	int global_x;
 	int global_y;
 } location_t;
-
-typedef enum action_bar_selectors { 
-	NOT_OPEN = -1, 
-	INVENTORY = 0, 
-	SPELLS = 1	
-} action_bar_selector_t;
-
-typedef enum inventory_category {
-	ITEM = 0,
-	FOOD = 1,
-	POTIONS = 2,
-	SCROLLS = 3
-} inv_cat_t;
 
 typedef struct action_bar {
 	//TODO these 3 bools should be 1 enum, less juggling just better in every way
@@ -57,16 +38,6 @@ typedef struct action_bar {
 	int inv_selector; // current inventory item you are selected on in a category
 	inv_cat_t cat; // current inventory category you are selected on TODO add categories
 } action_bar_t;
-
-typedef enum class_type {
-	CLASS_NONE = -1,
-	SWORDSMAN,
-	BARBARIAN,
-	SPEARMAN,
-	ARCHER,
-	WIZARD,
-	MERCHANT,
-} class_type_t;
 
 typedef struct class_data {
 	class_type_t type;
@@ -122,12 +93,6 @@ typedef struct player {
 	
 	action_bar_t action_bar;
 } player_t;
-
-typedef enum trait {
-	PASSIVE = 80000,
-	AGRESSIVE = 80001,
-	TACTICAL = 80002
-} trait_t;
 
 typedef enum enemy_type {
 	ENEMY_NONE = -1,

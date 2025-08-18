@@ -150,6 +150,11 @@
 #define CONSTITUTION_NAME					"Constitution"
 #define SPEED_NAME							"Speed"
 
+#define RARITY_COMMON_NAME					"Common"
+#define RARITY_UNCOMMOM_NAME				"Uncommon"
+#define RARITY_RARE_NAME					"Rare"
+#define RARITY_LEGENDARY_NAME				"Legendary"
+
 #define NULL_CLASS_NAME					"NULL"
 #define SWORDSMAN_CLASS_NAME			"Swordsman"
 #define BARBARIAN_CLASS_NAME			"Barbarian"

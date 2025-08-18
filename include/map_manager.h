@@ -7,16 +7,6 @@
 typedef struct item item_t;
 typedef enum item_ids item_ids_t;
 
-typedef enum biome {
-	BIOME_NULL = -1,
-	CAVE,
-	BOG,
-	CATACOMBS,
-	ANCIENT_CITY,
-	ARCANE_LABYRINTH,
-	VOID_HOLLOW
-} biome_t;
-
 typedef struct tile {
 	char floor; // what the floor tile is
 	bool has_light; // does this tile have light

@@ -1,0 +1,64 @@
+#ifndef ITEM_ENUMS_H_
+#define ITEM_ENUMS_H_
+
+typedef enum rarity {
+	NULL_RARITY,
+	COMMON,
+	UNCOMMON,
+	RARE,
+	LEGENDARY
+} rarity_t;
+
+typedef enum value_type {
+	VALUE_TYPE_NONE,
+	VALUE_TYPE_ARMOR,
+	VALUE_TYPE_WEAPON,
+	VALUE_TYPE_FOOD,
+	VALUE_TYPE_SCROLL
+} value_type_t;
+
+typedef enum armor_type {
+	LIGHT,
+	MEDIUM,
+	HEAVY,
+	NULL_ARMOR_TYPE
+} armor_type_t;
+
+// names should be limited to 32 characters
+typedef enum item_ids {
+	// items
+	BLANK,
+	TELEPORT_SCROLL,
+	HEALTH_POTION,
+	APPLE,
+	CHICKEN_DINNER,
+	
+	// heavy armors
+	BLACKSTONE_ARMOR,
+	BRONZE_ARMOR,
+	IRON_ARMOR,
+	STEEL_ARMOR,
+	MITHRIL_ARMOR,
+	SOULCRUST_ARMOR,
+	TERRACITE_ARMOR,
+	GRAVEMARROW_ARMOR,
+	VOIDMARROW_ARMOR,
+	
+	// medium armors
+	RAT_HIDE_ARMOR,
+	SLIME_ARMOR,
+	BOG_IRON_ARMOR,
+	BONE_ARMOR,
+	SUNSTEEL_ARMOR,
+	FALSE_IRON_ARMOR,
+	BARKMAIL_ARMOR,
+	DRAGON_BONE_ARMOR,
+	
+	// light armors
+	CLOAK,
+	LEATHER_CLOAK,
+	BOGSTICK_VEST,
+	VOIDLACE_CLOACK
+} item_ids_t;
+
+#endif

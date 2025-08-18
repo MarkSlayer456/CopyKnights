@@ -2,10 +2,32 @@
 #include <string.h>
 #include "items.h"
 #include "player.h"
+#include "enemy.h"
 #include "types.h"
 #include "game_constants.h"
+#include "map_manager.h"
 
-stats_map_t stats_map[] = {
+type_map_t rarity_map[] = {
+    {RARITY_COMMON_NAME, COMMON},
+    {RARITY_UNCOMMOM_NAME, UNCOMMON},
+    {RARITY_RARE_NAME, RARE},
+    {RARITY_LEGENDARY_NAME, LEGENDARY},
+};
+
+const int rarity_map_len = sizeof(rarity_map) / sizeof(rarity_map[0]);
+
+type_map_t item_biome_map[] = {
+    {CAVE_NAME, CAVE},
+    {BOG_NAME, BOG},
+    {CATACOMBS_NAME, CATACOMBS},
+    {ANCIENT_CITY_NAME, ANCIENT_CITY},
+    {ARCANE_LABYRINTH_NAME, ARCANE_LABYRINTH},
+    {VOID_HOLLOW_NAME, VOID_HOLLOW},
+};
+
+const int item_biome_map_len = sizeof(item_biome_map) / sizeof(item_biome_map[0]);
+
+type_map_t stats_map[] = {
     {STRENGTH_NAME, STRENGTH},
     {DEXTERITY_NAME, DEXTERITY},
     {INTELLIGENCE_NAME, INTELLIGENCE},
@@ -15,7 +37,7 @@ stats_map_t stats_map[] = {
 
 const int stats_map_len = sizeof(stats_map) / sizeof(stats_map[0]);
 
-armor_type_map_t armor_type_map[] = {
+type_map_t armor_type_map[] = {
     {ARMOR_TYPE_LIGHT_NAME, LIGHT},
     {ARMOR_TYPE_MEDIUM_NAME, MEDIUM},
     {ARMOR_TYPE_HEAVY_NAME, HEAVY},
@@ -23,7 +45,7 @@ armor_type_map_t armor_type_map[] = {
 
 const int armor_type_map_len = sizeof(armor_type_map) / sizeof(armor_type_map[0]);
 
-item_type_map_t item_type_map[] = {
+type_map_t item_type_map[] = {
     {BLANK_NAME, BLANK},
     {TELEPORT_SCROLL_NAME, TELEPORT_SCROLL},
     {HEALTH_POTION_NAME, HEALTH_POTION},
@@ -81,6 +103,14 @@ stats_t get_stat(const char *name) {
     return NULL_STAT;
 }
 
+rarity_t get_rarity(const char *name) {
+    for(int i = 0; i < rarity_map_len; i++) {
+        if(strcasecmp(name, rarity_map[i].name) == 0) {
+            return rarity_map[i].value;
+        }
+    }
+    return NULL_RARITY;
+}
 
 // returns 1 on success and 0 on fail
 int use_item(player_t *player)
@@ -148,6 +178,53 @@ void remove_item(player_t *player)
 	}
 }
 
+void load_armor_spawn_data(world_t *world) {
+    item_data_t *item_data = world->item_data;
+    FILE *fp = fopen("./data/armor_spawns.csv", "r");
+    if(!fp) {
+        perror("File open failed");
+        return;
+    }
+    
+    char line[2048];
+    
+    if(fgets(line, sizeof(line), fp) == NULL) {
+        fclose(fp);
+        return;
+    }
+    
+    int row = 0;
+    while(fgets(line, sizeof(line), fp)) {
+        line[strcspn(line, "\n")] = '\0';
+        char *armor_name = strtok(line, ",");
+        char *biome_name = strtok(NULL, ",");
+        char *spawn_rarity = strtok(NULL, ",");
+        
+        if(!armor_name || !biome_name || !spawn_rarity) {
+            continue;
+        }
+        
+        armor_type_t armor_type = armor_get_type(armor_name);
+        biome_t biome = get_biome(biome_name);
+        if(armor_type == NULL_ARMOR_TYPE || biome == BIOME_NULL) {
+            continue;
+        }
+        
+        int i = 0;
+        while(i < MAX_ITEMS) {
+            if(strcmp(armor_name, item_data[i].name) != 0) {
+                i++;
+                continue;
+            }
+            
+            item_data[i].spawn_biomes[item_data[i].spawn_biome_count++] = biome;
+            item_data[i].rarity = get_rarity(spawn_rarity);
+            break;
+        }
+        row++;
+    }
+}
+
 void load_armor_effects(world_t *world) {
     item_data_t *item_data = world->item_data;
     FILE *fp = fopen("./data/armor_effects.csv", "r");
@@ -181,7 +258,7 @@ void load_armor_effects(world_t *world) {
         
         int i = 0;
         while(i < MAX_ITEMS) {
-            if(item_data[i].value_type == VALUE_TYPE_ARMOR && item_data[i].stat_type.armor.type != armor_type) {
+            if(strcmp(armor_name, item_data[i].name) != 0) {
                 i++;
                 continue;
             }
@@ -194,6 +271,7 @@ void load_armor_effects(world_t *world) {
         }
         row++;
     }
+    load_armor_spawn_data(world);
 }
 
 void load_armor_data(world_t *world) {

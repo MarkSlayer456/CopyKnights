@@ -1,76 +1,13 @@
 #ifndef ITEM_TYPES_H_
 #define ITEM_TYPES_H_
 
-// names should be limited to 32 characters
-typedef enum item_ids {
-	// items
-	BLANK,
-	TELEPORT_SCROLL,
-	HEALTH_POTION,
-	APPLE,
-	CHICKEN_DINNER,
-	
-	// heavy armors
-	BLACKSTONE_ARMOR,
-	BRONZE_ARMOR,
-	IRON_ARMOR,
-	STEEL_ARMOR,
-	MITHRIL_ARMOR,
-	SOULCRUST_ARMOR,
-	TERRACITE_ARMOR,
-	GRAVEMARROW_ARMOR,
-	VOIDMARROW_ARMOR,
-	
-	// medium armors
-	RAT_HIDE_ARMOR,
-	SLIME_ARMOR,
-	BOG_IRON_ARMOR,
-	BONE_ARMOR,
-	SUNSTEEL_ARMOR,
-	FALSE_IRON_ARMOR,
-	BARKMAIL_ARMOR,
-	DRAGON_BONE_ARMOR,
-	
-	// light armors
-	CLOAK,
-	LEATHER_CLOAK,
-	BOGSTICK_VEST,
-	VOIDLACE_CLOACK
-} item_ids_t;
+#include "item_enums.h"
+#include "enums.h"
 
-typedef struct item_type_map {
+typedef struct type_map {
 	const char *name;
 	item_ids_t value;
-} item_type_map_t;
-
-typedef enum armor_type {
-	LIGHT,
-	MEDIUM,
-	HEAVY,
-	NULL_ARMOR_TYPE
-} armor_type_t;
-
-typedef struct armor_type_map {
-	const char *name;
-	armor_type_t value;
-} armor_type_map_t;
-
-typedef enum stats {
-	NULL_STAT,
-	STRENGTH,
-	DEXTERITY,
-	INTELLIGENCE,
-	CONSTITUTION,
-	SPEED
-} stats_t;
-
-typedef enum value_type {
-	VALUE_TYPE_NONE,
-	VALUE_TYPE_ARMOR,
-	VALUE_TYPE_WEAPON,
-	VALUE_TYPE_FOOD,
-	VALUE_TYPE_SCROLL
-} value_type_t;
+} type_map_t;
 
 typedef struct stat_modifier {
 	int modifier;
@@ -99,11 +36,6 @@ typedef struct scroll_stats {
 	// TODO 
 } scroll_stats_t;
 
-typedef struct stats_map {
-	const char *name;
-	item_ids_t value;
-} stats_map_t;
-
 typedef struct item {
 	char name[MAX_ITEM_NAME_LENGTH];
 	item_ids_t id;
@@ -121,13 +53,15 @@ typedef struct item_data {
 	char name[MAX_ITEM_NAME_LENGTH];
 	item_ids_t id;
 	value_type_t value_type;
+	rarity_t rarity;
+	biome_t spawn_biomes[NUMBER_OF_BIOMES];
+	int spawn_biome_count;
 	union {
 		armor_stats_t armor;
 		weapon_stats_t weapon;
 		food_stats_t food;
 		scroll_stats_t scroll;
 	} stat_type;
-	int spawn_rate;
 } item_data_t;
 
 #endif
