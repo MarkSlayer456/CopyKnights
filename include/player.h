@@ -2,6 +2,7 @@
 #define PLAYER_H_
 
 #include "types.h"
+#include <stdbool.h>
 
 class_type_t class_get_type(const char *name);
 
@@ -45,7 +46,11 @@ void player_cycle_action_bar_up(player_t *player);
 void player_cycle_action_bar_down(player_t *player);
 void player_cycle_inv_selector_up(player_t *player);
 void player_cycle_inv_selector_down(player_t *player);
+void player_cycle_loot_selector_up(player_t *player);
+void player_cycle_loot_selector_down(player_t *player);
 
+void player_open_loot(player_t *player);
+void player_close_loot(player_t *player);
 void player_open_inventory(player_t *player);
 void player_close_inventory(player_t *player);
 void player_open_spells(player_t *player);
@@ -53,6 +58,13 @@ void player_close_spells(player_t *player);
 
 // removes an item from the inventory list, not used to decrease item count
 void player_organize_inv(player_t *player, int loc);
+bool player_add_to_inv(player_t *player, item_t item);
+
+void player_take_loot_item(room_t *room, player_t *player);
+void player_get_nearby_loot(room_t *room, player_t *player);
+
+void player_clear_nearby_loot(player_t *player);
+
 
 #endif
 

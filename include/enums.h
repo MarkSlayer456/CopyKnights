@@ -30,7 +30,8 @@ typedef enum direction {
 typedef enum action_bar_selectors { 
 	NOT_OPEN = -1, 
 	INVENTORY = 0, 
-	SPELLS = 1	
+	SPELLS = 1,
+	LOOT = 2
 } action_bar_selector_t;
 
 typedef enum inventory_category {

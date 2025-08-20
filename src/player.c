@@ -381,25 +381,114 @@ void player_cycle_inv_selector_down(player_t *player)
 	}
 }
 
-void player_open_inventory(player_t *player)
-{
-	player->action_bar.inv_open = 1;
-	//hud_update_action_bar(player);
+void player_cycle_loot_selector_up(player_t *player) {
+	if(player->action_bar.loot_selector > 0) {
+		if(player->action_bar.loot_selector - player->action_bar.loot_offset == 0) {
+			player->action_bar.loot_offset++;
+		}
+		player->action_bar.loot_selector--;
+	}
 }
 
-void player_close_inventory(player_t *player)
-{
-	player->action_bar.inv_open = 0;
+void player_cycle_loot_selector_down(player_t *player) {
+	int visible_item_count = INVENTORY_HEIGHT-2;
+	if(player->nearby_loot[player->action_bar.loot_selector+1] != NULL) {
+		if(player->action_bar.loot_selector - player->action_bar.loot_offset >= visible_item_count-1) {
+			player->action_bar.loot_offset++;
+		}
+		player->action_bar.loot_selector++;
+	}
 }
 
-void player_open_spells(player_t *player)
-{
-	player->action_bar.spells_open = 1;
+void player_open_loot(player_t *player) {
+	player->action_bar.selector = LOOT;
 }
 
-void player_close_spells(player_t *player)
-{
-	player->action_bar.spells_open = 0;
+void player_close_loot(player_t *player) {
+	player->action_bar.selector = NOT_OPEN;
+}
+
+
+void player_open_inventory(player_t *player) {
+	player->action_bar.selector = INVENTORY;
+}
+
+void player_close_inventory(player_t *player) {
+	player->action_bar.selector = NOT_OPEN;
+}
+
+void player_open_spells(player_t *player) {
+	player->action_bar.selector = SPELLS;
+}
+
+void player_close_spells(player_t *player) {
+	player->action_bar.selector = NOT_OPEN;
+}
+
+bool player_add_to_inv(player_t *player, item_t item) {
+	if(player->inventory_count < INV_SIZE) {
+		player->inventory[player->inventory_count++] = item;
+		return true;
+	}
+	return false;
+}
+
+void player_take_loot_item(room_t *room, player_t *player) {
+	item_t *selected_item = player->nearby_loot[player->action_bar.loot_selector];
+	player_add_to_inv(player, *selected_item);
+	int start_y = player->y - 1;
+	int start_x = player->x - 1;
+	int end_y = player->y + 1;
+	int end_x = player->x + 1;
+	
+	if (start_y < 0) start_y = 0;
+	if (start_x < 0) start_x = 0;
+	if (end_y >= ROOM_HEIGHT) end_y = ROOM_HEIGHT - 1;
+	if (end_x >= ROOM_WIDTH) end_x = ROOM_WIDTH - 1;
+	
+	for(int y = start_y; y <= end_y; y++) {
+		for(int x = start_x; x <= end_x; x++) {
+			for(int i = 0; i < MAX_ITEMS_PER_TILE; i++) {
+				item_t *item = room->tiles[y][x]->items[i];
+				if(item == NULL || item->stack == 0) continue;
+				if(selected_item == item) {
+					free(item);
+					room->tiles[y][x]->items[i] = NULL;
+				}
+			}
+		}
+	}
+	// need to repopulate the array
+	player_get_nearby_loot(room, player);
+}
+
+void player_get_nearby_loot(room_t *room, player_t *player) {
+	player_clear_nearby_loot(player);
+	player->nearby_loot_count = 0;
+	int start_y = player->y - 1;
+	int start_x = player->x - 1;
+	int end_y = player->y + 1;
+	int end_x = player->x + 1;
+	
+	if (start_y < 0) start_y = 0;
+	if (start_x < 0) start_x = 0;
+	if (end_y >= ROOM_HEIGHT) end_y = ROOM_HEIGHT - 1;
+	if (end_x >= ROOM_WIDTH) end_x = ROOM_WIDTH - 1;
+	
+	for(int y = start_y; y <= end_y; y++) {
+		for(int x = start_x; x <= end_x; x++) {
+			for(int i = 0; i < MAX_ITEMS_PER_TILE; i++) {
+				item_t *item = room->tiles[y][x]->items[i];
+				if(item == NULL || item->stack == 0) continue;
+				player->nearby_loot[player->nearby_loot_count++] = item;
+			}
+		}
+	}
+}
+
+void player_clear_nearby_loot(player_t *player) {
+	player->nearby_loot_count = 0;
+	player->nearby_loot[0] = NULL;
 }
 
 // removes an item from the inventory list and reorganizes, not used to decrease item count

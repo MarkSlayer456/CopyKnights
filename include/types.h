@@ -27,18 +27,16 @@ typedef struct location {
 } location_t;
 
 typedef struct action_bar {
-	//TODO these 3 bools should be 1 enum, less juggling just better in every way
-	bool inv_open; // is inventory open
-	bool spells_open; // is options open
-	bool loot_open; // is a loot tile open
 	action_bar_selector_t selector; // which item is the selector on
 	
 	int spells_selector; // current spell you are selected on
 	
 	int inv_selector; // current inventory item you are selected on in a category
+	
+	int loot_selector; // current loot item you are selected on
+	int loot_offset;
 	inv_cat_t cat; // current inventory category you are selected on TODO add categories
 } action_bar_t;
-
 typedef struct class_data {
 	class_type_t type;
 	int base_strength;
@@ -85,6 +83,9 @@ typedef struct player {
 	int global_x; // pos on the map
 	int global_y; // pos on the map
 	item_t *inventory; // list of items in players inventory
+	int inventory_count; // amount of items the player has
+	item_t *nearby_loot[MAX_ITEMS_NEARBY_PLAYER];
+	int nearby_loot_count;
 	int *mana; // amount of player currently has
 	int *max_mana;
 	int action_points;

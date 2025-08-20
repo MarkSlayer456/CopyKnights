@@ -24,7 +24,7 @@ void draw(world_t *world, player_t *player) {
 	werase(inventory_hud);
 	werase(inventory_desc_hud);
 	// draw stuff...
-	if((player->action_bar.inv_open || player->action_bar.spells_open || player->action_bar.loot_open) || player->action_bar.selector != NOT_OPEN) {
+	if(player->action_bar.selector != NOT_OPEN) {
 		display_inventory_hud(world, player);
 		display_inventory_desc_hud(world, player);
 		wnoutrefresh(inventory_hud);
@@ -83,8 +83,8 @@ void draw(world_t *world, player_t *player) {
 	// wrefresh(action_bar);
 }
 
-bool manage_input(char c, world_t *world, player_t *player) 
-{
+bool manage_input(char c, world_t *world, player_t *player) {
+	room_t *room = world->room[player->global_x][player->global_y];
 	if (c == ERR) {
 		return true;
 	}
@@ -130,13 +130,16 @@ bool manage_input(char c, world_t *world, player_t *player)
 		}	
 		return true;
 	} else {
-		if(player->action_bar.inv_open) {
+		if(player->action_bar.selector == INVENTORY) {
 			switch(x) {
 				case UP_ARROW:
 					player_cycle_inv_selector_up(player);
 					break;
 				case DOWN_ARROW:
 					player_cycle_inv_selector_down(player);
+					break;
+				case RIGHT_ARROW:
+					player_open_loot(player);
 					break;
 				case CTRL_Q:
 					shutdown(world);
@@ -158,8 +161,37 @@ bool manage_input(char c, world_t *world, player_t *player)
 			}
 			hud_update_action_bar(player, world->room[player->global_x][player->global_y]);
 			return false;
-		} else if(player->action_bar.spells_open) {
+		} else if(player->action_bar.selector == SPELLS) {
 			return false; 
+		} else if(player->action_bar.selector == LOOT) { 
+			switch(x) {
+				case UP_ARROW:
+					player_cycle_loot_selector_up(player);
+					break;
+				case DOWN_ARROW:
+					player_cycle_loot_selector_down(player);
+					break;
+				case LEFT_ARROW:
+					player_open_inventory(player);
+					break;
+				case CTRL_Q:
+					shutdown(world);
+					break;
+				case ENTER_KEY:
+					player_take_loot_item(room, player);
+					break;
+				case KEY_I:
+					//TODO reset defaults
+					player_close_inventory(player);
+					player_close_action_bar(player);
+					break;
+				case KEY_B:
+					//TODO reset defaults
+					player_close_inventory(player);
+					break;
+				default:
+					break;
+			}
 		} else {
 			switch(x) {
 				case UP_ARROW:

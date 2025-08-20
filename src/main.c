@@ -83,7 +83,14 @@ int main(int argc, char *argv[]) {
 	
 	player_t *player = malloc(sizeof(player_t));
 	
-	action_bar_t action = {false, false, false, NOT_OPEN, 0, 0, ITEM};
+	action_bar_t action = {
+		.selector = NOT_OPEN,
+		.spells_selector = 0,
+		.inv_selector = 0,
+		.loot_selector = 0,
+		.loot_offset = 0,
+		.cat = ITEM
+	};
 	
 	player->action_bar = action;
 	player->x = 1;
@@ -115,6 +122,7 @@ int main(int argc, char *argv[]) {
 	player->inv_offset = 0;
 	
 	player->inventory = malloc(INV_SIZE * sizeof(item_t));
+	player->inventory_count = 0;
 	
 	item_t blank = {BLANK_NAME, "does nothing", BLANK, 0};
 	item_t test_item1 = {HEALTH_POTION_NAME, "heals player", HEALTH_POTION, 5};
@@ -124,16 +132,9 @@ int main(int argc, char *argv[]) {
 	for(int i = 0; i < INV_SIZE; i++) {
 		player->inventory[i] = blank;
 	}
-	
-	player->inventory[0] = test_item1;
-	
-	player->inventory[1] = test_item2;
-	
-	player->inventory[2] = test_item3;
-	
-	for(int i = 3; i < INV_SIZE; i++) {
-		player->inventory[i] = test_item3;
-	}
+	player_add_to_inv(player, test_item1);
+	player_add_to_inv(player, test_item2);
+	player_add_to_inv(player, test_item3);
 	
 	player->lantern.power = 5;
 	player->lantern.is_on = true;
@@ -168,6 +169,7 @@ int main(int argc, char *argv[]) {
 	strcpy(item->name, world->item_data[0].name);
 	item->stack = 1;
 	item->id = world->item_data[0].id;
+	strcpy(item->desc, "+4 armor");
 	item->value_type = world->item_data[0].value_type;
 	item->stat_type.armor.type = world->item_data[0].stat_type.armor.type;
 	item->stat_type.armor.defense = world->item_data[0].stat_type.armor.defense;
@@ -180,6 +182,7 @@ int main(int argc, char *argv[]) {
 		calculate_light(world, player);
 		generate_turn_order_display(world, player);
     	draw(world, player);
+		player_get_nearby_loot(world->room[player->global_x][player->global_y], player);
 		
 		int actor = pick_next_actor(world, player);
 		assert(actor != INVALID_ACTOR_INDEX);
