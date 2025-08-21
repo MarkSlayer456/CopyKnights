@@ -18,10 +18,10 @@ typedef enum value_type {
 } value_type_t;
 
 typedef enum armor_type {
+	NULL_ARMOR_TYPE,
 	LIGHT,
 	MEDIUM,
-	HEAVY,
-	NULL_ARMOR_TYPE
+	HEAVY
 } armor_type_t;
 
 // names should be limited to 32 characters

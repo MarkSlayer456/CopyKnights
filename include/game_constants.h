@@ -12,7 +12,7 @@
 #define PLAYER				'@'
 #define ITEM_SYMBOL			'*'
 
-#define MAX_ITEMS								1000
+#define MAX_ITEMS								128
 
 #define PLAYER_TURN_ORDER_INDEX					-1
 #define INVALID_ACTOR_INDEX						999999999
@@ -29,8 +29,10 @@
 #define ESC_KEY									27
 
 #define TEST_SEED								596231
-#define ENEMY_X_PRIME							19349663u
+#define SEED_PRIMER								19349663u
 #define ENEMY_Y_PRIME							73856093u
+#define ITEM_X_PRIME							10000019u
+#define ITEM_Y_PRIME							10000079u
 
 #define KEY_A      								97
 #define KEY_B									98
@@ -74,9 +76,10 @@
 #define ARCANE_LABYRINTH_NAME				"Arcane Labyrinth"
 #define VOID_HOLLOW_NAME					"Void Hollow"
 
-#define POTENTIAL_ENEMY_SPAWN_CHAR			'*'
+#define POTENTIAL_ENEMY_SPAWN_CHAR			'A'
 #define POTENTIAL_CHEST_SPAWN_CHAR			'$'
 #define POTENTIAL_TRAP_SPAWN_CHAR			'X'
+#define POTENTIAL_ITEM_SPAWN_CHAR			'*'
 
 #define MAX_ENEMIES_PER_TILE				8
 #define MAX_ITEMS_PER_TILE					8

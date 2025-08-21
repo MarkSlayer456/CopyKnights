@@ -69,6 +69,9 @@ int main(int argc, char *argv[]) {
 	
 	world->class_data = calloc(MAX_CLASSES, sizeof(class_data_t));
 	world->item_data = calloc(MAX_ITEMS, sizeof(item_data_t));
+	for(int i = 0; i < MAX_ITEMS; i++) {
+		world->item_data[i] = (item_data_t){0};
+	}
 	
 	world->max_message_storage = DEFAULT_MAX_MESSAGE_STORAGE;
 	world->messages_size = 0;
@@ -150,7 +153,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	world->seed = TEST_SEED;
-	room_t *first = setup_first_room(&world->seed, 0, 0, world->enemy_data);
+	room_t *first = setup_first_room(&world->seed, 0, 0, world->enemy_data, world->item_data);
 	first->enemies[0] = enemy_spawn(BAT, world->enemy_data, 1, 1);
 	
 	first->current_enemy_count++;

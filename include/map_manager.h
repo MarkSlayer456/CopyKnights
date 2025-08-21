@@ -23,9 +23,9 @@ typedef struct room {
 } room_t;
 //TODO these should return pointers not room_t this causes lots of copying that pointers don't
 
-room_t *generate_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data);
+room_t *generate_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data, item_data_t *item_data);
 
-room_t *load_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data);
+room_t *load_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data, item_data_t *item_data);
 
-room_t *setup_first_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data);
+room_t *setup_first_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data, item_data_t *item_data);
 #endif

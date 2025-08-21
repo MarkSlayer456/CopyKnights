@@ -24,4 +24,7 @@ void load_armor_spawn_data(world_t *world);
 void load_armor_effects(world_t *world);
 void load_armor_data(world_t *world);
 
+void item_spawn(item_ids_t id, biome_t biome, tile_t *tile, item_data_t *item_data);
+item_ids_t item_generate_type(unsigned int *seed, item_data_t *item_data, biome_t biome);
+
 #endif

@@ -4,6 +4,8 @@
 #include "item_enums.h"
 #include "enums.h"
 
+typedef struct tile tile_t;
+
 typedef struct type_map {
 	const char *name;
 	item_ids_t value;
@@ -56,8 +58,7 @@ typedef struct item_data {
 	item_ids_t id;
 	value_type_t value_type;
 	rarity_t rarity;
-	biome_t spawn_biomes[NUMBER_OF_BIOMES];
-	int spawn_biome_count;
+	bool spawn_biomes[NUMBER_OF_BIOMES];
 	union {
 		armor_stats_t armor;
 		weapon_stats_t weapon;

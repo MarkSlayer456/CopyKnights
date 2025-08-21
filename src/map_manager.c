@@ -11,20 +11,25 @@
 #include <math.h>
 #include <assert.h>
 #include "types.h"
+#include "items.h"
+#include "functions.h"
 
-room_t *setup_first_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data) {
-	return load_room(seed, x, y, enemy_data);
+room_t *setup_first_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data, item_data_t *item_data) {
+	return load_room(seed, x, y, enemy_data, item_data);
 }
 
-room_t *generate_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data) {
-	return load_room(seed, x, y, enemy_data);
+room_t *generate_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data, item_data_t *item_data) {
+	return load_room(seed, x, y, enemy_data, item_data);
 }
    
 // name is a file name
-room_t *load_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data)
+room_t *load_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data, item_data_t *item_data)
 {
 	int room_num = 0; 
-	unsigned int enemy_seed = (x*ENEMY_X_PRIME) + (y*ENEMY_Y_PRIME);
+	unsigned int cantor = cantor_pair(x, y);
+	unsigned int map_seed = cantor ^ (*seed);
+	map_seed *= SEED_PRIMER;
+	map_seed ^= (*seed) >> 15;
 	DEBUG_LOG("room_num: %d", room_num);
 	DEBUG_LOG("(x,y): (%d,%d)", x, y);
 	room_t *room = calloc(1, sizeof(room_t));
@@ -45,27 +50,27 @@ room_t *load_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data)
 	if(depth <= 10) {
 		room->biome = CAVE;
 		strcat(folder, "cave");
-		room_num = (rand_r(seed) % CAVE_ROOM_COUNT)+1;
+		room_num = (rand_r(&map_seed) % CAVE_ROOM_COUNT)+1;
 	} else if(depth <= 20) {
 		room->biome = BOG;
 		strcat(folder, "bog");
-		room_num = (rand_r(seed) % BOG_ROOM_COUNT)+1;
+		room_num = (rand_r(&map_seed) % BOG_ROOM_COUNT)+1;
 	} else if(depth <= 30) {
 		room->biome = CATACOMBS;
 		strcat(folder, "catacombs");
-		room_num = (rand_r(seed) % CATACOMBS_ROOM_COUNT)+1;
+		room_num = (rand_r(&map_seed) % CATACOMBS_ROOM_COUNT)+1;
 	} else if(depth <= 40) {
 		room->biome = ANCIENT_CITY;
 		strcat(folder, "ancient_city");
-		room_num = (rand_r(seed) % ANCIENT_CITY_ROOM_COUNT)+1;
+		room_num = (rand_r(&map_seed) % ANCIENT_CITY_ROOM_COUNT)+1;
 	} else if(depth <= 50) {
 		room->biome = ARCANE_LABYRINTH;
 		strcat(folder, "arcane_labyrinth");
-		room_num = (rand_r(seed) % ARCANE_LABYRINTH_ROOM_COUNT)+1;
+		room_num = (rand_r(&map_seed) % ARCANE_LABYRINTH_ROOM_COUNT)+1;
 	} else if(depth <= 60) {
 		room->biome = VOID_HOLLOW;
 		strcat(folder, "void_hollow");
-		room_num = (rand_r(seed) % VOID_HOLLOW_ROOM_COUNT)+1;
+		room_num = (rand_r(&map_seed) % VOID_HOLLOW_ROOM_COUNT)+1;
 	}
 	assert(room_num > 0);
 
@@ -90,7 +95,7 @@ room_t *load_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data)
 		for(int j = 0; j < strlen(tok); j++) {
 			switch(tok[j]) {
 				case POTENTIAL_ENEMY_SPAWN_CHAR:
-					room->enemies[room->current_enemy_count] = enemy_spawn(enemy_generate_type(&enemy_seed, enemy_data, room->biome), enemy_data, j, i);
+					room->enemies[room->current_enemy_count] = enemy_spawn(enemy_generate_type(&map_seed, enemy_data, room->biome), enemy_data, j, i);
 					room->tiles[i][j]->floor = EMPTY;
 					room->current_enemy_count++;
 					break;
@@ -98,26 +103,15 @@ room_t *load_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data)
 					break;
 				case POTENTIAL_TRAP_SPAWN_CHAR:
 					break;
+				case POTENTIAL_ITEM_SPAWN_CHAR:
+					item_spawn(item_generate_type(&map_seed, item_data, room->biome), room->biome, room->tiles[i][j], item_data);
+					room->tiles[i][j]->floor = EMPTY;
+					break;
 				default:
 					room->tiles[i][j]->floor = tok[j];
 					break;
 			}
 		}
-		/*strcpy(room->layout[i], tok);
-		for(int j = 0; j < strlen(room->layout[i]); j++) {
-			//TODO make this a chance not a 100%
-			switch(room->layout[i][j]) {
-				case POTENTIAL_ENEMY_SPAWN_CHAR:
-					room->enemies[room->current_enemy_count] = enemy_spawn(enemy_generate_type(&enemy_seed, enemy_data, room->biome), enemy_data, j, i);
-					room->layout[i][j] = EMPTY;
-					room->current_enemy_count++;
-					break;
-				case POTENTIAL_CHEST_SPAWN_CHAR:
-					break;
-				case POTENTIAL_TRAP_SPAWN_CHAR:
-					break;
-			}
-		}*/
 		tok = strtok(NULL, "\n");
 		i++;
 	}

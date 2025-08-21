@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 #include "items.h"
 #include "player.h"
 #include "enemy.h"
@@ -78,7 +79,7 @@ const int item_type_map_len = sizeof(item_type_map) / sizeof(item_type_map[0]);
 
 item_ids_t item_get_id(const char *name) {
 	for(int i = 0; i < item_type_map_len; i++) {
-		if(strcasecmp(name, item_type_map[i].name) == 0) {
+		if(strcmp(name, item_type_map[i].name) == 0) {
 			return item_type_map[i].value;
 		}
 	}
@@ -87,7 +88,7 @@ item_ids_t item_get_id(const char *name) {
 
 armor_type_t armor_get_type(const char *name) {
     for(int i = 0; i < armor_type_map_len; i++) {
-        if(strcasecmp(name, armor_type_map[i].name) == 0) {
+        if(strcmp(name, armor_type_map[i].name) == 0) {
             return armor_type_map[i].value;
         }
     }
@@ -96,7 +97,7 @@ armor_type_t armor_get_type(const char *name) {
 
 stats_t get_stat(const char *name) {
     for(int i = 0; i < stats_map_len; i++) {
-        if(strcasecmp(name, stats_map[i].name) == 0) {
+        if(strcmp(name, stats_map[i].name) == 0) {
             return stats_map[i].value;
         }
     }
@@ -105,7 +106,7 @@ stats_t get_stat(const char *name) {
 
 rarity_t get_rarity(const char *name) {
     for(int i = 0; i < rarity_map_len; i++) {
-        if(strcasecmp(name, rarity_map[i].name) == 0) {
+        if(strcmp(name, rarity_map[i].name) == 0) {
             return rarity_map[i].value;
         }
     }
@@ -204,9 +205,8 @@ void load_armor_spawn_data(world_t *world) {
             continue;
         }
         
-        armor_type_t armor_type = armor_get_type(armor_name);
         biome_t biome = get_biome(biome_name);
-        if(armor_type == NULL_ARMOR_TYPE || biome == BIOME_NULL) {
+        if(biome == BIOME_NULL) {
             continue;
         }
         
@@ -217,7 +217,7 @@ void load_armor_spawn_data(world_t *world) {
                 continue;
             }
             
-            item_data[i].spawn_biomes[item_data[i].spawn_biome_count++] = biome;
+            item_data[i].spawn_biomes[biome] = true;
             item_data[i].rarity = get_rarity(spawn_rarity);
             break;
         }
@@ -248,11 +248,6 @@ void load_armor_effects(world_t *world) {
         char *value = strtok(NULL, ",");
         
         if(!armor_name || !target_stat || !value) {
-            continue;
-        }
-        
-        armor_type_t armor_type = armor_get_type(armor_name);
-        if(armor_type == NULL_ARMOR_TYPE) {
             continue;
         }
         
@@ -325,4 +320,52 @@ void load_armor_data(world_t *world) {
     load_armor_effects(world);
 }
 
+void item_spawn(item_ids_t id, biome_t biome, tile_t *tile, item_data_t *item_data) {
+    for(int i = 0; i < MAX_ITEMS; i++) {
+        item_t *item = NULL;
+        for(int k = 0; k < MAX_ITEMS_PER_TILE; k++) {
+            if(tile->items[k] == NULL || tile->items[k]->stack == 0) {
+                item = tile->items[k];
+            }
+        }
+        if(!item) continue;
+        if(item_data[i].id == BLANK) continue;
+        if(item_data[i].id == id) {
+            strcpy(item->name, item_data[i].name);
+            strcpy(item->desc, item_data[i].desc);
+            item->id = id;
+            item->stack = 1;
+            item->value_type = item_data[i].value_type;
+            switch(item_data[i].value_type) {
+                case VALUE_TYPE_NONE:
+                    break;
+                case VALUE_TYPE_ARMOR:
+                    item->stat_type.armor = item_data[i].stat_type.armor;
+                    break;
+                case VALUE_TYPE_WEAPON:
+                    item->stat_type.weapon = item_data[i].stat_type.weapon;
+                    break;
+                case VALUE_TYPE_FOOD:
+                    item->stat_type.food = item_data[i].stat_type.food;
+                    break;
+                case VALUE_TYPE_SCROLL:
+                    item->stat_type.scroll = item_data[i].stat_type.scroll;
+                    break;
+            }
+        }
+    }
+}
+
+item_ids_t item_generate_type(unsigned int *seed, item_data_t *item_data, biome_t biome) {
+    item_ids_t items[MAX_ITEMS];
+    int items_size = 0;
+    for(int i = 0; i < MAX_ITEMS; i++) {
+        if(item_data[i].spawn_biomes[biome]) {
+            items[items_size++] = item_data[i].id;
+        }
+    }
+    assert(items_size > 0);
+    int random_number = (rand_r(seed) % items_size);
+    return items[random_number];
+}
 

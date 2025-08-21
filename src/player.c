@@ -122,7 +122,7 @@ void player_move_left(player_t *player, world_t *world)
 			}
 			player->global_x--;
 			if(!world->room[player->global_x][player->global_y]->is_created) {
-				world->room[player->global_x][player->global_y] = generate_room(&world->seed, player->global_x, player->global_y, world->enemy_data);
+				world->room[player->global_x][player->global_y] = generate_room(&world->seed, player->global_x, player->global_y, world->enemy_data, world->item_data);
 			}
 			turn_order_enter_new_room(world, player);
 			player->x = ROOM_WIDTH-2;
@@ -138,7 +138,7 @@ void player_move_right(player_t *player, world_t *world)
 		if(player_get_current_pos(player, world) == DOOR) {
 			player->global_x++;
 			if(!world->room[player->global_x][player->global_y]->is_created) {
-				world->room[player->global_x][player->global_y] = generate_room(&world->seed, player->global_x, player->global_y, world->enemy_data);
+				world->room[player->global_x][player->global_y] = generate_room(&world->seed, player->global_x, player->global_y, world->enemy_data, world->item_data);
 			}
 			turn_order_enter_new_room(world, player);
 			player->x = 1;
@@ -154,7 +154,7 @@ void player_move_down(player_t *player, world_t *world)
 		if(player_get_current_pos(player, world) == DOOR) {
 			player->global_y++;
 			if(!world->room[player->global_x][player->global_y]->is_created) {
-				world->room[player->global_x][player->global_y] = generate_room(&world->seed, player->global_x, player->global_y, world->enemy_data);
+				world->room[player->global_x][player->global_y] = generate_room(&world->seed, player->global_x, player->global_y, world->enemy_data, world->item_data);
 			}
 			turn_order_enter_new_room(world, player);
 			player->y = 1;
@@ -175,7 +175,7 @@ void player_move_up(player_t *player, world_t *world)
 			}
 			player->global_y--;
 			if(!world->room[player->global_x][player->global_y]->is_created) {
-				world->room[player->global_x][player->global_y] = generate_room(&world->seed, player->global_x, player->global_y, world->enemy_data);
+				world->room[player->global_x][player->global_y] = generate_room(&world->seed, player->global_x, player->global_y, world->enemy_data, world->item_data);
 			}
 			turn_order_enter_new_room(world, player);
 			player->y = ROOM_HEIGHT-2;
@@ -452,8 +452,7 @@ void player_take_loot_item(room_t *room, player_t *player) {
 				item_t *item = room->tiles[y][x]->items[i];
 				if(item == NULL || item->stack == 0) continue;
 				if(selected_item == item) {
-					free(item);
-					room->tiles[y][x]->items[i] = NULL;
+					item->stack = 0;
 				}
 			}
 		}

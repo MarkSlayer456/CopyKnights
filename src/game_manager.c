@@ -59,7 +59,7 @@ void draw(world_t *world, player_t *player) {
 				}
 				
 				for(int k = 0; k < MAX_ITEMS_PER_TILE; k++) {
-					if(room->tiles[i][j]->items[k]->stack > 0) {
+					if(room->tiles[i][j]->items[k] != NULL && room->tiles[i][j]->items[k]->stack > 0) {
 						waddch(world->win, ITEM_SYMBOL);
 						enemyIsThere = 1; //TODO
 						break;
