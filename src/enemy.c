@@ -6,9 +6,11 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <time.h>
 #include <assert.h>
 #include "types.h"
+#include "functions.h"
 
 extern char walk_chars[WALK_CHAR_LENGTH];
 enemy_type_map_t biome_type_map[] = {
@@ -62,7 +64,7 @@ enemy_t *enemy_create_temp(world_t *world)
 enemy_t *enemy_spawn(enemy_type_t type, const enemy_data_t *enemy_data, int x, int y)
 {
     if(enemy_data == NULL) return NULL;
-    DEBUG_LOG("spawning enemy...");
+    DEBUG_LOG("%s", "spawning enemy...");
     int i = 0;
     while(i < MAX_ENEMIES) {
         if(enemy_data[i].type != type) {
@@ -186,7 +188,7 @@ enemy_type_t enemy_generate_type(unsigned int *seed, enemy_data_t *enemy_data, b
         }
     }
     assert(enemies_size > 0);
-    int random_number = (rand_r(seed) % enemies_size);
+    int random_number = (rand_r_portable(seed) % enemies_size);
     return enemies[random_number];
 }
 
@@ -260,13 +262,8 @@ void enemy_kill(enemy_t *enemy, world_t *world, player_t *player)
 	for(int i = 0; i < room->current_enemy_count; i++) {
 		if(enemy == room->enemies[i]) {
 			room->enemies[i] = NULL;
-			// found = 1;
 		}
-		// if(found == 1) {
-		// 	room->enemies[i] = room->enemies[i+1];
-		// }
 	}
-	// room->current_enemy_count--;
 }
 
 enemy_type_t enemy_decrease_health(enemy_t *enemy, world_t *world, player_t *player)

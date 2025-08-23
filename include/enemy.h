@@ -5,12 +5,6 @@
 #include <stdbool.h>
 #include "types.h"
 
-typedef struct world world_t;
-typedef struct player player_t;
-typedef enum direction direction_t;
-
-typedef enum biome biome_t;
-
 //TODO need move functions and check functions so enemies don't leave the map
 // shouldn't happen but just in case
 

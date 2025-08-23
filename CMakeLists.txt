@@ -9,7 +9,7 @@ file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/data
 
 add_executable(ck ${sources})
 
-target_compile_options(ck PUBLIC -Wall -g)
+target_compile_options(ck PUBLIC -Wall -g -Werror -std=c99 -pedantic)
 target_include_directories(ck PUBLIC include/)
 file(COPY ${data} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/data)
 

@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include <strings.h>
 #include "types.h"
 
 #define MIN(a,b)       (a < b) ? a : b

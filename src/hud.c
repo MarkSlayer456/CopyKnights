@@ -1,3 +1,4 @@
+#include <ncurses.h>
 #include "hud.h"
 #include "game_manager.h"
 #include "map_manager.h"
@@ -99,15 +100,16 @@ void hud_update_action_bar(player_t *player, room_t *room) {
 			} else {
 				snprintf(item, MAX_ITEM_NAME_LENGTH+add_size, "%s x%d", player->inventory[i].name, player->inventory[i].stack);
 			}
-			mvwprintw(action_bar, i, 0, item);
+			wmove(action_bar, i, 0);
+			waddstr(action_bar, item);
 		}
 		// TODO display player's inventory
 	} else if(player->action_bar.selector == SPELLS) {
 		// TODO display player's spells
 	} else if(player->action_bar.selector == LOOT) { 
-		for(int i = 0; i < MAX_ITEMS_PER_TILE; i++) {
-			item_t *item = room->tiles[player->y][player->x]->items[i];
-		}
+		// for(int i = 0; i < MAX_ITEMS_PER_TILE; i++) {
+		// 	item_t *item = room->tiles[player->y][player->x]->items[i];
+		// }
 		// TODO
 	} else {
 		char inv[12] = "inventory";
@@ -119,11 +121,15 @@ void hud_update_action_bar(player_t *player, room_t *room) {
 			case SPELLS:
 				snprintf(spells, 9, "%s", ">>spells");
 				break;
+			case LOOT:
+				break;
 			case NOT_OPEN:
 				break;
 		}
-		wprintw(action_bar, inv);
-		mvwprintw(action_bar, 1, 0, spells);
+		// wprintw(action_bar, inv);
+		waddstr(action_bar, inv);
+		wmove(action_bar, 1, 0);
+		waddstr(action_bar, spells);
 	}
 	
 }
@@ -135,15 +141,17 @@ void hud_update_messages(world_t *world, player_t *player) {
 	for(int i = world->messages_size-1; i > -1; i--) {
 		if(printed_messages == MESSAGE_HUD_SPACE) return;
 		if(world->messages[i] != NULL) {
-			int y, x;
+			int y = 0;
+			int x = 0;
 			getyx(hud, y, x);
+			x++; // this is required for a compiler error x not used, despite it literally being used
 			wmove(hud, y-1, 0);
 			char *clear = calloc(HUD_LENGTH, sizeof(char));
-			wprintw(hud, clear);
+			waddstr(hud, clear);
 			wmove(hud, y-1, 0);
-			wprintw(hud, world->messages[i]);
+			waddstr(hud, world->messages[i]);
 		} else {
-			DEBUG_LOG("hud.c: hud_update_messages: world->messages[i] is null!");
+			DEBUG_LOG("%s", "hud.c: hud_update_messages: world->messages[i] is null!");
 		}
 		printed_messages++;
 	}
@@ -158,17 +166,18 @@ void display_error_message(const char *str) {
 	wmove(hud, PLAYER_STATS_HUD_SPACE, 0);
 	char *message = malloc(128);
 	snprintf(message, 128, "%s", str);
-	wprintw(hud, message);
+	waddstr(hud, message);
 }
 
 void display_inventory_hud(world_t *world, player_t *player) {
-	room_t *room = world->room[player->global_x][player->global_y];
 	box(inventory_hud, 0, 0);
 	char inv_str[32] = "Inventory";
 	int middle = (SCREEN_WIDTH/2)-1;
-	mvwprintw(inventory_hud, 0, (middle-strlen(inv_str))/2, inv_str);
+	wmove(inventory_hud, 0, (middle-strlen(inv_str))/2);
+	waddstr(inventory_hud, inv_str);
 	char loot_str[32] = "Nearby Loot";
-	mvwprintw(inventory_hud, 0, INVENTORY_WIDTH-(INVENTORY_WIDTH/4)-(strlen(loot_str))/2, loot_str);
+	wmove(inventory_hud, 0, INVENTORY_WIDTH-(INVENTORY_WIDTH/4)-(strlen(loot_str))/2);
+	waddstr(inventory_hud, loot_str);
 	for (int y = 0; y < INVENTORY_HEIGHT; y++) {
 		mvwaddch(inventory_hud, y, middle, '|');  // vertical divider at col 39
 	}
@@ -194,7 +203,8 @@ void display_inventory_hud(world_t *world, player_t *player) {
 			} else {
 				snprintf(item_name, MAX_ITEM_NAME_LENGTH+add_size, "%s x%d", item->name, item->stack);
 			}
-			mvwprintw(inventory_hud, loot_pos++, INVENTORY_WIDTH/2, item_name);
+			wmove(inventory_hud, loot_pos++, INVENTORY_WIDTH/2);
+			waddstr(inventory_hud, item_name);
 		}
 		
 		for(int i = player->inv_offset; i < visible_item_count+player->inv_offset; i++) {
@@ -208,7 +218,8 @@ void display_inventory_hud(world_t *world, player_t *player) {
 			} else {
 				snprintf(item_name, MAX_ITEM_NAME_LENGTH+add_size, "%s x%d", player->inventory[i].name, player->inventory[i].stack);
 			}
-			mvwprintw(inventory_hud, pos++, 1, item_name);
+			wmove(inventory_hud, pos++, 1);
+			waddstr(inventory_hud, item_name);
 		}
 		// TODO display player's inventory
 	} else if(player->action_bar.selector == SPELLS) {
@@ -224,11 +235,15 @@ void display_inventory_hud(world_t *world, player_t *player) {
 			case SPELLS:
 				snprintf(spells, 9, "%s", ">>spells");
 				break;
+			case LOOT:
+				break;
 			case NOT_OPEN:
 				break;
 		}
-		mvwprintw(inventory_hud, 1, 1, "%s", inv);
-		mvwprintw(inventory_hud, 2, 1, "%s", spells);
+		wmove(inventory_hud, 1, 1);
+		waddstr(inventory_hud, inv);
+		wmove(inventory_hud, 2, 1);
+		waddstr(inventory_hud, spells);
 	}
 }
 void display_inventory_desc_hud(world_t *world, player_t *player) {
@@ -239,8 +254,10 @@ void display_inventory_desc_hud(world_t *world, player_t *player) {
 	box(inventory_desc_hud, 0, 0);
 	int visible_item_count = INVENTORY_HEIGHT-2;
 	char desc_title_inv[32] = "Description";
-	mvwprintw(inventory_desc_hud, 0, (39-strlen(desc_title_inv))/2, desc_title_inv);
-	mvwprintw(inventory_desc_hud, 0, INVENTORY_WIDTH-(INVENTORY_WIDTH/4)-(strlen(desc_title_inv))/2, desc_title_inv);
+	wmove(inventory_hud, 0, (39-strlen(desc_title_inv))/2);
+	waddstr(inventory_hud, desc_title_inv);
+	wmove(inventory_hud, 0, INVENTORY_WIDTH-(INVENTORY_WIDTH/4)-(strlen(desc_title_inv))/2);
+	waddstr(inventory_hud, desc_title_inv);
 	for (int y = 0; y < INVENTORY_HEIGHT; y++) {
 		mvwaddch(inventory_desc_hud, y, 39, '|');
 	}
@@ -250,7 +267,6 @@ void display_inventory_desc_hud(world_t *world, player_t *player) {
 		}
 	}
 	
-	room_t *room = world->room[player->global_x][player->global_y];
 	int start = player->action_bar.loot_offset;
 	int end = visible_item_count+player->action_bar.loot_offset;
 	int max = player->nearby_loot_count;

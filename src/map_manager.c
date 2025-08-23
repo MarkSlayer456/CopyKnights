@@ -50,27 +50,27 @@ room_t *load_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data, it
 	if(depth <= 10) {
 		room->biome = CAVE;
 		strcat(folder, "cave");
-		room_num = (rand_r(&map_seed) % CAVE_ROOM_COUNT)+1;
+		room_num = (rand_r_portable(&map_seed) % CAVE_ROOM_COUNT)+1;
 	} else if(depth <= 20) {
 		room->biome = BOG;
 		strcat(folder, "bog");
-		room_num = (rand_r(&map_seed) % BOG_ROOM_COUNT)+1;
+		room_num = (rand_r_portable(&map_seed) % BOG_ROOM_COUNT)+1;
 	} else if(depth <= 30) {
 		room->biome = CATACOMBS;
 		strcat(folder, "catacombs");
-		room_num = (rand_r(&map_seed) % CATACOMBS_ROOM_COUNT)+1;
+		room_num = (rand_r_portable(&map_seed) % CATACOMBS_ROOM_COUNT)+1;
 	} else if(depth <= 40) {
 		room->biome = ANCIENT_CITY;
 		strcat(folder, "ancient_city");
-		room_num = (rand_r(&map_seed) % ANCIENT_CITY_ROOM_COUNT)+1;
+		room_num = (rand_r_portable(&map_seed) % ANCIENT_CITY_ROOM_COUNT)+1;
 	} else if(depth <= 50) {
 		room->biome = ARCANE_LABYRINTH;
 		strcat(folder, "arcane_labyrinth");
-		room_num = (rand_r(&map_seed) % ARCANE_LABYRINTH_ROOM_COUNT)+1;
+		room_num = (rand_r_portable(&map_seed) % ARCANE_LABYRINTH_ROOM_COUNT)+1;
 	} else if(depth <= 60) {
 		room->biome = VOID_HOLLOW;
 		strcat(folder, "void_hollow");
-		room_num = (rand_r(&map_seed) % VOID_HOLLOW_ROOM_COUNT)+1;
+		room_num = (rand_r_portable(&map_seed) % VOID_HOLLOW_ROOM_COUNT)+1;
 	}
 	assert(room_num > 0);
 

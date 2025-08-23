@@ -4,7 +4,7 @@
 #include "items/items.h"
 #include "map_manager.h"
 #include "enemy.h"
-#include "math.h"
+#include <math.h>
 #include <assert.h>
 #include <ncurses.h>
 #include <stdlib.h>
@@ -218,6 +218,7 @@ bool manage_input(char c, world_t *world, player_t *player) {
 			return false;
 		}
 	}
+	return false;
 }
 
 void display_combat_message(world_t *world, player_t *player, const char *str) {

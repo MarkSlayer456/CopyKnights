@@ -14,3 +14,11 @@ int compare4(int a, int b, int c, int d)
 unsigned int cantor_pair(int x, int y) {
 	return (x + y) * (x + y + 1) / 2 + y;
 }
+
+/**
+ * cross platform rand_r function
+ **/
+int rand_r_portable(unsigned int *seed) {
+	*seed = *seed * 1103515245 + 12345;
+	return (unsigned int)(*seed / 65536) % 32768;
+}

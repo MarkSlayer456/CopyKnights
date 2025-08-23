@@ -1,5 +1,5 @@
-#include <stdio.h>
 #include <ncurses.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <unistd.h>
@@ -17,6 +17,7 @@
 #include "types.h"
 #include "lantern.h"
 #include "items/armor.h"
+#include "items/weapons.h"
 
 /*
 	Top down dungeon crawler
@@ -84,6 +85,7 @@ int main(int argc, char *argv[]) {
 	load_enemy_data(world->enemy_data);
 	load_class_data(world->class_data);
 	load_armor_data(world);
+	load_weapon_data(world);
 	
 	player_t *player = malloc(sizeof(player_t));
 	

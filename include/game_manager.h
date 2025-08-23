@@ -2,12 +2,8 @@
 #define GAME_MANAGER_H_
 #include <ncurses.h>
 #include <stdbool.h>
-
-typedef struct class_data class_data_t;
-typedef enum class_type class_type_t;
-typedef struct player player_t;
-typedef struct world world_t;
-typedef struct room room_t;
+#include "enums.h"
+#include "types.h"
 
 void draw(world_t *world, player_t *player);
 bool manage_input(char c, world_t *world, player_t *player);

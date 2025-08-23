@@ -1,6 +1,10 @@
 #ifndef GAME_CONSTANTS_H_
 
 #define GAME_CONSTANTS_H_
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 #define MESSAGE_IS_PLAYERS_TURN					"It is your turn!"
 
 #define WALL 				'#' // a wall
@@ -12,7 +16,7 @@
 #define PLAYER				'@'
 #define ITEM_SYMBOL			'*'
 
-#define MAX_ITEMS								128
+#define MAX_ITEMS								512
 
 #define PLAYER_TURN_ORDER_INDEX					-1
 #define INVALID_ACTOR_INDEX						999999999
@@ -107,6 +111,8 @@
 #define MUD_CRAWLER_ENEMY_NAME				"Mud Crawler"
 #define BOG_LURKER_ENEMY_NAME				"Bog Lurker"
 
+/////////////// items //////////////////
+
 #define INV_SIZE					128
 
 #define BLANK_NAME					"Blank"
@@ -121,6 +127,7 @@
 
 #define PLAYER_MIN_VISION_RANGE				2
 
+// heavy armor
 #define BLACKSTONE_ARMOR_NAME				"Blackstone Armor"
 #define BRONZE_ARMOR_NAME					"Bronze Armor"
 #define IRON_ARMOR_NAME						"Iron Armor"
@@ -130,6 +137,8 @@
 #define TERRACITE_ARMOR_NAME				"Terracite Armor"
 #define GRAVEMARROW_ARMOR_NAME				"Gravemarrow Armor"
 #define VOIDMARROW_ARMOR_NAME				"Voidmarrow Armor"
+
+// medium armor
 #define RAT_HIDE_ARMOR_NAME					"Rat Hide Armor"
 #define SLIME_ARMOR_NAME					"Slime Armor"
 #define BOG_IRON_ARMOR_NAME					"Bog Iron Armor"
@@ -138,11 +147,14 @@
 #define FALSE_IRON_ARMOR_NAME				"False Iron Armor"
 #define BARKMAIL_ARMOR_NAME					"Barkmail Armor"
 #define DRAGON_BONE_ARMOR_NAME				"Dragon Bone Armor"
+
+// light armor
 #define CLOAK_NAME							"Cloak"
 #define LEATHER_CLOAK_NAME					"Leather Cloak"
 #define BOGSTICK_VEST_NAME					"Bogstick Vest"
 #define VOIDLACE_CLOAK_NAME					"Voidlace Cloak"
 
+// armor types
 #define ARMOR_TYPE_LIGHT_NAME				"light"
 #define ARMOR_TYPE_MEDIUM_NAME				"medium"
 #define ARMOR_TYPE_HEAVY_NAME				"heavy"
@@ -155,10 +167,84 @@
 #define CONSTITUTION_NAME					"Constitution"
 #define SPEED_NAME							"Speed"
 
+// rarities
 #define RARITY_COMMON_NAME					"Common"
 #define RARITY_UNCOMMOM_NAME				"Uncommon"
 #define RARITY_RARE_NAME					"Rare"
 #define RARITY_LEGENDARY_NAME				"Legendary"
+
+// swords
+#define BLACK_STONE_SWORD_NAME				"Black Stone Sword"
+#define BRONZE_SWORD_NAME					"Bronze Sword"
+#define IRON_SWORD_NAME						"Iron Sword"
+#define STEEL_SWORD_NAME					"Steel Sword"
+#define MITHRIL_SWORD_NAME					"Mithril Sword"
+#define SOULCRUST_SWORD_NAME				"Soulcrust Sword"
+#define TERRACTIE_SWORD_NAME				"Terracite Sword"
+#define GRAVEMARROW_SWORD_NAME				"Gravemarrow Sword"
+#define VOIDMARROW_SWORD_NAME				"Voidmarrow Sword"
+
+#define BLACK_STONE_SPEAR_NAME				"Black Stone Spear"
+#define BRONZE_SPEAR_NAME					"Bronze Spear"
+#define IRON_SPEAR_NAME						"Iron Spear"
+#define STEEL_SPEAR_NAME					"Steel Spear"
+#define MITHRIL_SPEAR_NAME					"Mithril Spear"
+#define SOULCRUST_SPEAR_NAME				"Soulcrust Spear"
+#define TERRACTIE_SPEAR_NAME				"Terracite Spear"
+#define GRAVEMARROW_SPEAR_NAME				"Gravemarrow Spear"
+#define VOIDMARROW_SPEAR_NAME				"Voidmarrow Spear"
+
+#define BLACK_STONE_MACE_NAME				"Black Stone Mace"
+#define BRONZE_MACE_NAME					"Bronze Mace"
+#define IRON_MACE_NAME						"Iron Mace"
+#define STEEL_MACE_NAME						"Steel Mace"
+#define MITHRIL_MACE_NAME					"Mithril Mace"
+#define SOULCRUST_MACE_NAME					"Soulcrust Mace"
+#define TERRACTIE_MACE_NAME					"Terracite Mace"
+#define GRAVEMARROW_MACE_NAME				"Gravemarrow Mace"
+#define VOIDMARROW_MACE_NAME				"Voidmarrow Mace"
+
+#define BLACK_STONE_AXE_NAME				"Black Stone Axe"
+#define BRONZE_AXE_NAME						"Bronze Axe"
+#define IRON_AXE_NAME						"Iron Axe"
+#define STEEL_AXE_NAME						"Steel Axe"
+#define MITHRIL_AXE_NAME					"Mithril Axe"
+#define SOULCRUST_AXE_NAME					"Soulcrust Axe"
+#define TERRACTIE_AXE_NAME					"Terracite Axe"
+#define GRAVEMARROW_AXE_NAME				"Gravemarrow Axe"
+#define VOIDMARROW_AXE_NAME					"Voidmarrow Axe"
+
+#define BLACK_STONE_PICKAXE_NAME			"Black Stone Pickaxe"	
+#define BRONZE_PICKAXE_NAME					"Bronze Pickaxe"
+#define IRON_PICKAXE_NAME					"Iron Pickaxe"
+#define STEEL_PICKAXE_NAME					"Steel Pickaxe"
+#define MITHRIL_PICKAXE_NAME				"Mithril Pickaxe"
+#define SOULCRUST_PICKAXE_NAME				"Soulcrust Pickaxe"
+#define TERRACTIE_PICKAXE_NAME				"Terracite Pickaxe"
+#define GRAVEMARROW_PICKAXE_NAME			"Gravemarrow Pickaxe"	
+#define VOIDMARROW_PICKAXE_NAME				"Voidmarrow Pickaxe"
+
+#define BLACK_STONE_BOW_NAME				"Black Stone Bow"
+#define BRONZE_BOW_NAME						"Bronze Bow"
+#define IRON_BOW_NAME						"Iron Bow"
+#define STEEL_BOW_NAME						"Steel Bow"
+#define MITHRIL_BOW_NAME					"Mithril Bow"
+#define SOULCRUST_BOW_NAME					"Soulcrust Bow"
+#define TERRACTIE_BOW_NAME					"Terracite Bow"
+#define GRAVEMARROW_BOW_NAME				"Gravemarrow Bow"
+#define VOIDMARROW_BOW_NAME					"Voidmarrow Bow"
+
+#define BLACK_STONE_STAFF_NAME				"Black Stone Staff"
+#define BRONZE_STAFF_NAME					"Bronze Staff"
+#define IRON_STAFF_NAME						"Iron Staff"
+#define STEEL_STAFF_NAME					"Steel Staff"
+#define MITHRIL_STAFF_NAME					"Mithril Staff"
+#define SOULCRUST_STAFF_NAME				"Soulcrust Staff"
+#define TERRACTIE_STAFF_NAME				"Terracite Staff"
+#define GRAVEMARROW_STAFF_NAME				"Gravemarrow Staff"
+#define VOIDMARROW_STAFF_NAME				"Voidmarrow Staff"
+
+///////////// player //////////////
 
 #define NULL_CLASS_NAME					"NULL"
 #define SWORDSMAN_CLASS_NAME			"Swordsman"

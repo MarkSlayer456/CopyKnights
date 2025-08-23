@@ -61,7 +61,7 @@ void load_armor_spawn_data(world_t *world) {
 			}
 			
 			item_data[i].spawn_biomes[biome] = true;
-			item_data[i].rarity = get_rarity(spawn_rarity);
+			item_data[i].rarity[biome] = get_rarity(spawn_rarity);
 			break;
 		}
 		row++;
