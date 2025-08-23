@@ -57,4 +57,25 @@ typedef enum trait {
 	TACTICAL = 80002
 } trait_t;
 
+typedef enum enemy_type {
+	ENEMY_NONE = -1,
+	SLIME,
+	BAT,
+	SKELETON,
+	RAT,
+	DRAGON,
+	BABY_DRAGON,
+	GOBLIN,
+	GHOST,
+	LOOT_GOBLIN,
+	MOSS_BEAST,
+	JESTER,
+	VOIDLING,
+	MARROW_CRAWLER,
+	VOID_MAW,
+	MARROW_LEECH,
+	MUD_CRAWLER,
+	BOG_LURKER,
+} enemy_type_t;
+
 #endif

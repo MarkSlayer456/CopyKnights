@@ -1,7 +1,7 @@
 #include "game_manager.h"
 #include "hud.h"
 #include "player.h"
-#include "items.h"
+#include "items/items.h"
 #include "map_manager.h"
 #include "enemy.h"
 #include "math.h"

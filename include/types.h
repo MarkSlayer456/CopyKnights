@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <ncurses.h>
 #include "game_constants.h"
-#include "item_types.h"
+#include "items/item_types.h"
 #include "enums.h"
 
 #define DEBUG_LOG(fmt, ...) \
@@ -65,6 +65,7 @@ typedef struct lantern {
 typedef struct equipment {
 	item_t *armor;
 	item_t *main_hand;
+	bool main_hand_two_handed; // is this weapon 2 handed
 	item_t *off_hand;
 } equipment_t;
 
@@ -96,27 +97,6 @@ typedef struct player {
 	
 	action_bar_t action_bar;
 } player_t;
-
-typedef enum enemy_type {
-	ENEMY_NONE = -1,
-	SLIME,
-	BAT,
-	SKELETON,
-	RAT,
-	DRAGON,
-	BABY_DRAGON,
-	GOBLIN,
-	GHOST,
-	LOOT_GOBLIN,
-	MOSS_BEAST,
-	JESTER,
-	VOIDLING,
-	MARROW_CRAWLER,
-	VOID_MAW,
-	MARROW_LEECH,
-	MUD_CRAWLER,
-	BOG_LURKER,
-} enemy_type_t;
 
 typedef struct enemy {
 	int health;

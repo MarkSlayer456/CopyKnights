@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#include "items.h"
+#include "items/items.h"
 #include "player.h"
 #include "enemy.h"
 #include "types.h"
@@ -37,14 +37,6 @@ type_map_t stats_map[] = {
 };
 
 const int stats_map_len = sizeof(stats_map) / sizeof(stats_map[0]);
-
-type_map_t armor_type_map[] = {
-    {ARMOR_TYPE_LIGHT_NAME, LIGHT},
-    {ARMOR_TYPE_MEDIUM_NAME, MEDIUM},
-    {ARMOR_TYPE_HEAVY_NAME, HEAVY},
-};
-
-const int armor_type_map_len = sizeof(armor_type_map) / sizeof(armor_type_map[0]);
 
 type_map_t item_type_map[] = {
     {BLANK_NAME, BLANK},
@@ -84,15 +76,6 @@ item_ids_t item_get_id(const char *name) {
 		}
 	}
 	return BLANK;
-}
-
-armor_type_t armor_get_type(const char *name) {
-    for(int i = 0; i < armor_type_map_len; i++) {
-        if(strcmp(name, armor_type_map[i].name) == 0) {
-            return armor_type_map[i].value;
-        }
-    }
-    return NULL_ARMOR_TYPE;
 }
 
 stats_t get_stat(const char *name) {
@@ -178,148 +161,6 @@ void remove_item(player_t *player)
 		player_organize_inv(player, player->action_bar.inv_selector);
 	}
 }
-
-void load_armor_spawn_data(world_t *world) {
-    item_data_t *item_data = world->item_data;
-    FILE *fp = fopen("./data/armor_spawns.csv", "r");
-    if(!fp) {
-        perror("File open failed");
-        return;
-    }
-    
-    char line[2048];
-    
-    if(fgets(line, sizeof(line), fp) == NULL) {
-        fclose(fp);
-        return;
-    }
-    
-    int row = 0;
-    while(fgets(line, sizeof(line), fp)) {
-        line[strcspn(line, "\n")] = '\0';
-        char *armor_name = strtok(line, ",");
-        char *biome_name = strtok(NULL, ",");
-        char *spawn_rarity = strtok(NULL, ",");
-        
-        if(!armor_name || !biome_name || !spawn_rarity) {
-            continue;
-        }
-        
-        biome_t biome = get_biome(biome_name);
-        if(biome == BIOME_NULL) {
-            continue;
-        }
-        
-        int i = 0;
-        while(i < MAX_ITEMS) {
-            if(strcmp(armor_name, item_data[i].name) != 0) {
-                i++;
-                continue;
-            }
-            
-            item_data[i].spawn_biomes[biome] = true;
-            item_data[i].rarity = get_rarity(spawn_rarity);
-            break;
-        }
-        row++;
-    }
-}
-
-void load_armor_effects(world_t *world) {
-    item_data_t *item_data = world->item_data;
-    FILE *fp = fopen("./data/armor_effects.csv", "r");
-    if(!fp) {
-        perror("File open failed");
-        return;
-    }
-    
-    char line[2048];
-    
-    if(fgets(line, sizeof(line), fp) == NULL) {
-        fclose(fp);
-        return;
-    }
-    
-    int row = 0;
-    while(fgets(line, sizeof(line), fp)) {
-        line[strcspn(line, "\n")] = '\0';
-        char *armor_name = strtok(line, ",");
-        char *target_stat = strtok(NULL, ",");
-        char *value = strtok(NULL, ",");
-        
-        if(!armor_name || !target_stat || !value) {
-            continue;
-        }
-        
-        int i = 0;
-        while(i < MAX_ITEMS) {
-            if(strcmp(armor_name, item_data[i].name) != 0) {
-                i++;
-                continue;
-            }
-            int idx = item_data[i].stat_type.armor.modifier_count;
-            
-            item_data[i].stat_type.armor.modifier_stats[idx].modifier = atoi(value);
-            item_data[i].stat_type.armor.modifier_stats[idx].stat = get_stat(target_stat);
-            item_data[i].stat_type.armor.modifier_count++;
-            break;
-        }
-        row++;
-    }
-    load_armor_spawn_data(world);
-}
-
-void load_armor_data(world_t *world) {
-	item_data_t *item_data = world->item_data;
-    FILE *fp = fopen("./data/armors.csv", "r");
-    if(!fp) {
-        perror("File open failed");
-        return;
-    }
-    
-    char line[2048];
-    
-    if(fgets(line, sizeof(line), fp) == NULL) {
-        fprintf(stderr, "File is empty\n");
-        fclose(fp);
-        return;
-    }
-    
-    int row = 0;
-    while(fgets(line, sizeof(line), fp)) {
-        line[strcspn(line, "\n")] = '\0';
-        int col = 0;
-        char *token = strtok(line, ",");
-        while(token) {
-            switch(col) {
-                case 0:
-					snprintf(item_data[row].name, sizeof(item_data[row].name), "%s", token);
-                    item_data[row].id = item_get_id(token);
-                    break;
-                case 1:
-                    item_data[row].value_type = VALUE_TYPE_ARMOR;
-                    item_data[row].stat_type.armor.type = armor_get_type(token);
-                    break;
-                case 2:
-                    item_data[row].stat_type.armor.defense = atoi(token);
-                    break;
-            }
-            token = strtok(NULL, ",");
-            col++;
-        }
-        world->item_data_count++;
-        snprintf(item_data[row].desc, MAX_ITEM_DESC_LEN, "+%d defense", item_data[row].stat_type.armor.defense);
-		DEBUG_LOG("Loaded Armor Data: %d, %s, %d, %d, %s", 
-				  item_data[row].id, item_data[row].name, 
-            item_data[row].stat_type.armor.defense, item_data[row].stat_type.armor.type,
-            item_data[row].desc);
-        
-        col = 0;
-        row++;
-    }
-    load_armor_effects(world);
-}
-
 void item_spawn(item_ids_t id, biome_t biome, tile_t *tile, item_data_t *item_data) {
     for(int i = 0; i < MAX_ITEMS; i++) {
         item_t *item = NULL;

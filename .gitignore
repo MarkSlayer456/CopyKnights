@@ -7,3 +7,5 @@ src/obj/*
 src/run
 src/ck
 .kateproject
+build/
+size

@@ -11,18 +11,19 @@
 #include "map_manager.h"
 #include "game_manager.h"
 #include "player.h"
-#include "items.h"
+#include "items/items.h"
 #include "enemy.h"
 #include "hud.h"
 #include "types.h"
 #include "lantern.h"
+#include "items/armor.h"
 
 /*
 	Top down dungeon crawler
 */
 
 WINDOW *hud; // gives player useful information
-WINDOW *action_bar; // OLG player's inventory/spells menu, maybe a help menu in the furture
+WINDOW *action_bar; // OLG player's inventory/spells menu, maybe a help menu in the future
 WINDOW *error; // USED FOR ERROR CHECKING ONLY
 WINDOW *inventory_hud; // player's inventory
 WINDOW *inventory_desc_hud; // player's description in the inventory

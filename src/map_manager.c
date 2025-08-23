@@ -11,7 +11,7 @@
 #include <math.h>
 #include <assert.h>
 #include "types.h"
-#include "items.h"
+#include "items/items.h"
 #include "functions.h"
 
 room_t *setup_first_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data, item_data_t *item_data) {

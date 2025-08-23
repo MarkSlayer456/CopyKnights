@@ -4,7 +4,7 @@
 #include "functions.h"
 #include "enemy.h"
 #include "hud.h"
-#include "items.h"
+#include "items/items.h"
 #include "math.h"
 #include <stdlib.h>
 #include <stdbool.h>
@@ -401,6 +401,7 @@ void player_cycle_loot_selector_down(player_t *player) {
 }
 
 void player_open_loot(player_t *player) {
+	if(player->nearby_loot_count == 0) return;
 	player->action_bar.selector = LOOT;
 }
 
@@ -459,6 +460,7 @@ void player_take_loot_item(room_t *room, player_t *player) {
 	}
 	// need to repopulate the array
 	player_get_nearby_loot(room, player);
+	if(player->nearby_loot_count == 0) player_open_inventory(player);
 }
 
 void player_get_nearby_loot(room_t *room, player_t *player) {

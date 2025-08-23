@@ -21,6 +21,7 @@ typedef struct armor_stats {
 	int defense;
 	stat_modifier_t modifier_stats[MAX_ARMOR_MODIFIERS];
 	int modifier_count;
+	bool equipped;
 } armor_stats_t;
 
 typedef struct weapon_stats {
@@ -28,6 +29,7 @@ typedef struct weapon_stats {
 	int strength_requirement;
 	int dexterity_requirement;
 	int intelligence_requirement;
+	bool equipped;
 } weapon_stats_t;
 
 typedef struct food_stats {
