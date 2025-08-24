@@ -140,9 +140,11 @@ void load_weapon_data(world_t *world) {
 			col++;
 		}
 		world->item_data_count++;
-		snprintf(item_data[row].desc, MAX_ITEM_DESC_LEN, "attack damage: %d", item_data[row].stat_type.weapon.attack);
-		DEBUG_LOG("Loaded Weapon Data: %d, %s, %d, %s", 
-				item_data[row].id, item_data[row].name, 
+		snprintf(item_data[row].desc, MAX_ITEM_DESC_LEN, 
+				 "attack damage: %d\nstrength requirement: %d\ndexterity requirement: %d\nintelligence requirement: %d"
+				 , item_data[row].stat_type.weapon.attack, item_data[row].stat_type.weapon.strength_requirement, item_data[row].stat_type.weapon.dexterity_requirement, item_data[row].stat_type.weapon.intelligence_requirement);
+		DEBUG_LOG("Loaded Weapon Data: %d, %s, %d, %s",
+				item_data[row].id, item_data[row].name,
 				item_data[row].stat_type.weapon.attack,
 				item_data[row].desc);
 		

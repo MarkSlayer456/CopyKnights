@@ -57,7 +57,7 @@
 
 
 #define MAX_ITEM_NAME_LENGTH					32
-#define MAX_ITEM_DESC_LEN						128
+#define MAX_ITEM_DESC_LEN						256
 #define MAX_ITEM_STACK							99
 #define DEFAULT_MAX_MESSAGE_STORAGE				1000
 #define MAX_MESSAGE_LENGTH						59

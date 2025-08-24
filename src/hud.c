@@ -263,7 +263,18 @@ void display_inventory_desc_hud(world_t *world, player_t *player) {
 	}
 	for(int i = player->inv_offset; i < visible_item_count+player->inv_offset; i++) {
 		if(i == player->action_bar.inv_selector) {
-			mvwprintw(inventory_desc_hud, 1, 1,  "%s", player->inventory[i].desc);
+			int x = 1, y = 1;
+			char desc_copy[MAX_ITEM_DESC_LEN];
+			strncpy(desc_copy, player->inventory[i].desc, MAX_ITEM_DESC_LEN);
+			desc_copy[MAX_ITEM_DESC_LEN - 1] = '\0';
+			char *token = strtok(desc_copy, "\n");
+			while(token) {
+				wmove(inventory_desc_hud, y, x);
+				DEBUG_LOG("%s", token);
+				waddstr(inventory_desc_hud, token);
+				y++;
+				token = strtok(NULL, "\n");
+			}
 		}
 	}
 	
@@ -274,13 +285,18 @@ void display_inventory_desc_hud(world_t *world, player_t *player) {
 		item_t *item = player->nearby_loot[i];
 		if(item == NULL || item->stack == 0) continue;
 		if(i == player->action_bar.loot_selector) {
-			mvwprintw(inventory_desc_hud, 1, INVENTORY_WIDTH/2, "%s", item->desc);
-		}
-	}
-	
-	for(int i = player->inv_offset; i < visible_item_count+player->inv_offset; i++) {
-		if(i == player->action_bar.inv_selector) {
-			mvwprintw(inventory_desc_hud, 1, 1,  "%s", player->inventory[i].desc);
+			int x = 1, y = 1;
+			char desc_copy[MAX_ITEM_DESC_LEN];
+			strncpy(desc_copy, item->desc, MAX_ITEM_DESC_LEN);
+			desc_copy[MAX_ITEM_DESC_LEN - 1] = '\0';
+			char *token = strtok(desc_copy, "\n");
+			while(token) {
+				wmove(inventory_desc_hud, y, (INVENTORY_WIDTH/2)+x);
+				DEBUG_LOG("%s", token);
+				waddstr(inventory_desc_hud, token);
+				y++;
+				token = strtok(NULL, "\n");
+			}
 		}
 	}
 }
