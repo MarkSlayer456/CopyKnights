@@ -67,75 +67,75 @@ type_map_t item_type_map[] = {
     {BOGSTICK_VEST_NAME, BOGSTICK_VEST},
     {VOIDLACE_CLOAK_NAME, VOIDLACE_CLOACK},
     
-    {BLACK_STONE_SWORD_NAME, VOIDLACE_CLOACK},
-    {BRONZE_SWORD_NAME, VOIDLACE_CLOACK},
-    {IRON_SWORD_NAME, VOIDLACE_CLOACK},
-    {STEEL_SWORD_NAME, VOIDLACE_CLOACK},
-    {MITHRIL_SWORD_NAME, VOIDLACE_CLOACK},
-    {SOULCRUST_SWORD_NAME, VOIDLACE_CLOACK},
-    {TERRACTIE_SWORD_NAME, VOIDLACE_CLOACK},
-    {GRAVEMARROW_SWORD_NAME, VOIDLACE_CLOACK},
-    {VOIDMARROW_SWORD_NAME, VOIDLACE_CLOACK},
+    {BLACK_STONE_SWORD_NAME, BLACK_STONE_SWORD},
+    {BRONZE_SWORD_NAME, BRONZE_SWORD},
+    {IRON_SWORD_NAME, IRON_SWORD},
+    {STEEL_SWORD_NAME, STEEL_SWORD},
+    {MITHRIL_SWORD_NAME, MITHRIL_SWORD},
+    {SOULCRUST_SWORD_NAME, SOULCRUST_SWORD},
+    {TERRACTIE_SWORD_NAME, TERRACTIE_SWORD},
+    {GRAVEMARROW_SWORD_NAME, GRAVEMARROW_SWORD},
+    {VOIDMARROW_SWORD_NAME, VOIDMARROW_SWORD},
     
-    {BLACK_STONE_SPEAR_NAME, VOIDLACE_CLOACK},
-    {BRONZE_SPEAR_NAME, VOIDLACE_CLOACK},
-    {IRON_SPEAR_NAME, VOIDLACE_CLOACK},
-    {STEEL_SPEAR_NAME, VOIDLACE_CLOACK},
-    {MITHRIL_SPEAR_NAME, VOIDLACE_CLOACK},
-    {SOULCRUST_SPEAR_NAME, VOIDLACE_CLOACK},
-    {TERRACTIE_SPEAR_NAME, VOIDLACE_CLOACK},
-    {GRAVEMARROW_SPEAR_NAME, VOIDLACE_CLOACK},
-    {VOIDMARROW_SPEAR_NAME, VOIDLACE_CLOACK},
+    {BLACK_STONE_SPEAR_NAME, BLACK_STONE_SPEAR},
+    {BRONZE_SPEAR_NAME, BRONZE_SPEAR},
+    {IRON_SPEAR_NAME, IRON_SPEAR},
+    {STEEL_SPEAR_NAME, STEEL_SPEAR},
+    {MITHRIL_SPEAR_NAME, MITHRIL_SPEAR},
+    {SOULCRUST_SPEAR_NAME, SOULCRUST_SPEAR},
+    {TERRACTIE_SPEAR_NAME, TERRACTIE_SPEAR},
+    {GRAVEMARROW_SPEAR_NAME, GRAVEMARROW_SPEAR},
+    {VOIDMARROW_SPEAR_NAME, VOIDMARROW_SPEAR},
     
-    {BLACK_STONE_MACE_NAME, VOIDLACE_CLOACK},
-    {BRONZE_MACE_NAME, VOIDLACE_CLOACK},
-    {IRON_MACE_NAME, VOIDLACE_CLOACK},
-    {STEEL_MACE_NAME, VOIDLACE_CLOACK},
-    {MITHRIL_MACE_NAME, VOIDLACE_CLOACK},
-    {SOULCRUST_MACE_NAME, VOIDLACE_CLOACK},
-    {TERRACTIE_MACE_NAME, VOIDLACE_CLOACK},
-    {GRAVEMARROW_MACE_NAME, VOIDLACE_CLOACK},
-    {VOIDMARROW_MACE_NAME, VOIDLACE_CLOACK},
+    {BLACK_STONE_MACE_NAME, BLACK_STONE_MACE},
+    {BRONZE_MACE_NAME, BRONZE_MACE},
+    {IRON_MACE_NAME, IRON_MACE},
+    {STEEL_MACE_NAME, STEEL_MACE},
+    {MITHRIL_MACE_NAME, MITHRIL_MACE},
+    {SOULCRUST_MACE_NAME, SOULCRUST_MACE},
+    {TERRACTIE_MACE_NAME, TERRACTIE_MACE},
+    {GRAVEMARROW_MACE_NAME, GRAVEMARROW_MACE},
+    {VOIDMARROW_MACE_NAME, VOIDMARROW_MACE},
     
-    {BLACK_STONE_AXE_NAME, VOIDLACE_CLOACK},
-    {BRONZE_AXE_NAME, VOIDLACE_CLOACK},
-    {IRON_AXE_NAME, VOIDLACE_CLOACK},
-    {STEEL_AXE_NAME, VOIDLACE_CLOACK},
-    {MITHRIL_AXE_NAME, VOIDLACE_CLOACK},
-    {SOULCRUST_AXE_NAME, VOIDLACE_CLOACK},
-    {TERRACTIE_AXE_NAME, VOIDLACE_CLOACK},
-    {GRAVEMARROW_AXE_NAME, VOIDLACE_CLOACK},
-    {VOIDMARROW_AXE_NAME, VOIDLACE_CLOACK},
+    {BLACK_STONE_AXE_NAME, BLACK_STONE_AXE},
+    {BRONZE_AXE_NAME, BRONZE_AXE},
+    {IRON_AXE_NAME, IRON_AXE},
+    {STEEL_AXE_NAME, STEEL_AXE},
+    {MITHRIL_AXE_NAME, MITHRIL_AXE},
+    {SOULCRUST_AXE_NAME, SOULCRUST_AXE},
+    {TERRACTIE_AXE_NAME, TERRACTIE_AXE},
+    {GRAVEMARROW_AXE_NAME, GRAVEMARROW_AXE},
+    {VOIDMARROW_AXE_NAME, VOIDMARROW_AXE},
     
-    {BLACK_STONE_PICKAXE_NAME, VOIDLACE_CLOACK},
-    {BRONZE_PICKAXE_NAME, VOIDLACE_CLOACK},
-    {IRON_PICKAXE_NAME, VOIDLACE_CLOACK},
-    {STEEL_PICKAXE_NAME, VOIDLACE_CLOACK},
-    {MITHRIL_PICKAXE_NAME, VOIDLACE_CLOACK},
-    {SOULCRUST_PICKAXE_NAME, VOIDLACE_CLOACK},
-    {TERRACTIE_PICKAXE_NAME, VOIDLACE_CLOACK},
-    {GRAVEMARROW_PICKAXE_NAME, VOIDLACE_CLOACK},
-    {VOIDMARROW_PICKAXE_NAME, VOIDLACE_CLOACK},
+    {BLACK_STONE_PICKAXE_NAME, BLACK_STONE_PICKAXE},
+    {BRONZE_PICKAXE_NAME, BRONZE_PICKAXE},
+    {IRON_PICKAXE_NAME, IRON_PICKAXE},
+    {STEEL_PICKAXE_NAME, STEEL_PICKAXE},
+    {MITHRIL_PICKAXE_NAME, MITHRIL_PICKAXE},
+    {SOULCRUST_PICKAXE_NAME, SOULCRUST_PICKAXE},
+    {TERRACTIE_PICKAXE_NAME, TERRACTIE_PICKAXE},
+    {GRAVEMARROW_PICKAXE_NAME, GRAVEMARROW_PICKAXE},
+    {VOIDMARROW_PICKAXE_NAME, VOIDMARROW_PICKAXE},
     
-    {BLACK_STONE_BOW_NAME, VOIDLACE_CLOACK},
-    {BRONZE_BOW_NAME, VOIDLACE_CLOACK},
-    {IRON_BOW_NAME, VOIDLACE_CLOACK},
-    {STEEL_BOW_NAME, VOIDLACE_CLOACK},
-    {MITHRIL_BOW_NAME, VOIDLACE_CLOACK},
-    {SOULCRUST_BOW_NAME, VOIDLACE_CLOACK},
-    {TERRACTIE_BOW_NAME, VOIDLACE_CLOACK},
-    {GRAVEMARROW_BOW_NAME, VOIDLACE_CLOACK},
-    {VOIDMARROW_BOW_NAME, VOIDLACE_CLOACK},
+    {BLACK_STONE_BOW_NAME, BLACK_STONE_BOW},
+    {BRONZE_BOW_NAME, BRONZE_BOW},
+    {IRON_BOW_NAME, IRON_BOW},
+    {STEEL_BOW_NAME, STEEL_BOW},
+    {MITHRIL_BOW_NAME, MITHRIL_BOW},
+    {SOULCRUST_BOW_NAME, SOULCRUST_BOW},
+    {TERRACTIE_BOW_NAME, TERRACTIE_BOW},
+    {GRAVEMARROW_BOW_NAME, GRAVEMARROW_BOW},
+    {VOIDMARROW_BOW_NAME, VOIDMARROW_BOW},
     
-    {BLACK_STONE_STAFF_NAME, VOIDLACE_CLOACK},
-    {BRONZE_STAFF_NAME, VOIDLACE_CLOACK},
-    {IRON_STAFF_NAME, VOIDLACE_CLOACK},
-    {STEEL_STAFF_NAME, VOIDLACE_CLOACK},
-    {MITHRIL_STAFF_NAME, VOIDLACE_CLOACK},
-    {SOULCRUST_STAFF_NAME, VOIDLACE_CLOACK},
-    {TERRACTIE_STAFF_NAME, VOIDLACE_CLOACK},
-    {GRAVEMARROW_STAFF_NAME, VOIDLACE_CLOACK},
-    {VOIDMARROW_STAFF_NAME, VOIDLACE_CLOACK},
+    {BLACK_STONE_STAFF_NAME, BLACK_STONE_STAFF},
+    {BRONZE_STAFF_NAME, BRONZE_STAFF},
+    {IRON_STAFF_NAME, IRON_STAFF},
+    {STEEL_STAFF_NAME, STEEL_STAFF},
+    {MITHRIL_STAFF_NAME, MITHRIL_STAFF},
+    {SOULCRUST_STAFF_NAME, SOULCRUST_STAFF},
+    {TERRACTIE_STAFF_NAME, TERRACTIE_STAFF},
+    {GRAVEMARROW_STAFF_NAME, GRAVEMARROW_STAFF},
+    {VOIDMARROW_STAFF_NAME, VOIDMARROW_STAFF},
 };
 
 const int item_type_map_len = sizeof(item_type_map) / sizeof(item_type_map[0]);
@@ -172,25 +172,32 @@ int use_item(player_t *player)
 {
 	int success = 0;
 	if(player->inventory[player->action_bar.inv_selector].stack > 0) {
-		switch(player->inventory[player->action_bar.inv_selector].id) {
-			case BLANK:
-				success = 0;
-			case TELEPORT_SCROLL:
-				use_teleport_scroll(player);
-				success = 1;
-			case HEALTH_POTION:
-				use_health_potion(player);
-				success = 1;
-			case APPLE:
-				use_apple(player);
-				success = 1;
-			case CHICKEN_DINNER:
-				use_chicken_dinner(player);
-				success = 1;
-			default:
-				success = 0;
-		}
-		remove_item(player);
+        if(player->inventory[player->action_bar.inv_selector].value_type == VALUE_TYPE_ARMOR) {
+            player->equipment.armor = &player->inventory[player->action_bar.inv_selector];
+        } else if(player->inventory[player->action_bar.inv_selector].value_type == VALUE_TYPE_WEAPON) {
+            player->equipment.main_hand = &player->inventory[player->action_bar.inv_selector]; 
+            //TODO off_hand and two handed weapons
+        } else {
+            switch(player->inventory[player->action_bar.inv_selector].id) {
+                case BLANK:
+                    success = 0;
+                case TELEPORT_SCROLL:
+                    use_teleport_scroll(player);
+                    success = 1;
+                case HEALTH_POTION:
+                    use_health_potion(player);
+                    success = 1;
+                case APPLE:
+                    use_apple(player);
+                    success = 1;
+                case CHICKEN_DINNER:
+                    use_chicken_dinner(player);
+                    success = 1;
+                default:
+                    success = 0;
+            }
+            remove_item(player);
+        }
 		player_close_inventory(player);
 		player_close_action_bar(player);
 	}
@@ -233,14 +240,14 @@ void remove_item(player_t *player)
 	}
 }
 void item_spawn(item_ids_t id, biome_t biome, tile_t *tile, item_data_t *item_data) {
-    for(int i = 0; i < MAX_ITEMS; i++) {
-        item_t *item = NULL;
-        for(int k = 0; k < MAX_ITEMS_PER_TILE; k++) {
-            if(tile->items[k] == NULL || tile->items[k]->stack == 0) {
-                //TODO items shouldn't just max out all slots have a chance to spawn here?
-                item = tile->items[k];
-            }
+    item_t *item = NULL;
+    for(int k = 0; k < MAX_ITEMS_PER_TILE; k++) {
+        if(tile->items[k] == NULL || tile->items[k]->stack == 0) {
+            item = tile->items[k];
+            break;
         }
+    }
+    for(int i = 0; i < MAX_ITEMS; i++) {
         if(!item) continue;
         if(item_data[i].id == BLANK) continue;
         if(item_data[i].id == id) {

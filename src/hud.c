@@ -182,7 +182,7 @@ void display_inventory_hud(world_t *world, player_t *player) {
 		mvwaddch(inventory_hud, y, middle, '|');  // vertical divider at col 39
 	}
 	if(player->action_bar.selector == INVENTORY || player->action_bar.selector == LOOT) {
-		int add_size = 8;
+		int add_size = 16;
 		char item_name[MAX_ITEM_NAME_LENGTH+add_size];
 		int visible_item_count = INVENTORY_HEIGHT-2;
 		int pos = 1;
@@ -210,13 +210,25 @@ void display_inventory_hud(world_t *world, player_t *player) {
 		for(int i = player->inv_offset; i < visible_item_count+player->inv_offset; i++) {
 			if(player->inventory[i].stack == 0) continue;
 			if(i == player->action_bar.inv_selector) {
-				if(player->action_bar.selector == INVENTORY) {
-					snprintf(item_name, MAX_ITEM_NAME_LENGTH+add_size, ">>%s x%d", player->inventory[i].name, player->inventory[i].stack);
+				if(player->equipment.armor == &player->inventory[i] || player->equipment.main_hand == &player->inventory[i] || player->equipment.off_hand == &player->inventory[i]) {
+					if(player->action_bar.selector == INVENTORY) {
+						snprintf(item_name, MAX_ITEM_NAME_LENGTH+add_size, ">>%s (E) x%d", player->inventory[i].name, player->inventory[i].stack);
+					} else {
+						snprintf(item_name, MAX_ITEM_NAME_LENGTH+add_size, ">%s (E) x%d", player->inventory[i].name, player->inventory[i].stack);
+					}
 				} else {
-					snprintf(item_name, MAX_ITEM_NAME_LENGTH+add_size, ">%s x%d", player->inventory[i].name, player->inventory[i].stack);
+					if(player->action_bar.selector == INVENTORY) {
+						snprintf(item_name, MAX_ITEM_NAME_LENGTH+add_size, ">>%s x%d", player->inventory[i].name, player->inventory[i].stack);
+					} else {
+						snprintf(item_name, MAX_ITEM_NAME_LENGTH+add_size, ">%s x%d", player->inventory[i].name, player->inventory[i].stack);
+					}
 				}
 			} else {
-				snprintf(item_name, MAX_ITEM_NAME_LENGTH+add_size, "%s x%d", player->inventory[i].name, player->inventory[i].stack);
+				if(player->equipment.armor == &player->inventory[i] || player->equipment.main_hand == &player->inventory[i] || player->equipment.off_hand == &player->inventory[i]) {
+					snprintf(item_name, MAX_ITEM_NAME_LENGTH+add_size, "%s (E) x%d", player->inventory[i].name, player->inventory[i].stack);
+				} else {
+					snprintf(item_name, MAX_ITEM_NAME_LENGTH+add_size, "%s x%d", player->inventory[i].name, player->inventory[i].stack);
+				}
 			}
 			wmove(inventory_hud, pos++, 1);
 			waddstr(inventory_hud, item_name);

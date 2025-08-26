@@ -19,7 +19,6 @@ void load_weapon_spawn_data(world_t *world) {
 		return;
 	}
 	
-	int row = 0;
 	while(fgets(line, sizeof(line), fp)) {
 		line[strcspn(line, "\n")] = '\0';
 		char *weapon_name = strtok(line, ",");
@@ -46,7 +45,6 @@ void load_weapon_spawn_data(world_t *world) {
 			item_data[i].rarity[biome] = get_rarity(spawn_rarity);
 			break;
 		}
-		row++;
 	}
 }
 
@@ -65,7 +63,6 @@ void load_weapon_effects(world_t *world) {
 		return;
 	}
 	
-	int row = 0;
 	while(fgets(line, sizeof(line), fp)) {
 		line[strcspn(line, "\n")] = '\0';
 		char *weapon_name = strtok(line, ",");
@@ -90,7 +87,6 @@ void load_weapon_effects(world_t *world) {
 			item_data[i].stat_type.weapon.modifier_count++;
 			break;
 		}
-		row++;
 	}
 	load_weapon_spawn_data(world);
 }
@@ -111,7 +107,6 @@ void load_weapon_data(world_t *world) {
 		return;
 	}
 	
-	int row = 0;
 	while(fgets(line, sizeof(line), fp)) {
 		line[strcspn(line, "\n")] = '\0';
 		int col = 0;
@@ -119,37 +114,39 @@ void load_weapon_data(world_t *world) {
 		while(token) {
 			switch(col) {
 				case 0:
-					snprintf(item_data[row].name, sizeof(item_data[row].name), "%s", token);
-					item_data[row].id = item_get_id(token);
-					item_data[row].value_type = VALUE_TYPE_WEAPON;
+					snprintf(item_data[world->item_data_count].name, sizeof(item_data[world->item_data_count].name), "%s", token);
+					item_data[world->item_data_count].id = item_get_id(token);
+					item_data[world->item_data_count].value_type = VALUE_TYPE_WEAPON;
 					break;
 				case 1:
-					item_data[row].stat_type.weapon.attack = atoi(token);
+					item_data[world->item_data_count].stat_type.weapon.attack = atoi(token);
 					break;
 				case 2:
-					item_data[row].stat_type.weapon.strength_requirement = atoi(token);
+					item_data[world->item_data_count].stat_type.weapon.strength_requirement = atoi(token);
 					break;
 				case 3:
-					item_data[row].stat_type.weapon.dexterity_requirement= atoi(token);
+					item_data[world->item_data_count].stat_type.weapon.dexterity_requirement= atoi(token);
 					break;
 				case 4:
-					item_data[row].stat_type.weapon.intelligence_requirement = atoi(token);
+					item_data[world->item_data_count].stat_type.weapon.intelligence_requirement = atoi(token);
 					break;
 			}
 			token = strtok(NULL, ",");
 			col++;
 		}
-		world->item_data_count++;
-		snprintf(item_data[row].desc, MAX_ITEM_DESC_LEN, 
-				 "attack damage: %d\nstrength requirement: %d\ndexterity requirement: %d\nintelligence requirement: %d"
-				 , item_data[row].stat_type.weapon.attack, item_data[row].stat_type.weapon.strength_requirement, item_data[row].stat_type.weapon.dexterity_requirement, item_data[row].stat_type.weapon.intelligence_requirement);
-		DEBUG_LOG("Loaded Weapon Data: %d, %s, %d, %s",
-				item_data[row].id, item_data[row].name,
-				item_data[row].stat_type.weapon.attack,
-				item_data[row].desc);
+		snprintf(item_data[world->item_data_count].desc, MAX_ITEM_DESC_LEN, 
+				 "attack damage: %d\nstrength requirement: %d\ndexterity requirement: %d\nintelligence requirement: %d", 
+				item_data[world->item_data_count].stat_type.weapon.attack, 
+				item_data[world->item_data_count].stat_type.weapon.strength_requirement, 
+				item_data[world->item_data_count].stat_type.weapon.dexterity_requirement, 
+				item_data[world->item_data_count].stat_type.weapon.intelligence_requirement);
 		
+		DEBUG_LOG("Loaded Weapon Data: %d, %s, %d, %s",
+				item_data[world->item_data_count].id, item_data[world->item_data_count].name,
+				item_data[world->item_data_count].stat_type.weapon.attack,
+				item_data[world->item_data_count].desc);
+		world->item_data_count++;
 		col = 0;
-		row++;
 	}
 	load_weapon_effects(world);
 }

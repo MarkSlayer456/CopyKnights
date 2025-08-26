@@ -129,7 +129,6 @@ void load_armor_data(world_t *world) {
 		return;
 	}
 	
-	int row = 0;
 	while(fgets(line, sizeof(line), fp)) {
 		line[strcspn(line, "\n")] = '\0';
 		int col = 0;
@@ -137,29 +136,29 @@ void load_armor_data(world_t *world) {
 		while(token) {
 			switch(col) {
 				case 0:
-					snprintf(item_data[row].name, sizeof(item_data[row].name), "%s", token);
-					item_data[row].id = item_get_id(token);
+					snprintf(item_data[world->item_data_count].name, sizeof(item_data[world->item_data_count].name), "%s", token);
+					item_data[world->item_data_count].id = item_get_id(token);
 					break;
 				case 1:
-					item_data[row].value_type = VALUE_TYPE_ARMOR;
-					item_data[row].stat_type.armor.type = armor_get_type(token);
+					item_data[world->item_data_count].value_type = VALUE_TYPE_ARMOR;
+					item_data[world->item_data_count].stat_type.armor.type = armor_get_type(token);
 					break;
 				case 2:
-					item_data[row].stat_type.armor.defense = atoi(token);
+					item_data[world->item_data_count].stat_type.armor.defense = atoi(token);
 					break;
 			}
 			token = strtok(NULL, ",");
 			col++;
 		}
-		world->item_data_count++;
-		snprintf(item_data[row].desc, MAX_ITEM_DESC_LEN, "+%d defense", item_data[row].stat_type.armor.defense);
+		snprintf(item_data[world->item_data_count].desc, MAX_ITEM_DESC_LEN, "+%d defense", item_data[world->item_data_count].stat_type.armor.defense);
 		DEBUG_LOG("Loaded Armor Data: %d, %s, %d, %d, %s", 
-				  item_data[row].id, item_data[row].name, 
-			item_data[row].stat_type.armor.defense, item_data[row].stat_type.armor.type,
-			item_data[row].desc);
-		
+				item_data[world->item_data_count].id, 
+				item_data[world->item_data_count].name, 
+				item_data[world->item_data_count].stat_type.armor.defense, 
+				item_data[world->item_data_count].stat_type.armor.type,
+				item_data[world->item_data_count].desc);
+		world->item_data_count++;
 		col = 0;
-		row++;
 	}
 	load_armor_effects(world);
 }
