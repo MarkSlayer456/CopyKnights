@@ -117,7 +117,9 @@ bool manage_input(char c, world_t *world, player_t *player) {
 				player_attack(player, world);
 				break;
 			case KEY_F_MINE:
-				lantern_increase_power(&player->lantern);
+				if(lantern_increase_power(&player->lantern, &player->oil) == false) {
+					display_world_message(world, player, LANTERN_CAN_AFFORD_REFUEL);
+				}
 				break;
 			case CTRL_Q:
 				shutdown(world);

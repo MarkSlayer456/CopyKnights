@@ -21,6 +21,9 @@
 
 /*
 	Top down dungeon crawler
+	oil is the currency here
+	your lamp is powered by oil
+	oil is your friend without you won't last long
 */
 
 WINDOW *hud; // gives player useful information
@@ -126,6 +129,7 @@ int main(int argc, char *argv[]) {
 	player->level = 1;
 	player->xp = 0;
 	player->inv_offset = 0;
+	player->oil = STARTING_OIL;
 	
 	player->inventory = malloc(INV_SIZE * sizeof(item_t));
 	player->inventory_count = 0;

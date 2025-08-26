@@ -46,6 +46,11 @@ void hud_update_player_health(player_t *player) {
 	wmove(hud, y+1, 0);
 	snprintf(buf, sizeof(buf), "Constitution: %d | Speed: %d", player->constitution, player->speed);
 	waddstr(hud, buf);
+
+	getyx(hud, y, x);
+	wmove(hud, y+1, 0);
+	snprintf(buf, sizeof(buf), "Oil: %d", player->oil);
+	waddstr(hud, buf);
 }
 
 void hud_update_nearby_enemies(world_t *world, player_t *player) {

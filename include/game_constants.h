@@ -262,6 +262,8 @@
 
 #define MAX_CLASSES						32
 
+#define STARTING_OIL					100
+
 #define HUD_WIDTH					59
 #define HUD_HEIGHT					24
 
@@ -286,5 +288,8 @@
 #define LANTERN_OVER_LOAD_THRESHOLD						4
 #define LANTERN_OVER_LOAD_LOWER_BOUNDS					6
 #define LANTERN_TURNS_TO_DIM							10
+#define LANTERN_OIL_FOR_NORMAL_POWER					1
+#define LANTERN_OIL_FOR_OVER_LOAD_POWER 				10
+#define LANTERN_CAN_AFFORD_REFUEL						"You don't have enough oil to light you lantern!"
 
 #endif

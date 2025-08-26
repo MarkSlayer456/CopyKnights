@@ -2,10 +2,22 @@
 #include "lantern.h"
 #include "game_constants.h"
 
-void lantern_increase_power(lantern_t *lantern) {
-	if(lantern->power >= LANTERN_MAX_POWER) return;
-	if(lantern->power >= LANTERN_OVER_LOAD_THRESHOLD && lantern->power <= LANTERN_OVER_LOAD_LOWER_BOUNDS) lantern_over_load(lantern);
-	else if(lantern->power < LANTERN_NORMAL_POWER) lantern_set_normal_power(lantern);
+bool lantern_increase_power(lantern_t *lantern, int *oil) {
+	if(lantern->power >= LANTERN_MAX_POWER) return true;
+	if(lantern->power >= LANTERN_OVER_LOAD_THRESHOLD && lantern->power <= LANTERN_OVER_LOAD_LOWER_BOUNDS) {
+		if(*oil >= LANTERN_OIL_FOR_OVER_LOAD_POWER) {
+			*oil -= LANTERN_OIL_FOR_OVER_LOAD_POWER;
+			lantern_over_load(lantern);
+			return true;
+		}
+	} else if(lantern->power < LANTERN_NORMAL_POWER) {
+		if(*oil >= LANTERN_OIL_FOR_NORMAL_POWER) {
+			*oil -= LANTERN_OIL_FOR_NORMAL_POWER;
+			lantern_set_normal_power(lantern);
+			return true;
+		}
+	}
+	return false;
 }
 
 void lantern_over_load(lantern_t *lantern) {

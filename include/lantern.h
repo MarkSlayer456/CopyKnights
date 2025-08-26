@@ -2,8 +2,9 @@
 
 #define LANTERN_H_
 #include "types.h"
+#include <stdbool.h>
 
-void lantern_increase_power(lantern_t *lantern);
+bool lantern_increase_power(lantern_t *lantern, int *oil);
 
 void lantern_over_load(lantern_t *lantern);
 

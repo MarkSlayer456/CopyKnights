@@ -77,6 +77,7 @@ typedef struct player {
 	int inv_offset;
 	lantern_t lantern;
 	equipment_t equipment;
+	int oil;
 	
 	action_bar_t action_bar;
 } player_t;
