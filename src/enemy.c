@@ -265,16 +265,18 @@ void enemy_kill(enemy_t *enemy, world_t *world, player_t *player)
 		}
 	}
 }
-
-enemy_type_t enemy_decrease_health(enemy_t *enemy, world_t *world, player_t *player)
+/*
+ * returns true on kill returns false otherwise
+ */
+bool enemy_decrease_health(enemy_t *enemy, world_t *world, player_t *player)
 {
+    if(!enemy) return false;
     enemy->health -= player->strength;
 	if(enemy->health <= 0) {
-        enemy_type_t type = enemy_get_type(enemy->name);
 		enemy_kill(enemy, world, player);
-        return type;
+        return true;
 	}
-	return ENEMY_NONE;
+	return false;
 }
 
 void enemy_attack(enemy_t *enemy, player_t *player, world_t *world)

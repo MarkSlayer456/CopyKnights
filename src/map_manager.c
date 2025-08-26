@@ -75,9 +75,9 @@ room_t *load_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data, it
 	assert(room_num > 0);
 
 	if(x == 0 && y == 0) {
-		strcat(file, "startingroom.ck");
+		strcat(file, "startingroom.ck.txt");
 	} else {
-		snprintf(file, 64, "./data/rooms/%s/room%d.ck", folder, room_num);
+		snprintf(file, 64, "./data/rooms/%s/room%d.ck.txt", folder, room_num);
 	}
 
 	int fd = open(file, O_RDONLY);

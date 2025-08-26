@@ -22,6 +22,7 @@
 #define INVALID_ACTOR_INDEX						999999999
 
 #define DOOR_BLOCKED_MESSAGE					"This door won't seem to budge!"
+#define ATTACK_DIRECTION_MESSAGE				"choose a direction to attack!"
 
 #define ARROW_KEY_MOD							1000
 #define DOWN_ARROW								ARROW_KEY_MOD + 66

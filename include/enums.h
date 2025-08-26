@@ -27,6 +27,19 @@ typedef enum direction {
 	DOWN
 } direction_t;
 
+typedef enum {
+	PLAYER_STATE_NULL = -1,
+	// not in a menu
+	PLAYER_STATE_MOVING,
+	PLAYER_STATE_ATTACKING,
+	PLAYER_STATE_CASTING,
+	// in a menu
+	PLAYER_STATE_INVENTORY,
+	PLAYER_STATE_LOOTING,
+	PLAYER_STATE_TALKING,
+	PLAYER_STATE_MENU, // settings menu not an inventory
+} player_state_t;
+
 typedef enum action_bar_selectors { 
 	NOT_OPEN = -1, 
 	INVENTORY = 0, 

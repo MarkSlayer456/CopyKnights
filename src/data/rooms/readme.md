@@ -1,4 +1,4 @@
-how a .ck file works
+how a .ck.txt file works
 
 # is a wall
 . is a open space

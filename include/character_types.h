@@ -9,17 +9,17 @@ typedef struct location {
 	int global_y;
 } location_t;
 
-typedef struct action_bar {
-	action_bar_selector_t selector; // which item is the selector on
-	
+typedef struct {
 	int spells_selector; // current spell you are selected on
 	
 	int inv_selector; // current inventory item you are selected on in a category
+	int inv_offset;
 	
 	int loot_selector; // current loot item you are selected on
 	int loot_offset;
 	inv_cat_t cat; // current inventory category you are selected on TODO add categories
-} action_bar_t;
+} inventory_manager_t;
+
 typedef struct class_data {
 	class_type_t type;
 	int base_strength;
@@ -74,12 +74,12 @@ typedef struct player {
 	int *max_mana;
 	int action_points;
 	class_type_t player_class;
-	int inv_offset;
 	lantern_t lantern;
 	equipment_t equipment;
 	int oil;
+	player_state_t state;
 	
-	action_bar_t action_bar;
+	inventory_manager_t inventory_manager;
 } player_t;
 
 typedef struct enemy {

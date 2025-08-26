@@ -24,7 +24,8 @@ void draw(world_t *world, player_t *player) {
 	werase(inventory_hud);
 	werase(inventory_desc_hud);
 	// draw stuff...
-	if(player->action_bar.selector != NOT_OPEN) {
+	if(player->state != PLAYER_STATE_MOVING && player->state != PLAYER_STATE_ATTACKING 
+		&& player->state != PLAYER_STATE_CASTING) {
 		display_inventory_hud(world, player);
 		display_inventory_desc_hud(world, player);
 		wnoutrefresh(inventory_hud);
@@ -34,7 +35,7 @@ void draw(world_t *world, player_t *player) {
 		room_t *room = world->room[player->global_x][player->global_y];
 		hud_update_player_health(player);
 		hud_update_nearby_enemies(world, player);
-		hud_update_action_bar(player, room);
+		// hud_update_menus(player, room);
 		hud_update_messages(world, player);
 		for(int i = 0; i < ROOM_HEIGHT; i++) {
 			for(int j = 0; j < ROOM_WIDTH; j++) {
@@ -78,11 +79,9 @@ void draw(world_t *world, player_t *player) {
 		wnoutrefresh(action_bar);
 	}
 	doupdate();
-	// wrefresh(world->win);
-	// wrefresh(hud);
-	// wrefresh(action_bar);
 }
 
+// TODO change this function it's not written well
 bool manage_input(char c, world_t *world, player_t *player) {
 	room_t *room = world->room[player->global_x][player->global_y];
 	if (c == ERR) {
@@ -96,7 +95,7 @@ bool manage_input(char c, world_t *world, player_t *player) {
 			x = ARROW_KEY_MOD + c;
 		}
 	}
-	if(player->action_bar.selector == NOT_OPEN) {
+	if(player->state == PLAYER_STATE_MOVING) {
 		switch(x) {
 			case LEFT_ARROW:
 				player_move_dir(player, world, LEFT);
@@ -114,8 +113,8 @@ bool manage_input(char c, world_t *world, player_t *player) {
 				player_wait(player, world);
 				break;
 			case KEY_S:
-				player_attack(player, world);
-				break;
+				player_enter_attack_state(player, world);
+				return false;
 			case KEY_F_MINE:
 				if(lantern_increase_power(&player->lantern, &player->oil) == false) {
 					display_world_message(world, player, LANTERN_CAN_AFFORD_REFUEL);
@@ -125,100 +124,96 @@ bool manage_input(char c, world_t *world, player_t *player) {
 				shutdown(world);
 				break;
 			case KEY_I:
-				player_open_action_bar(player);
+				player_open_inventory(player);
 				break;
 			default:
 				break;
 		}	
 		return true;
-	} else {
-		if(player->action_bar.selector == INVENTORY) {
-			switch(x) {
-				case UP_ARROW:
-					player_cycle_inv_selector_up(player);
-					break;
-				case DOWN_ARROW:
-					player_cycle_inv_selector_down(player);
-					break;
-				case RIGHT_ARROW:
-					player_open_loot(player);
-					break;
-				case CTRL_Q:
-					shutdown(world);
-					break;
-				case ENTER_KEY:
-					use_item(player);
-					break;
-				case KEY_I:
-					//TODO reset defaults
-					player_close_inventory(player);
-					player_close_action_bar(player);
-					break;
-				case KEY_B:
-					//TODO reset defaults
-					player_close_inventory(player);
-					break;
-				default:
-					break;
-			}
-			hud_update_action_bar(player, world->room[player->global_x][player->global_y]);
-			return false;
-		} else if(player->action_bar.selector == SPELLS) {
-			return false; 
-		} else if(player->action_bar.selector == LOOT) { 
-			switch(x) {
-				case UP_ARROW:
-					player_cycle_loot_selector_up(player);
-					break;
-				case DOWN_ARROW:
-					player_cycle_loot_selector_down(player);
-					break;
-				case LEFT_ARROW:
-					player_open_inventory(player);
-					break;
-				case CTRL_Q:
-					shutdown(world);
-					break;
-				case ENTER_KEY:
-					player_take_loot_item(room, player);
-					break;
-				case KEY_I:
-					//TODO reset defaults
-					player_close_inventory(player);
-					player_close_action_bar(player);
-					break;
-				case KEY_B:
-					//TODO reset defaults
-					player_close_inventory(player);
-					break;
-				default:
-					break;
-			}
-		} else {
-			switch(x) {
-				case UP_ARROW:
-					player_cycle_action_bar_up(player);
-					break;
-				case DOWN_ARROW:
-					player_cycle_action_bar_down(player);
-					break;
-				case CTRL_Q:
-					shutdown(world);
-					break;
-				case ENTER_KEY:
-					if(player->action_bar.selector == INVENTORY) {
-						player_open_inventory(player);
-					} else if(player->action_bar.selector == SPELLS) {
-						player_open_spells(player);
-					}
-					break;
-				case KEY_I:
-					player_close_action_bar(player);
-				default:
-					break;
-			}
-			return false;
+	} else if(player->state == PLAYER_STATE_INVENTORY) {
+		switch(x) {
+			case UP_ARROW:
+				player_cycle_inv_selector_up(player);
+				break;
+			case DOWN_ARROW:
+				player_cycle_inv_selector_down(player);
+				break;
+			case RIGHT_ARROW:
+				player_open_loot(player);
+				break;
+			case CTRL_Q:
+				shutdown(world);
+				break;
+			case ENTER_KEY:
+				use_item(player);
+				break;
+			case KEY_I:
+				//TODO reset defaults
+				player_close_inventory(player);
+				break;
+			case KEY_B:
+				//TODO reset defaults
+				player_close_inventory(player);
+				break;
+			default:
+				break;
 		}
+		// hud_update_action_bar(player, world->room[player->global_x][player->global_y]);
+		return false;
+	} else if(player->state == PLAYER_STATE_LOOTING) { 
+		switch(x) {
+			case UP_ARROW:
+				player_cycle_loot_selector_up(player);
+				break;
+			case DOWN_ARROW:
+				player_cycle_loot_selector_down(player);
+				break;
+			case LEFT_ARROW:
+				player_open_inventory(player);
+				break;
+			case CTRL_Q:
+				shutdown(world);
+				break;
+			case ENTER_KEY:
+				player_take_loot_item(room, player);
+				break;
+			case KEY_I:
+				//TODO reset defaults
+				player_close_inventory(player);
+				break;
+			case KEY_B:
+				//TODO reset defaults
+				player_close_inventory(player);
+				break;
+			default:
+				break;
+		}
+		return false;
+	} else if(player->state == PLAYER_STATE_ATTACKING) {
+		switch(x) {
+			case UP_ARROW:
+				player_attack(player, world, UP);
+				return true;
+			case DOWN_ARROW:
+				player_attack(player, world, DOWN);
+				return true;
+			case RIGHT_ARROW:
+				player_attack(player, world, RIGHT);
+				return true;
+			case LEFT_ARROW:
+				player_attack(player, world, LEFT);
+				return true;
+			case CTRL_Q:
+				shutdown(world);
+				break;
+			case ENTER_KEY:
+				player_take_loot_item(room, player);
+				break;
+			// TODO need a way to cancel attacks
+			default:
+				break;
+		}
+		return false;
 	}
 	return false;
 }

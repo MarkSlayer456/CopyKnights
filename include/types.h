@@ -25,7 +25,6 @@ do { \
 typedef struct world {
 	WINDOW *win;
 	room_t *room[WORLD_HEIGHT][WORLD_WIDTH];
-	int isPlayerTurn;
 	unsigned int seed;
 	enemy_data_t *enemy_data;
 	class_data_t *class_data;

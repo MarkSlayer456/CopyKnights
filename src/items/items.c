@@ -171,14 +171,14 @@ rarity_t get_rarity(const char *name) {
 int use_item(player_t *player)
 {
 	int success = 0;
-	if(player->inventory[player->action_bar.inv_selector].stack > 0) {
-        if(player->inventory[player->action_bar.inv_selector].value_type == VALUE_TYPE_ARMOR) {
-            player->equipment.armor = &player->inventory[player->action_bar.inv_selector];
-        } else if(player->inventory[player->action_bar.inv_selector].value_type == VALUE_TYPE_WEAPON) {
-            player->equipment.main_hand = &player->inventory[player->action_bar.inv_selector]; 
+	if(player->inventory[player->inventory_manager.inv_selector].stack > 0) {
+        if(player->inventory[player->inventory_manager.inv_selector].value_type == VALUE_TYPE_ARMOR) {
+            player->equipment.armor = &player->inventory[player->inventory_manager.inv_selector];
+        } else if(player->inventory[player->inventory_manager.inv_selector].value_type == VALUE_TYPE_WEAPON) {
+            player->equipment.main_hand = &player->inventory[player->inventory_manager.inv_selector]; 
             //TODO off_hand and two handed weapons
         } else {
-            switch(player->inventory[player->action_bar.inv_selector].id) {
+            switch(player->inventory[player->inventory_manager.inv_selector].id) {
                 case BLANK:
                     success = 0;
                 case TELEPORT_SCROLL:
@@ -199,7 +199,6 @@ int use_item(player_t *player)
             remove_item(player);
         }
 		player_close_inventory(player);
-		player_close_action_bar(player);
 	}
 	return success;
 }
@@ -234,9 +233,9 @@ int use_chicken_dinner(player_t *player)
 
 void remove_item(player_t *player)
 {
-	player->inventory[player->action_bar.inv_selector].stack -= 1;
-	if(player->inventory[player->action_bar.inv_selector].stack <= 0) {
-		player_organize_inv(player, player->action_bar.inv_selector);
+	player->inventory[player->inventory_manager.inv_selector].stack -= 1;
+	if(player->inventory[player->inventory_manager.inv_selector].stack <= 0) {
+		player_organize_inv(player, player->inventory_manager.inv_selector);
 	}
 }
 void item_spawn(item_ids_t id, biome_t biome, tile_t *tile, item_data_t *item_data) {

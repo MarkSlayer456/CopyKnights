@@ -93,52 +93,6 @@ void hud_update_nearby_enemies(world_t *world, player_t *player) {
 	}
 }
 
-void hud_update_action_bar(player_t *player, room_t *room) {
-	wmove(action_bar, 0, 0);
-	if(player->action_bar.selector == INVENTORY) {
-		int add_size = 8;
-		char item[MAX_ITEM_NAME_LENGTH+add_size];
-		for(int i = 0; i < INV_SIZE; i++) {
-			if(player->inventory[i].stack == 0) continue;
-			if(i == player->action_bar.inv_selector) {
-				snprintf(item, MAX_ITEM_NAME_LENGTH+add_size, ">>%s x%d", player->inventory[i].name, player->inventory[i].stack);
-			} else {
-				snprintf(item, MAX_ITEM_NAME_LENGTH+add_size, "%s x%d", player->inventory[i].name, player->inventory[i].stack);
-			}
-			wmove(action_bar, i, 0);
-			waddstr(action_bar, item);
-		}
-		// TODO display player's inventory
-	} else if(player->action_bar.selector == SPELLS) {
-		// TODO display player's spells
-	} else if(player->action_bar.selector == LOOT) { 
-		// for(int i = 0; i < MAX_ITEMS_PER_TILE; i++) {
-		// 	item_t *item = room->tiles[player->y][player->x]->items[i];
-		// }
-		// TODO
-	} else {
-		char inv[12] = "inventory";
-		char spells[9] = "spells";
-		switch(player->action_bar.selector) {
-			case INVENTORY:
-				snprintf(inv, 12, "%s", ">>inventory");
-				break;
-			case SPELLS:
-				snprintf(spells, 9, "%s", ">>spells");
-				break;
-			case LOOT:
-				break;
-			case NOT_OPEN:
-				break;
-		}
-		// wprintw(action_bar, inv);
-		waddstr(action_bar, inv);
-		wmove(action_bar, 1, 0);
-		waddstr(action_bar, spells);
-	}
-	
-}
-
 void hud_update_messages(world_t *world, player_t *player) {
 	int start_y = PLAYER_STATS_HUD_SPACE+ENEMY_STATS_HUD_SPACE+MESSAGE_HUD_SPACE-1;
 	wmove(hud, start_y, 0);
@@ -186,21 +140,21 @@ void display_inventory_hud(world_t *world, player_t *player) {
 	for (int y = 0; y < INVENTORY_HEIGHT; y++) {
 		mvwaddch(inventory_hud, y, middle, '|');  // vertical divider at col 39
 	}
-	if(player->action_bar.selector == INVENTORY || player->action_bar.selector == LOOT) {
+	if(player->state == PLAYER_STATE_INVENTORY || player->state == PLAYER_STATE_LOOTING) {
 		int add_size = 16;
 		char item_name[MAX_ITEM_NAME_LENGTH+add_size];
 		int visible_item_count = INVENTORY_HEIGHT-2;
 		int pos = 1;
 		int loot_pos = 1;
 
-		int start = player->action_bar.loot_offset;
-		int end = visible_item_count+player->action_bar.loot_offset;
+		int start = player->inventory_manager.loot_offset;
+		int end = visible_item_count+player->inventory_manager.loot_offset;
 		int max = player->nearby_loot_count;
 		for(int i = start; i < end && i < max; i++) {
 			item_t *item = player->nearby_loot[i];
 			if(item == NULL || item->stack == 0) continue;
-			if(i == player->action_bar.loot_selector) {
-				if(player->action_bar.selector == LOOT) {
+			if(i == player->inventory_manager.loot_selector) {
+				if(player->state == PLAYER_STATE_LOOTING) {
 					snprintf(item_name, MAX_ITEM_NAME_LENGTH+add_size, ">>%s x%d", item->name, item->stack);
 				} else {
 					snprintf(item_name, MAX_ITEM_NAME_LENGTH+add_size, ">%s x%d", item->name, item->stack);
@@ -212,17 +166,17 @@ void display_inventory_hud(world_t *world, player_t *player) {
 			waddstr(inventory_hud, item_name);
 		}
 		
-		for(int i = player->inv_offset; i < visible_item_count+player->inv_offset; i++) {
+		for(int i = player->inventory_manager.inv_offset; i < visible_item_count+player->inventory_manager.inv_offset; i++) {
 			if(player->inventory[i].stack == 0) continue;
-			if(i == player->action_bar.inv_selector) {
+			if(i == player->inventory_manager.inv_selector) {
 				if(player->equipment.armor == &player->inventory[i] || player->equipment.main_hand == &player->inventory[i] || player->equipment.off_hand == &player->inventory[i]) {
-					if(player->action_bar.selector == INVENTORY) {
+					if(player->state == PLAYER_STATE_INVENTORY) {
 						snprintf(item_name, MAX_ITEM_NAME_LENGTH+add_size, ">>%s (E) x%d", player->inventory[i].name, player->inventory[i].stack);
 					} else {
 						snprintf(item_name, MAX_ITEM_NAME_LENGTH+add_size, ">%s (E) x%d", player->inventory[i].name, player->inventory[i].stack);
 					}
 				} else {
-					if(player->action_bar.selector == INVENTORY) {
+					if(player->state == PLAYER_STATE_INVENTORY) {
 						snprintf(item_name, MAX_ITEM_NAME_LENGTH+add_size, ">>%s x%d", player->inventory[i].name, player->inventory[i].stack);
 					} else {
 						snprintf(item_name, MAX_ITEM_NAME_LENGTH+add_size, ">%s x%d", player->inventory[i].name, player->inventory[i].stack);
@@ -239,32 +193,12 @@ void display_inventory_hud(world_t *world, player_t *player) {
 			waddstr(inventory_hud, item_name);
 		}
 		// TODO display player's inventory
-	} else if(player->action_bar.selector == SPELLS) {
-		// TODO display player's spells
-	} else {
-		werase(inventory_hud); // TODO this is unoptimal we should check for this case first and not draw if we don't need to
-		char inv[12] = "inventory";
-		char spells[9] = "spells";
-		switch(player->action_bar.selector) {
-			case INVENTORY:
-				snprintf(inv, 12, "%s", ">>inventory");
-				break;
-			case SPELLS:
-				snprintf(spells, 9, "%s", ">>spells");
-				break;
-			case LOOT:
-				break;
-			case NOT_OPEN:
-				break;
-		}
-		wmove(inventory_hud, 1, 1);
-		waddstr(inventory_hud, inv);
-		wmove(inventory_hud, 2, 1);
-		waddstr(inventory_hud, spells);
 	}
 }
 void display_inventory_desc_hud(world_t *world, player_t *player) {
-	if(player->action_bar.selector == NOT_OPEN || player->action_bar.selector == SPELLS) {
+	if(player->state == PLAYER_STATE_MOVING || player->state == PLAYER_STATE_MOVING
+		|| player->state == PLAYER_STATE_CASTING) {
+		// this should never happen
 		werase(inventory_desc_hud);
 		return;
 	}
@@ -278,8 +212,8 @@ void display_inventory_desc_hud(world_t *world, player_t *player) {
 	for (int y = 0; y < INVENTORY_HEIGHT; y++) {
 		mvwaddch(inventory_desc_hud, y, 39, '|');
 	}
-	for(int i = player->inv_offset; i < visible_item_count+player->inv_offset; i++) {
-		if(i == player->action_bar.inv_selector) {
+	for(int i = player->inventory_manager.inv_offset; i < visible_item_count+player->inventory_manager.inv_offset; i++) {
+		if(i == player->inventory_manager.inv_selector) {
 			int x = 1, y = 1;
 			char desc_copy[MAX_ITEM_DESC_LEN];
 			strncpy(desc_copy, player->inventory[i].desc, MAX_ITEM_DESC_LEN);
@@ -295,13 +229,13 @@ void display_inventory_desc_hud(world_t *world, player_t *player) {
 		}
 	}
 	
-	int start = player->action_bar.loot_offset;
-	int end = visible_item_count+player->action_bar.loot_offset;
+	int start = player->inventory_manager.loot_offset;
+	int end = visible_item_count+player->inventory_manager.loot_offset;
 	int max = player->nearby_loot_count;
 	for(int i = start; i < end && i < max; i++) {
 		item_t *item = player->nearby_loot[i];
 		if(item == NULL || item->stack == 0) continue;
-		if(i == player->action_bar.loot_selector) {
+		if(i == player->inventory_manager.loot_selector) {
 			int x = 1, y = 1;
 			char desc_copy[MAX_ITEM_DESC_LEN];
 			strncpy(desc_copy, item->desc, MAX_ITEM_DESC_LEN);

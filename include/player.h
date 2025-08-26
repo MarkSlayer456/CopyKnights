@@ -29,7 +29,7 @@ int player_can_move_dir(player_t *player, world_t *world, direction_t dir);
 // this will return NULL if no enemy is next to the player
 enemy_t *player_get_dir_enemy(player_t *player, world_t *world, direction_t dir);
 
-void player_attack(player_t *player, world_t *world);
+void player_attack(player_t *player, world_t *world, direction_t dir);
 
 int xp_to_level_up(int level);
 
@@ -37,10 +37,9 @@ void player_add_xp(player_t *player, int amount, const class_data_t *class_data)
 
 void player_check_level_up(player_t *player, const class_data_t *class_data);
 
-void player_open_action_bar(player_t *player);
-void player_close_action_bar(player_t *player);
-void player_cycle_action_bar_up(player_t *player);
-void player_cycle_action_bar_down(player_t *player);
+void player_enter_attack_state(player_t *player, world_t *world);
+void player_exit_attack_state(player_t *player, world_t *world);
+
 void player_cycle_inv_selector_up(player_t *player);
 void player_cycle_inv_selector_down(player_t *player);
 void player_cycle_loot_selector_up(player_t *player);
@@ -50,8 +49,6 @@ void player_open_loot(player_t *player);
 void player_close_loot(player_t *player);
 void player_open_inventory(player_t *player);
 void player_close_inventory(player_t *player);
-void player_open_spells(player_t *player);
-void player_close_spells(player_t *player);
 
 // removes an item from the inventory list, not used to decrease item count
 void player_organize_inv(player_t *player, int loc);

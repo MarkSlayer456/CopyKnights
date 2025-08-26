@@ -24,7 +24,7 @@ biome_t get_biome(const char *name);
 
 void enemy_kill(enemy_t *enemy, world_t *world, player_t *player);
 
-enemy_type_t enemy_decrease_health(enemy_t *enemy, world_t *world, player_t *player);
+bool enemy_decrease_health(enemy_t *enemy, world_t *world, player_t *player);
 
 void enemy_attack(enemy_t *enemy, player_t *player, world_t *world);
 

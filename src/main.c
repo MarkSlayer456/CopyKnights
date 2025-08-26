@@ -63,8 +63,6 @@ int main(int argc, char *argv[]) {
 	}
 
 	world_t *world = malloc(sizeof(world_t));
-	world->isPlayerTurn = 1;
-	
 	world->enemy_data = calloc(MAX_ENEMIES, sizeof(enemy_data_t));
 	for(int row = 0; row < MAX_ENEMIES; row++) {
 		for(int i = 0; i < NUMBER_OF_BIOMES; i++) {
@@ -94,16 +92,16 @@ int main(int argc, char *argv[]) {
 	
 	player_t *player = malloc(sizeof(player_t));
 	
-	action_bar_t action = {
-		.selector = NOT_OPEN,
+	inventory_manager_t inv_manager = {
 		.spells_selector = 0,
 		.inv_selector = 0,
+		.inv_offset = 0,
 		.loot_selector = 0,
 		.loot_offset = 0,
 		.cat = ITEM
 	};
 	
-	player->action_bar = action;
+	player->inventory_manager = inv_manager;
 	player->x = 1;
 	player->y = 10;
 	player->player_class = SWORDSMAN;
@@ -130,8 +128,8 @@ int main(int argc, char *argv[]) {
 	player->action_points = 0;
 	player->level = 1;
 	player->xp = 0;
-	player->inv_offset = 0;
 	player->oil = STARTING_OIL;
+	player->state = PLAYER_STATE_MOVING;
 	
 	player->inventory = malloc(INV_SIZE * sizeof(item_t));
 	player->inventory_count = 0;
@@ -151,8 +149,6 @@ int main(int argc, char *argv[]) {
 	player->lantern.power = 5;
 	player->lantern.is_on = true;
 	player->lantern.turns_since_last_dim = 0;
-
-	world->isPlayerTurn = 1;
 
 	world->turn_order = calloc(MAX_ENEMIES_PER_LEVEL+1, sizeof(int));
 	world->turn_order_size = 0;

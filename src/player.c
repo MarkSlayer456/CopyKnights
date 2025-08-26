@@ -144,7 +144,6 @@ void player_move_dir(player_t *player, world_t *world, direction_t dir) {
 		if(dir == DOWN) player->y = 1;
 		if(dir == UP) player->y = ROOM_HEIGHT-2;
 	}
-	world->isPlayerTurn = 0;
 }
 
 void player_enter_new_room(player_t *player, world_t *world) {
@@ -191,7 +190,6 @@ int player_can_move_dir(player_t *player, world_t *world, direction_t dir) {
 void player_wait(player_t *player, world_t *world)
 {
 	display_world_message(world, player, "You stand still!");
-    world->isPlayerTurn = 0;
 }
 
 void player_decrease_health(player_t *player, world_t *world, int attack)
@@ -231,39 +229,15 @@ enemy_t *player_get_dir_enemy(player_t *player, world_t *world, direction_t dir)
 }
 
 /**
- * This function looks at all knights and will pick the weakest enemy for the knight to attack
- * then call the given attack function
- * TODO redo this whole function it sucks
+ * attacks in a given direction doesn't matter if there is an enemy there or not
  */
-void player_attack(player_t *player, world_t *world) {
-	enemy_t *enL = player_get_dir_enemy(player, world, LEFT);
-	enemy_t *enR = player_get_dir_enemy(player, world, RIGHT);
-	enemy_t *enD = player_get_dir_enemy(player, world, DOWN);
-	enemy_t *enU = player_get_dir_enemy(player, world, UP);
-	if(!enL) enL = enemy_create_temp(world);
-	if(!enR) enR = enemy_create_temp(world);
-	if(!enD) enD = enemy_create_temp(world);
-	if(!enU) enU = enemy_create_temp(world);
-	if(enL->health == 1000000 && enR->health == 1000000 &&
-		enD->health == 1000000 && enU->health == 1000000) {
-		return;
-	}
-	enemy_type_t killed = ENEMY_NONE;
-	int res = compare4(enL->health, enR->health, enD->health, enU->health);
-	if(res == enL->health) {
-		killed = enemy_decrease_health(enL, world, player);
-	} else if(res == enR->health) {
-		killed = enemy_decrease_health(enR, world, player);
-	} else if(res == enD->health) {
-		killed = enemy_decrease_health(enD, world, player);
-	} else if(res == enU->health) {
-		killed = enemy_decrease_health(enU, world, player);
-	}
-	if(killed != ENEMY_NONE) {
-		//TODO each enemy type needs different xp it gives
+void player_attack(player_t *player, world_t *world, direction_t dir) {
+	player_exit_attack_state(player, world);
+	enemy_t *enemy = player_get_dir_enemy(player, world, dir);
+	
+	if(enemy_decrease_health(enemy, world, player)) {
 		player_add_xp(player, 100, world->class_data);
 	}
-    world->isPlayerTurn = 0;
 }
 
 int xp_to_level_up(int level) {
@@ -300,102 +274,76 @@ void player_check_level_up(player_t *player, const class_data_t *class_data) {
 	}
 }
 
+void player_enter_attack_state(player_t *player, world_t *world) {
+	display_combat_message(world, player, ATTACK_DIRECTION_MESSAGE);
+	player->state = PLAYER_STATE_ATTACKING;
+}
+
+void player_exit_attack_state(player_t *player, world_t *world) {
+	player->state = PLAYER_STATE_MOVING;
+}
+
 void player_add_xp(player_t *player, int amount, const class_data_t *class_data) {
 	player->xp += amount;
 	player_check_level_up(player, class_data);
 }
 
-void player_open_action_bar(player_t *player)
-{
-	player->action_bar.selector = INVENTORY;
-}
-
-void player_close_action_bar(player_t *player)
-{
-	player->action_bar.selector = NOT_OPEN;
-}
-
-void player_cycle_action_bar_down(player_t *player)
-{
-	if(player->action_bar.selector+1 >= ACTION_BAR_SELECTOR_COUNT) {
-		player->action_bar.selector = 0;
-	} else {
-		player->action_bar.selector += 1;
-	}
-}
-
-void player_cycle_action_bar_up(player_t *player)
-{
-	if(player->action_bar.selector <= 0) {
-		player->action_bar.selector = ACTION_BAR_SELECTOR_COUNT-1;
-	} else {
-		player->action_bar.selector -= 1;
-	}
-}
 void player_cycle_inv_selector_up(player_t *player)
 {
-	if(player->action_bar.inv_selector > 0) {
-		if(player->action_bar.inv_selector - player->inv_offset == 0) {
-			player->inv_offset--;
+	if(player->inventory_manager.inv_selector > 0) {
+		if(player->inventory_manager.inv_selector - player->inventory_manager.inv_offset == 0) {
+			player->inventory_manager.inv_offset--;
 		}
-		player->action_bar.inv_selector--;
+		player->inventory_manager.inv_selector--;
 	}
 }
 
 void player_cycle_inv_selector_down(player_t *player)
 {
 	int visible_item_count = INVENTORY_HEIGHT-2;
-	if(player->inventory[player->action_bar.inv_selector+1].id != BLANK) {
-		if(player->action_bar.inv_selector - player->inv_offset >= visible_item_count-1) {
-			player->inv_offset++;
+	if(player->inventory[player->inventory_manager.inv_selector+1].id != BLANK) {
+		if(player->inventory_manager.inv_selector - player->inventory_manager.inv_offset >= visible_item_count-1) {
+			player->inventory_manager.inv_offset++;
 		}
-		player->action_bar.inv_selector++;
+		player->inventory_manager.inv_selector++;
 	}
 }
 
 void player_cycle_loot_selector_up(player_t *player) {
-	if(player->action_bar.loot_selector > 0) {
-		if(player->action_bar.loot_selector - player->action_bar.loot_offset == 0) {
-			player->action_bar.loot_offset++;
+	if(player->inventory_manager.loot_selector > 0) {
+		if(player->inventory_manager.loot_selector - player->inventory_manager.loot_offset == 0) {
+			player->inventory_manager.loot_offset++;
 		}
-		player->action_bar.loot_selector--;
+		player->inventory_manager.loot_selector--;
 	}
 }
 
 void player_cycle_loot_selector_down(player_t *player) {
 	int visible_item_count = INVENTORY_HEIGHT-2;
-	if(player->nearby_loot[player->action_bar.loot_selector+1] != NULL) {
-		if(player->action_bar.loot_selector - player->action_bar.loot_offset >= visible_item_count-1) {
-			player->action_bar.loot_offset++;
+	if(player->nearby_loot[player->inventory_manager.loot_selector+1] != NULL) {
+		if(player->inventory_manager.loot_selector - player->inventory_manager.loot_offset >= visible_item_count-1) {
+			player->inventory_manager.loot_offset++;
 		}
-		player->action_bar.loot_selector++;
+		player->inventory_manager.loot_selector++;
 	}
 }
 
 void player_open_loot(player_t *player) {
 	if(player->nearby_loot_count == 0) return;
-	player->action_bar.selector = LOOT;
+	player->state = PLAYER_STATE_LOOTING;
 }
 
 void player_close_loot(player_t *player) {
-	player->action_bar.selector = NOT_OPEN;
+	player->state  = PLAYER_STATE_MOVING;
 }
 
 
 void player_open_inventory(player_t *player) {
-	player->action_bar.selector = INVENTORY;
+	player->state  = PLAYER_STATE_INVENTORY;
 }
 
 void player_close_inventory(player_t *player) {
-	player->action_bar.selector = NOT_OPEN;
-}
-
-void player_open_spells(player_t *player) {
-	player->action_bar.selector = SPELLS;
-}
-
-void player_close_spells(player_t *player) {
-	player->action_bar.selector = NOT_OPEN;
+	player->state  = PLAYER_STATE_MOVING;
 }
 
 bool player_add_to_inv(player_t *player, item_t item) {
@@ -407,7 +355,7 @@ bool player_add_to_inv(player_t *player, item_t item) {
 }
 
 void player_take_loot_item(room_t *room, player_t *player) {
-	item_t *selected_item = player->nearby_loot[player->action_bar.loot_selector];
+	item_t *selected_item = player->nearby_loot[player->inventory_manager.loot_selector];
 	player_add_to_inv(player, *selected_item);
 	int start_y = player->y - 1;
 	int start_x = player->x - 1;
@@ -472,7 +420,7 @@ void player_organize_inv(player_t *player, int loc)
 	}
 	item_t blank = {BLANK_NAME, "does nothing", BLANK, 0};
 	player->inventory[INV_SIZE-1] = blank;
-	while(player->inventory[player->action_bar.inv_selector].id == BLANK && player->action_bar.inv_selector > 0) {
+	while(player->inventory[player->inventory_manager.inv_selector].id == BLANK && player->inventory_manager.inv_selector > 0) {
 		player_cycle_inv_selector_up(player);
 	}
 }
