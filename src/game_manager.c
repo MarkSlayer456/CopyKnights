@@ -99,16 +99,16 @@ bool manage_input(char c, world_t *world, player_t *player) {
 	if(player->action_bar.selector == NOT_OPEN) {
 		switch(x) {
 			case LEFT_ARROW:
-				player_move_left(player, world);
+				player_move_dir(player, world, LEFT);
 				break;
 			case RIGHT_ARROW:
-				player_move_right(player, world);
+				player_move_dir(player, world, RIGHT);
 				break;
 			case UP_ARROW:
-				player_move_up(player, world);
+				player_move_dir(player, world, UP);
 				break;
 			case DOWN_ARROW:
-				player_move_down(player, world);
+				player_move_dir(player, world, DOWN);
 				break;
 			case KEY_A:
 				player_wait(player, world);

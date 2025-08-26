@@ -13,14 +13,11 @@ void player_wait(player_t *player, world_t *world);
 void player_decrease_health(player_t *player, world_t *world, int attack);
 void player_increase_health(player_t *player, int amount);
 
-void player_move_left(player_t *player, world_t *world);
-void player_move_right(player_t *player, world_t *world);
-void player_move_down(player_t *player, world_t *world);
-void player_move_up(player_t *player, world_t *world);
+void player_move_dir(player_t *player, world_t *world, direction_t dir);
+
+void player_enter_new_room(player_t *player, world_t *world);
 
 char player_get_current_pos(player_t *player, world_t *world);
-
-void player_add_knight(player_t *player);
 
 // used by can_move function probably shouldn't call for other reasons
 char player_check_dir(player_t *player, world_t *world, direction_t dir);

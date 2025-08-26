@@ -56,6 +56,8 @@ int main(int argc, char *argv[]) {
 	scrollok(win, FALSE);
 	raw();
 	
+	srand(time(NULL));
+	
 	if(argc != 1) {
 		fprintf(stderr, "No arguments required!\n");
 	}

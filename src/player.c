@@ -11,6 +11,7 @@
 #include <string.h>
 #include <strings.h>
 #include "types.h"
+#include "entrances.h"
 
 #define MIN(a,b)       (a < b) ? a : b
 
@@ -111,78 +112,48 @@ char player_get_current_pos(player_t *player, world_t *world)
 	return world->room[player->global_x][player->global_y]->tiles[player->y][player->x]->floor;
 }
 
-void player_move_left(player_t *player, world_t *world)
-{
-	if(player_can_move_dir(player, world, LEFT)) {
-		player->x -= 1;
-		if(player_get_current_pos(player, world) == DOOR) {
-			if(player->global_x - 1 < 0) {
-				player->x += 1;
-				display_world_message(world, player, DOOR_BLOCKED_MESSAGE);
-				return;
-			}
-			player->global_x--;
-			if(!world->room[player->global_x][player->global_y]->is_created) {
-				world->room[player->global_x][player->global_y] = generate_room(&world->seed, player->global_x, player->global_y, world->enemy_data, world->item_data);
-			}
-			turn_order_enter_new_room(world, player);
-			player->x = ROOM_WIDTH-2;
+void player_move_dir(player_t *player, world_t *world, direction_t dir) {
+	if(dir == LEFT && player_can_move_dir(player, world, LEFT)) player->x--;
+	if(dir == RIGHT && player_can_move_dir(player, world, RIGHT)) player->x++;
+	if(dir == DOWN && player_can_move_dir(player, world, DOWN)) player->y++;
+	if(dir == UP && player_can_move_dir(player, world, UP)) player->y--;
+	
+	if(player_get_current_pos(player, world) == DOOR) {
+		if(dir == LEFT) player->global_x--;
+		if(dir == RIGHT) player->global_x++;
+		if(dir == DOWN) player->global_y++;
+		if(dir == UP) player->global_y--;
+		if(player->global_y < 0) {
+			player->y += 1;
+			display_world_message(world, player, DOOR_BLOCKED_MESSAGE);
+			return;
 		}
+		if(player->global_x < 0) {
+			player->x += 1;
+			display_world_message(world, player, DOOR_BLOCKED_MESSAGE);
+			return;
+		}
+		
+		if(!world->room[player->global_x][player->global_y]->is_created) {
+			player_enter_new_room(player, world);
+		}
+		
+		turn_order_enter_new_room(world, player);
+		if(dir == LEFT) player->x = ROOM_WIDTH-2;
+		if(dir == RIGHT) player->x = 1;
+		if(dir == DOWN) player->y = 1;
+		if(dir == UP) player->y = ROOM_HEIGHT-2;
 	}
 	world->isPlayerTurn = 0;
 }
 
-void player_move_right(player_t *player, world_t *world)
-{
-	if(player_can_move_dir(player, world, RIGHT)) {
-		player->x += 1;
-		if(player_get_current_pos(player, world) == DOOR) {
-			player->global_x++;
-			if(!world->room[player->global_x][player->global_y]->is_created) {
-				world->room[player->global_x][player->global_y] = generate_room(&world->seed, player->global_x, player->global_y, world->enemy_data, world->item_data);
-			}
-			turn_order_enter_new_room(world, player);
-			player->x = 1;
-		}
+void player_enter_new_room(player_t *player, world_t *world) {
+	float chance = (float)rand() / (float)RAND_MAX;
+	if(chance <= ENTRANCE_MESSAGE_CHANCE) {
+		int message = rand() % cave_entrance_messages_count;
+		display_combat_message(world, player, cave_entrance_messages[message]);
 	}
-	world->isPlayerTurn = 0;
-}
-
-void player_move_down(player_t *player, world_t *world)
-{
-	if(player_can_move_dir(player, world, DOWN)) {
-		player->y += 1;
-		if(player_get_current_pos(player, world) == DOOR) {
-			player->global_y++;
-			if(!world->room[player->global_x][player->global_y]->is_created) {
-				world->room[player->global_x][player->global_y] = generate_room(&world->seed, player->global_x, player->global_y, world->enemy_data, world->item_data);
-			}
-			turn_order_enter_new_room(world, player);
-			player->y = 1;
-		}
-	}
-	world->isPlayerTurn = 0;
-}
-
-void player_move_up(player_t *player, world_t *world)
-{
-	if(player_can_move_dir(player, world, UP)) {
-		player->y -= 1;
-		if(player_get_current_pos(player, world) == DOOR) {
-			if(player->global_y - 1 < 0) {
-				player->y += 1;
-				display_world_message(world, player, DOOR_BLOCKED_MESSAGE);
-				return;
-			}
-			player->global_y--;
-			if(!world->room[player->global_x][player->global_y]->is_created) {
-				world->room[player->global_x][player->global_y] = generate_room(&world->seed, player->global_x, player->global_y, world->enemy_data, world->item_data);
-			}
-			turn_order_enter_new_room(world, player);
-			player->y = ROOM_HEIGHT-2;
-		}
-	}
-	world->isPlayerTurn = 0;
+	world->room[player->global_x][player->global_y] = generate_room(&world->seed, player->global_x, player->global_y, world->enemy_data, world->item_data);
 }
 
 char player_check_dir(player_t *player, world_t *world, direction_t dir) {

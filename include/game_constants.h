@@ -292,4 +292,11 @@
 #define LANTERN_OIL_FOR_OVER_LOAD_POWER 				10
 #define LANTERN_CAN_AFFORD_REFUEL						"You don't have enough oil to light you lantern!"
 
+#define ENTRANCE_MESSAGE_CHANCE							.1
+
+#define CAVE_ENTRANCE1									"You hear the flickering sound of your lantern"
+#define CAVE_ENTRANCE2									"The path ahead twists into darkness"
+#define CAVE_ENTRANCE3									"A faint breeze smells of minerals and decay"
+#define CAVE_ENTRANCE4									"Drips of water echo through the darkness ahead"
+
 #endif
