@@ -61,7 +61,7 @@ enemy_t *enemy_create_temp(world_t *world)
 	return e;
 }
 
-enemy_t *enemy_spawn(enemy_type_t type, const enemy_data_t *enemy_data, int x, int y)
+enemy_t *enemy_spawn(enemy_type_t type, const enemy_data_t *enemy_data, int x, int y, biome_t biome)
 {
     if(enemy_data == NULL) return NULL;
     DEBUG_LOG("%s", "spawning enemy...");
@@ -74,17 +74,26 @@ enemy_t *enemy_spawn(enemy_type_t type, const enemy_data_t *enemy_data, int x, i
         enemy_t *e = malloc(sizeof(enemy_t));
         e->type = enemy_data[i].type;
         DEBUG_LOG("Type: %s", enemy_get_name(e->type));
-        e->strength = enemy_data[i].strength;
+        
+        unsigned int seed = cantor_pair(x, y);
+        int range = enemy_data[i].highest_level[biome] - enemy_data[i].lowest_level[biome] + 1;
+        int level = (rand_r_portable(&seed) % range) +  enemy_data[i].lowest_level[biome];
+        
+        e->level = level;
+        DEBUG_LOG("Level: %d", e->level);
+        e->strength = (int)enemy_data[i].base_strength + ((e->level-1) * ENEMY_GROWTH_MODIFER);
         DEBUG_LOG("str: %d", e->strength);
-        e->dexterity = enemy_data[i].dexterity;
+        e->dexterity = (int)enemy_data[i].base_dexterity + ((e->level-1) * ENEMY_GROWTH_MODIFER);
         DEBUG_LOG("dex: %d", e->dexterity);
-        e->intelligence = enemy_data[i].intelligence;
+        e->intelligence = (int)enemy_data[i].base_intelligence + ((e->level-1) * ENEMY_GROWTH_MODIFER);
         DEBUG_LOG("int: %d", e->intelligence);
-        e->constitution = enemy_data[i].constitution;
+        e->constitution = (int)enemy_data[i].base_constitution + ((e->level-1) * ENEMY_GROWTH_MODIFER);
         DEBUG_LOG("con: %d", e->constitution);
-        e->health = enemy_data[i].constitution * 10;
-        e->speed = enemy_data[i].speed;
+        e->health = (int)(enemy_data[i].base_constitution + ((e->level-1) * ENEMY_GROWTH_MODIFER)) * 10;
+        e->speed = (int)enemy_data[i].base_speed + ((e->level-1) * ENEMY_GROWTH_MODIFER);
         DEBUG_LOG("speed: %d", e->speed);
+        e->defense = (int)enemy_data[i].base_defense + ((e->level-1) * ENEMY_GROWTH_MODIFER);
+        DEBUG_LOG("defense: %d", e->defense);
         e->x = x;
         e->y = y;
         e->trait = PASSIVE;
@@ -218,25 +227,28 @@ void load_enemy_data(enemy_data_t *enemy_data) {
                     enemy_data[row].type = enemy_get_type(token);
                     break;
                 case 1:
-                    enemy_data[row].strength = atoi(token);
+                    enemy_data[row].base_strength = atoi(token);
                     break;
                 case 2:
-                    enemy_data[row].dexterity = atoi(token);
+                    enemy_data[row].base_dexterity = atoi(token);
                     break;
                 case 3:
-                    enemy_data[row].intelligence = atoi(token);
+                    enemy_data[row].base_intelligence = atoi(token);
                     break;
                 case 4:
-                    enemy_data[row].constitution = atoi(token);
+                    enemy_data[row].base_constitution = atoi(token);
                     break;
                 case 5:
-                    enemy_data[row].speed = atoi(token);
+                    enemy_data[row].base_speed = atoi(token);
                     break;
                 case 6:
+                    enemy_data[row].base_defense = atoi(token);
+                    break;
+                case 7:
                     // TODO
                     // enemy_data[row].trait = atoi(token);
                     break;
-                case 7:
+                case 8:
                     enemy_data[row].symbol = token[0];
                     break;
                     
@@ -244,9 +256,9 @@ void load_enemy_data(enemy_data_t *enemy_data) {
             token = strtok(NULL, ",");
             col++;
         }
-        DEBUG_LOG("Loaded Enemy Data: %d, %d, %d, %d, %d, %d, %c", enemy_data[row].type, 
-                  enemy_data[row].strength, enemy_data[row].dexterity, enemy_data[row].intelligence,
-                  enemy_data[row].constitution, enemy_data[row].speed, enemy_data[row].symbol);
+        DEBUG_LOG("Loaded Enemy Data: %d, %d, %d, %d, %d, %d, %d, %c", enemy_data[row].type, 
+                  enemy_data[row].base_strength, enemy_data[row].base_dexterity, enemy_data[row].base_intelligence,
+                  enemy_data[row].base_constitution, enemy_data[row].base_speed, enemy_data[row].base_defense, enemy_data[row].symbol);
         col = 0;
         row++;
     }
@@ -255,7 +267,7 @@ void load_enemy_data(enemy_data_t *enemy_data) {
     
 }
 
-void enemy_kill(enemy_t *enemy, world_t *world, player_t *player) 
+void enemy_kill(enemy_t *enemy, world_t *world, const player_t *player) 
 {
     room_t *room = world->room[player->global_x][player->global_y];
 	// int found = 0;
@@ -268,10 +280,10 @@ void enemy_kill(enemy_t *enemy, world_t *world, player_t *player)
 /*
  * returns true on kill returns false otherwise
  */
-bool enemy_decrease_health(enemy_t *enemy, world_t *world, player_t *player)
+bool enemy_decrease_health(enemy_t *enemy, world_t *world, const player_t *player, int amount)
 {
     if(!enemy) return false;
-    enemy->health -= player->strength;
+    enemy->health -= amount;
 	if(enemy->health <= 0) {
 		enemy_kill(enemy, world, player);
         return true;
@@ -295,30 +307,40 @@ void enemy_decide_move(enemy_t *enemy, world_t *world, player_t *player)
 			if(player->x < enemy->x) {
                 if(enemy_can_move_dir(enemy, world, player, LEFT) && (enemy->x-1 != player->x || enemy->y != player->y)) {
                     enemy->x-=1;
+                    break;
                 } else if(enemy->x-1 == player->x && enemy->y == player->y) {
                     enemy_attack(enemy, player, world);
+                    break;
                 }
-			} else if(player->x > enemy->x) {
+			} 
+			if(player->x > enemy->x) {
                 if(enemy_can_move_dir(enemy, world, player, RIGHT) && (enemy->x+1 != player->x || enemy->y != player->y)) {
                     enemy->x+=1;
+                    break;
                 } else if(enemy->x+1 == player->x && enemy->y == player->y) {
                     enemy_attack(enemy, player, world);
+                    break;
                 }
-			} else if(player->y < enemy->y) {
+			} 
+			if(player->y < enemy->y) {
                 if(enemy_can_move_dir(enemy, world, player, UP) && (enemy->y-1 != player->y || enemy->x != player->x)) {
                     enemy->y-=1;
+                    break;
                 } else if(enemy->y-1 == player->y && enemy->x == player->x) {
                     enemy_attack(enemy, player, world);
+                    break;
                 }
-			} else if(player->y > enemy->y) {
+			} 
+			if(player->y > enemy->y) {
                 if(enemy_can_move_dir(enemy, world, player, DOWN) && (enemy->y+1 != player->y || enemy->x != player->x)) {
                     enemy->y+=1;
+                    break;
                 } else if(enemy->y+1 == player->y && enemy->x == player->x) {
                     enemy_attack(enemy, player, world);
+                    break;
                 }
-			} else {
-                enemy_attack(enemy, player, world);
-            }
+			}
+            enemy_attack(enemy, player, world);
 			break;
 		case AGRESSIVE:
 			break;

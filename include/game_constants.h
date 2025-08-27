@@ -18,6 +18,8 @@
 
 #define MAX_ITEMS								512
 
+#define DEFENSE_SCALING_CONSTANT				50 // high defense less powerful, lower more powerful
+
 #define PLAYER_TURN_ORDER_INDEX					-1
 #define INVALID_ACTOR_INDEX						999999999
 
@@ -111,6 +113,8 @@
 #define MARROW_LEECH_ENEMY_NAME				"Marrow Leech"
 #define MUD_CRAWLER_ENEMY_NAME				"Mud Crawler"
 #define BOG_LURKER_ENEMY_NAME				"Bog Lurker"
+
+#define ENEMY_GROWTH_MODIFER				1.15
 
 /////////////// items //////////////////
 
@@ -288,7 +292,7 @@
 #define LANTERN_OVER_LOAD_POWER							10
 #define LANTERN_OVER_LOAD_THRESHOLD						4
 #define LANTERN_OVER_LOAD_LOWER_BOUNDS					6
-#define LANTERN_TURNS_TO_DIM							10
+#define LANTERN_TURNS_TO_DIM							20
 #define LANTERN_OIL_FOR_NORMAL_POWER					1
 #define LANTERN_OIL_FOR_OVER_LOAD_POWER 				10
 #define LANTERN_CAN_AFFORD_REFUEL						"You don't have enough oil to light you lantern!"

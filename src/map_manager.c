@@ -95,7 +95,7 @@ room_t *load_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data, it
 		for(int j = 0; j < strlen(tok); j++) {
 			switch(tok[j]) {
 				case POTENTIAL_ENEMY_SPAWN_CHAR:
-					room->enemies[room->current_enemy_count] = enemy_spawn(enemy_generate_type(&map_seed, enemy_data, room->biome), enemy_data, j, i);
+					room->enemies[room->current_enemy_count] = enemy_spawn(enemy_generate_type(&map_seed, enemy_data, room->biome), enemy_data, j, i, room->biome);
 					room->tiles[i][j]->floor = EMPTY;
 					room->current_enemy_count++;
 					break;

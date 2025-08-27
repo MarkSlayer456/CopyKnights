@@ -14,6 +14,7 @@
 #include "entrances.h"
 
 #define MIN(a,b)       (a < b) ? a : b
+#define MAX(a,b)       (a > b) ? a : b
 
 extern char walk_chars[WALK_CHAR_LENGTH];
 
@@ -234,8 +235,10 @@ enemy_t *player_get_dir_enemy(player_t *player, world_t *world, direction_t dir)
 void player_attack(player_t *player, world_t *world, direction_t dir) {
 	player_exit_attack_state(player, world);
 	enemy_t *enemy = player_get_dir_enemy(player, world, dir);
-	
-	if(enemy_decrease_health(enemy, world, player)) {
+	int raw_damage = player->strength; //TODO this will change later
+	int damage = raw_damage * (DEFENSE_SCALING_CONSTANT)/(DEFENSE_SCALING_CONSTANT+enemy->defense);
+	damage = MAX(1, damage);
+	if(enemy_decrease_health(enemy, world, player, damage)) {
 		player_add_xp(player, 100, world->class_data);
 	}
 }

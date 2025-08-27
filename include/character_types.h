@@ -90,6 +90,7 @@ typedef struct enemy {
 	int intelligence;
 	int constitution;
 	int speed;
+	int defense;
 	int world;
 	int x; // room pos
 	int y; // room pos
@@ -105,11 +106,12 @@ typedef struct enemy {
 
 typedef struct enemy_data {
 	enemy_type_t type;
-	int strength;
-	int dexterity;
-	int intelligence;
-	int constitution;
-	int speed;
+	int base_strength;
+	int base_dexterity;
+	int base_intelligence;
+	int base_constitution;
+	int base_speed;
+	int base_defense;
 	int level;
 	char symbol;
 	trait_t trait;

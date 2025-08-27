@@ -121,8 +121,8 @@ int main(int argc, char *argv[]) {
 			break;
 		}
 	}
-	player->health = player->constitution * 100;
-	player->max_health = player->constitution * 100;
+	player->health = player->constitution * 10;
+	player->max_health = player->constitution * 10;
 	player->global_x = 0;
 	player->global_y = 0;
 	player->action_points = 0;
@@ -159,7 +159,7 @@ int main(int argc, char *argv[]) {
 	}
 	world->seed = TEST_SEED;
 	room_t *first = setup_first_room(&world->seed, 0, 0, world->enemy_data, world->item_data);
-	first->enemies[0] = enemy_spawn(BAT, world->enemy_data, 1, 1);
+	first->enemies[0] = enemy_spawn(BAT, world->enemy_data, 1, 1, first->biome);
 	
 	first->current_enemy_count++;
 	

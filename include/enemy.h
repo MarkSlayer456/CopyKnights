@@ -8,7 +8,7 @@
 //TODO need move functions and check functions so enemies don't leave the map
 // shouldn't happen but just in case
 
-enemy_t *enemy_spawn(enemy_type_t type, const enemy_data_t *enemy_data, int x, int y);
+enemy_t *enemy_spawn(enemy_type_t type, const enemy_data_t *enemy_data, int x, int y, biome_t biome);
 
 const char *enemy_get_name(enemy_type_t type);
 
@@ -22,9 +22,9 @@ void load_biome_data(enemy_data_t *enemy_data);
 
 biome_t get_biome(const char *name);
 
-void enemy_kill(enemy_t *enemy, world_t *world, player_t *player);
+void enemy_kill(enemy_t *enemy, world_t *world, const player_t *player);
 
-bool enemy_decrease_health(enemy_t *enemy, world_t *world, player_t *player);
+bool enemy_decrease_health(enemy_t *enemy, world_t *world, const player_t *player, int amount);
 
 void enemy_attack(enemy_t *enemy, player_t *player, world_t *world);
 
