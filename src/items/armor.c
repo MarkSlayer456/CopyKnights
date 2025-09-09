@@ -24,7 +24,7 @@ armor_type_t armor_get_type(const char *name) {
 
 void load_armor_spawn_data(world_t *world) {
 	item_data_t *item_data = world->item_data;
-	FILE *fp = fopen("./data/armor_spawns.csv", "r");
+	FILE *fp = fopen("./data/armor/armor_spawns.csv", "r");
 	if(!fp) {
 		perror("File open failed");
 		return;
@@ -70,7 +70,7 @@ void load_armor_spawn_data(world_t *world) {
 
 void load_armor_effects(world_t *world) {
 	item_data_t *item_data = world->item_data;
-	FILE *fp = fopen("./data/armor_effects.csv", "r");
+	FILE *fp = fopen("./data/armor/armor_effects.csv", "r");
 	if(!fp) {
 		perror("File open failed");
 		return;
@@ -150,7 +150,7 @@ void load_armor_data(world_t *world) {
 			token = strtok(NULL, ",");
 			col++;
 		}
-		snprintf(item_data[world->item_data_count].desc, MAX_ITEM_DESC_LEN, "+%d defense", item_data[world->item_data_count].stat_type.armor.defense);
+		snprintf(item_data[world->item_data_count].desc, MAX_ITEM_DESC_LEN, "+%03d defense", item_data[world->item_data_count].stat_type.armor.defense);
 		DEBUG_LOG("Loaded Armor Data: %d, %s, %d, %d, %s", 
 				item_data[world->item_data_count].id, 
 				item_data[world->item_data_count].name, 

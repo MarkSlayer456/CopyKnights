@@ -18,6 +18,7 @@
 #include "lantern.h"
 #include "items/armor.h"
 #include "items/weapons.h"
+#include "items/foods.h"
 
 /*
 	Top down dungeon crawler
@@ -85,10 +86,13 @@ int main(int argc, char *argv[]) {
 		world->messages[i] = calloc(MAX_MESSAGE_LENGTH, sizeof(char));
 	}
 	
+	world->item_data_count = 0;
+	
 	load_enemy_data(world->enemy_data);
 	load_class_data(world->class_data);
 	load_armor_data(world);
 	load_weapon_data(world);
+	load_foods_data(world);
 	
 	player_t *player = malloc(sizeof(player_t));
 	
@@ -129,22 +133,23 @@ int main(int argc, char *argv[]) {
 	player->level = 1;
 	player->xp = 0;
 	player->oil = STARTING_OIL;
+	player->equipment = (equipment_t) {0};
 	player->state = PLAYER_STATE_MOVING;
 	
 	player->inventory = malloc(INV_SIZE * sizeof(item_t));
 	player->inventory_count = 0;
 	
 	item_t blank = {BLANK_NAME, "does nothing", BLANK, 0};
-	item_t test_item1 = {HEALTH_POTION_NAME, "heals player", HEALTH_POTION, 5};
-	item_t test_item2 = {APPLE_NAME, "heals player", APPLE, 3};
-	item_t test_item3 = {TELEPORT_SCROLL_NAME, "teleports player", TELEPORT_SCROLL, 1};
-	
+// 	item_t test_item1 = {HEALTH_POTION_NAME, "heals player", HEALTH_POTION, 5};
+// 	item_t test_item2 = {APPLE_NAME, "heals player", APPLE, 3};
+// 	item_t test_item3 = {TELEPORT_SCROLL_NAME, "teleports player", TELEPORT_SCROLL, 1};
+// 	
 	for(int i = 0; i < INV_SIZE; i++) {
 		player->inventory[i] = blank;
 	}
-	player_add_to_inv(player, test_item1);
-	player_add_to_inv(player, test_item2);
-	player_add_to_inv(player, test_item3);
+	// player_add_to_inv(player, test_item1);
+	// player_add_to_inv(player, test_item2);
+	// player_add_to_inv(player, test_item3);
 	
 	player->lantern.power = 5;
 	player->lantern.is_on = true;

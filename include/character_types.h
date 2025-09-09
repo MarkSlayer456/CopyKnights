@@ -70,8 +70,8 @@ typedef struct player {
 	int inventory_count; // amount of items the player has
 	item_t *nearby_loot[MAX_ITEMS_NEARBY_PLAYER];
 	int nearby_loot_count;
-	int *mana; // amount of player currently has
-	int *max_mana;
+	int mana; // amount of player currently has
+	int max_mana;
 	int action_points;
 	class_type_t player_class;
 	lantern_t lantern;

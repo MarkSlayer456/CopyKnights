@@ -41,10 +41,13 @@ const int stats_map_len = sizeof(stats_map) / sizeof(stats_map[0]);
 
 type_map_t item_type_map[] = {
     {BLANK_NAME, BLANK},
+    
     {TELEPORT_SCROLL_NAME, TELEPORT_SCROLL},
+    
     {HEALTH_POTION_NAME, HEALTH_POTION},
     {APPLE_NAME, APPLE},
     {CHICKEN_DINNER_NAME, CHICKEN_DINNER},
+    
     {BLACKSTONE_ARMOR_NAME, BLACKSTONE_ARMOR},
     {BRONZE_ARMOR_NAME, BRONZE_ARMOR},
     {IRON_ARMOR_NAME, IRON_ARMOR},
@@ -177,21 +180,16 @@ int use_item(player_t *player)
         } else if(player->inventory[player->inventory_manager.inv_selector].value_type == VALUE_TYPE_WEAPON) {
             player->equipment.main_hand = &player->inventory[player->inventory_manager.inv_selector]; 
             //TODO off_hand and two handed weapons
+        } else if(player->inventory[player->inventory_manager.inv_selector].value_type == VALUE_TYPE_FOOD) {
+            //TODO effects with durations
+            player_increase_health(player, player->inventory[player->inventory_manager.inv_selector].stat_type.food.heal_amount);
+            player_increase_mana(player, player->inventory[player->inventory_manager.inv_selector].stat_type.food.mana_heal_amount);
         } else {
             switch(player->inventory[player->inventory_manager.inv_selector].id) {
                 case BLANK:
                     success = 0;
                 case TELEPORT_SCROLL:
                     use_teleport_scroll(player);
-                    success = 1;
-                case HEALTH_POTION:
-                    use_health_potion(player);
-                    success = 1;
-                case APPLE:
-                    use_apple(player);
-                    success = 1;
-                case CHICKEN_DINNER:
-                    use_chicken_dinner(player);
                     success = 1;
                 default:
                     success = 0;

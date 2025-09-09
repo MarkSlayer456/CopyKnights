@@ -34,6 +34,10 @@ typedef struct weapon_stats {
 
 typedef struct food_stats {
 	int heal_amount;
+	int mana_heal_amount;
+	stat_modifier_t modifier_stats[MAX_ARMOR_MODIFIERS];
+	int modifier_count;
+	int duration;
 } food_stats_t;
 
 typedef struct scroll_stats {

@@ -201,12 +201,19 @@ void player_decrease_health(player_t *player, world_t *world, int attack)
     }
 }
 
-void player_increase_health(player_t *player, int amount)
-{
+void player_increase_health(player_t *player, int amount) {
 	if(player->health + amount > player->max_health) {
 		player->health = player->max_health;
 	} else {
 		player->health += amount;
+	}
+}
+
+void player_increase_mana(player_t *player, int amount) {
+	if(player->mana + amount > player->max_mana) {
+		player->mana = player->max_mana;
+	} else {
+		player->mana += amount;
 	}
 }
 
@@ -235,6 +242,7 @@ enemy_t *player_get_dir_enemy(player_t *player, world_t *world, direction_t dir)
 void player_attack(player_t *player, world_t *world, direction_t dir) {
 	player_exit_attack_state(player, world);
 	enemy_t *enemy = player_get_dir_enemy(player, world, dir);
+	if(!enemy) return;
 	int raw_damage = player->strength; //TODO this will change later
 	int damage = raw_damage * (DEFENSE_SCALING_CONSTANT)/(DEFENSE_SCALING_CONSTANT+enemy->defense);
 	damage = MAX(1, damage);

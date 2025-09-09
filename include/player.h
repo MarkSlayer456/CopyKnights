@@ -12,6 +12,7 @@ void player_wait(player_t *player, world_t *world);
 
 void player_decrease_health(player_t *player, world_t *world, int attack);
 void player_increase_health(player_t *player, int amount);
+void player_increase_mana(player_t *player, int amount);
 
 void player_move_dir(player_t *player, world_t *world, direction_t dir);
 
