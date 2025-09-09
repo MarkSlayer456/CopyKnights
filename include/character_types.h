@@ -46,6 +46,7 @@ typedef struct lantern {
 } lantern_t;
 
 typedef struct equipment {
+	item_ids_t armor_id, main_hand_id, off_hand_id;
 	item_t *armor;
 	item_t *main_hand;
 	bool main_hand_two_handed; // is this weapon 2 handed

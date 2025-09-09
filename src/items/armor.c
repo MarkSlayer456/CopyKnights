@@ -26,7 +26,7 @@ void load_armor_spawn_data(world_t *world) {
 	item_data_t *item_data = world->item_data;
 	FILE *fp = fopen("./data/armor/armor_spawns.csv", "r");
 	if(!fp) {
-		perror("File open failed");
+		perror("armor_spawns.csv File open failed");
 		return;
 	}
 	
@@ -72,7 +72,7 @@ void load_armor_effects(world_t *world) {
 	item_data_t *item_data = world->item_data;
 	FILE *fp = fopen("./data/armor/armor_effects.csv", "r");
 	if(!fp) {
-		perror("File open failed");
+		perror("armor_effects.csv File open failed");
 		return;
 	}
 	
@@ -115,9 +115,9 @@ void load_armor_effects(world_t *world) {
 
 void load_armor_data(world_t *world) {
 	item_data_t *item_data = world->item_data;
-	FILE *fp = fopen("./data/armors.csv", "r");
+	FILE *fp = fopen("./data/armor/armors.csv", "r");
 	if(!fp) {
-		perror("File open failed");
+		perror("armors.csv File open failed");
 		return;
 	}
 	

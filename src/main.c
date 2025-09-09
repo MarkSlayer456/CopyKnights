@@ -19,6 +19,7 @@
 #include "items/armor.h"
 #include "items/weapons.h"
 #include "items/foods.h"
+#include "save.h"
 
 /*
 	Top down dungeon crawler
@@ -57,6 +58,8 @@ int main(int argc, char *argv[]) {
 	scrollok(win, FALSE);
 	raw();
 	
+	ensure_save_folder();
+	
 	srand(time(NULL));
 	
 	if(argc != 1) {
@@ -94,7 +97,7 @@ int main(int argc, char *argv[]) {
 	load_weapon_data(world);
 	load_foods_data(world);
 	
-	player_t *player = malloc(sizeof(player_t));
+	player_t *player = calloc(1, sizeof(player_t));
 	
 	inventory_manager_t inv_manager = {
 		.spells_selector = 0,
@@ -138,12 +141,13 @@ int main(int argc, char *argv[]) {
 	
 	player->inventory = malloc(INV_SIZE * sizeof(item_t));
 	player->inventory_count = 0;
+	for(int i = 0; i < MAX_ITEMS_NEARBY_PLAYER; i++) {
+		player->nearby_loot[i] = malloc(1 * sizeof(item_t));
+	}
+	player->nearby_loot_count = 0;
 	
 	item_t blank = {BLANK_NAME, "does nothing", BLANK, 0};
-// 	item_t test_item1 = {HEALTH_POTION_NAME, "heals player", HEALTH_POTION, 5};
-// 	item_t test_item2 = {APPLE_NAME, "heals player", APPLE, 3};
-// 	item_t test_item3 = {TELEPORT_SCROLL_NAME, "teleports player", TELEPORT_SCROLL, 1};
-// 	
+	
 	for(int i = 0; i < INV_SIZE; i++) {
 		player->inventory[i] = blank;
 	}
@@ -191,6 +195,12 @@ int main(int argc, char *argv[]) {
 	
 	world->win = win;
     world->turn_order_size = 0;
+	// TODO for testing only
+	save_player(player, "");
+	player_t *save_test = malloc(sizeof(player_t));
+	load_player(save_test, "");
+	
+	DEBUG_LOG("x, y: %d, %d", save_test->x, save_test->y);
 	for(;;) {
 		calculate_light(world, player);
 		generate_turn_order_display(world, player);

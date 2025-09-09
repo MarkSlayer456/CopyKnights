@@ -9,7 +9,7 @@ void load_foods_spawn_data(world_t *world) {
 	item_data_t *item_data = world->item_data;
 	FILE *fp = fopen("./data/foods/foods_spawns.csv", "r");
 	if(!fp) {
-		perror("File open failed");
+		perror("foods_spawns.csv File open failed");
 		return;
 	}
 	
@@ -55,7 +55,7 @@ void load_foods_effects(world_t *world) {
 	item_data_t *item_data = world->item_data;
 	FILE *fp = fopen("./data/foods/foods_effects.csv", "r");
 	if(!fp) {
-		perror("File open failed");
+		perror("foods_effects.csv File open failed");
 		return;
 	}
 	
@@ -99,7 +99,7 @@ void load_foods_data(world_t *world) {
 	item_data_t *item_data = world->item_data;
 	FILE *fp = fopen("./data/foods/foods.csv", "r");
 	if(!fp) {
-		perror("File open failed");
+		perror("foods.csv File open failed");
 		return;
 	}
 	
