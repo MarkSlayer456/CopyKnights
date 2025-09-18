@@ -153,7 +153,7 @@ void player_enter_new_room(player_t *player, world_t *world) {
 		int message = rand() % cave_entrance_messages_count;
 		display_combat_message(world, player, cave_entrance_messages[message]);
 	}
-	world->room[player->global_x][player->global_y] = generate_room(&world->seed, player->global_x, player->global_y, world->enemy_data, world->item_data);
+	world->room[player->global_x][player->global_y] = generate_room(&world->seed, player->global_x, player->global_y, world->enemy_data, world->item_data, world);
 }
 
 char player_check_dir(player_t *player, world_t *world, direction_t dir) {

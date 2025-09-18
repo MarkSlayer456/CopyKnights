@@ -340,7 +340,6 @@ void enemy_decide_move(enemy_t *enemy, world_t *world, player_t *player)
                     break;
                 }
 			}
-            enemy_attack(enemy, player, world);
 			break;
 		case AGRESSIVE:
 			break;

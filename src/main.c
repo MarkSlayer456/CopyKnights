@@ -167,7 +167,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	world->seed = TEST_SEED;
-	room_t *first = setup_first_room(&world->seed, 0, 0, world->enemy_data, world->item_data);
+	room_t *first = setup_first_room(&world->seed, 0, 0, world->enemy_data, world->item_data, world);
 	first->enemies[0] = enemy_spawn(BAT, world->enemy_data, 1, 1, first->biome);
 	
 	first->current_enemy_count++;
@@ -193,8 +193,13 @@ int main(int argc, char *argv[]) {
 	
 	world->room[0][0] = first;
 	
+	world->room_template_count = 0;
+	calculate_door_masks(world);
+	calculate_main_path(&world->seed, world);
+	
 	world->win = win;
     world->turn_order_size = 0;
+	
 	// TODO for testing only
 	save_player(player, "");
 	player_t *save_test = malloc(sizeof(player_t));

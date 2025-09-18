@@ -35,6 +35,8 @@ typedef struct world {
 	int messages_size;
 	int *turn_order; // -1 for player, index for enemies
 	int turn_order_size;
+	room_template_t room_templates[128];
+	int room_template_count;
 } world_t;
 
 #endif

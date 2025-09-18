@@ -1,6 +1,12 @@
 #ifndef MAP_TYPES_H_
 #define MAP_TYPES_H_
 
+typedef struct room_template {
+	char filename[128];
+	unsigned int mask;
+	biome_t biome;
+} room_template_t;
+
 typedef struct tile {
 	char floor; // what the floor tile is
 	bool has_light; // does this tile have light
@@ -14,6 +20,8 @@ typedef struct room {
 	bool is_created; // TODO what is this?
 	int global_time;
 	biome_t biome;
+	bool is_main_path; // is main path
+	unsigned int door_mask;
 } room_t;
 
 #endif
