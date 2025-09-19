@@ -90,6 +90,7 @@ int main(int argc, char *argv[]) {
 	}
 	
 	world->item_data_count = 0;
+	world->room_template_count = 0;
 	
 	load_enemy_data(world->enemy_data);
 	load_class_data(world->class_data);
@@ -128,8 +129,8 @@ int main(int argc, char *argv[]) {
 			break;
 		}
 	}
-	player->health = player->constitution * 10;
-	player->max_health = player->constitution * 10;
+	player->health = player->constitution * 100;
+	player->max_health = player->constitution * 100;
 	player->global_x = 0;
 	player->global_y = 0;
 	player->action_points = 0;
@@ -166,7 +167,9 @@ int main(int argc, char *argv[]) {
 			world->room[y][x] = calloc(1, sizeof(room_t));
 		}
 	}
+	
 	world->seed = TEST_SEED;
+	
 	room_t *first = setup_first_room(&world->seed, 0, 0, world->enemy_data, world->item_data, world);
 	first->enemies[0] = enemy_spawn(BAT, world->enemy_data, 1, 1, first->biome);
 	
@@ -193,7 +196,7 @@ int main(int argc, char *argv[]) {
 	
 	world->room[0][0] = first;
 	
-	world->room_template_count = 0;
+	world->room[0][0]->door_mask = 0x6;
 	calculate_door_masks(world);
 	calculate_main_path(&world->seed, world);
 	

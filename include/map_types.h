@@ -22,6 +22,7 @@ typedef struct room {
 	biome_t biome;
 	bool is_main_path; // is main path
 	unsigned int door_mask;
+	unsigned int forbidden_door_mask;
 } room_t;
 
 #endif
