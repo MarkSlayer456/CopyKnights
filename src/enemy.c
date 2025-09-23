@@ -71,7 +71,7 @@ enemy_t *enemy_spawn(enemy_type_t type, const enemy_data_t *enemy_data, int x, i
             i++;
             continue;
         }
-        enemy_t *e = malloc(sizeof(enemy_t));
+        enemy_t *e = calloc(1, sizeof(enemy_t));
         e->type = enemy_data[i].type;
         DEBUG_LOG("Type: %s", enemy_get_name(e->type));
         
@@ -274,6 +274,8 @@ void enemy_kill(enemy_t *enemy, world_t *world, const player_t *player)
 	for(int i = 0; i < room->current_enemy_count; i++) {
 		if(enemy == room->enemies[i]) {
 			room->enemies[i] = NULL;
+            room->current_enemy_count--;
+            i--;
 		}
 	}
 }

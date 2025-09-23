@@ -16,11 +16,9 @@ do { \
 		fclose(f); \
 	} \
 } while (0)
-// EXAMPLE: DEBUG_LOG("Constitution: %d", enemy_data[row].constitution);
 
-/* a world is really a floor
- * it has the whole room inside of it
- * each room, and each room's layout because the rooms all have a layout
+/*
+ * holds all world information, aside from the player
  */
 typedef struct world {
 	WINDOW *win;
@@ -30,13 +28,13 @@ typedef struct world {
 	class_data_t *class_data;
 	item_data_t *item_data;
 	int item_data_count;
+	int messages_size;
 	char **messages;
 	int max_message_storage;
-	int messages_size;
-	int *turn_order; // -1 for player, index for enemies
 	int turn_order_size;
-	room_template_t room_templates[128];
+	int *turn_order; // -1 for player, index for enemies
 	int room_template_count;
+	room_template_t room_templates[128];
 } world_t;
 
 #endif

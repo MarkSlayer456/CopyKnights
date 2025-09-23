@@ -237,13 +237,7 @@ void remove_item(player_t *player)
 	}
 }
 void item_spawn(item_ids_t id, biome_t biome, tile_t *tile, item_data_t *item_data) {
-    item_t *item = NULL;
-    for(int k = 0; k < MAX_ITEMS_PER_TILE; k++) {
-        if(tile->items[k] == NULL || tile->items[k]->stack == 0) {
-            item = tile->items[k];
-            break;
-        }
-    }
+    item_t *item = tile->items[tile->item_count];
     for(int i = 0; i < MAX_ITEMS; i++) {
         if(!item) continue;
         if(item_data[i].id == BLANK) continue;

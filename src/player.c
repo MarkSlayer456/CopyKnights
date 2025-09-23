@@ -380,13 +380,9 @@ void player_take_loot_item(room_t *room, player_t *player) {
 	
 	for(int y = start_y; y <= end_y; y++) {
 		for(int x = start_x; x <= end_x; x++) {
-			for(int i = 0; i < MAX_ITEMS_PER_TILE; i++) {
-				item_t *item = room->tiles[y][x]->items[i];
-				if(item == NULL || item->stack == 0) continue;
-				if(selected_item == item) {
-					item->stack = 0;
-				}
-			}
+				item_t *item = room->tiles[y][x]->items[player->inventory_manager.loot_selector];
+				item->stack = 0;
+				room->tiles[y][x]->item_count--;
 		}
 	}
 	// need to repopulate the array

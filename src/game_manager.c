@@ -11,6 +11,7 @@
 #include <string.h>
 #include "types.h"
 #include "lantern.h"
+#include "save.h"
 
 //wmove(win, x, y);
 //waddch(win, char);
@@ -114,6 +115,9 @@ bool manage_input(char c, world_t *world, player_t *player) {
 				break;
 			case KEY_S:
 				player_enter_attack_state(player, world);
+				return false;
+			case CTRL_S:
+				save_game(world, player, "");
 				return false;
 			case KEY_F_MINE:
 				if(lantern_increase_power(&player->lantern, &player->oil) == false) {

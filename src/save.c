@@ -42,14 +42,19 @@ void ensure_save_folder() {
 }
 
 void save_game(world_t *world, player_t *player, char *name) {
-	save_world(world, name);
-	save_player(player, name);
-}
-
-void save_player(player_t *player, char *name) {
 	FILE *file = fopen(get_save_path(), "wb");
 	if(!file) return;
-	
+	save_world(world, file);
+	save_player(player, file);
+	fclose(file);
+	DEBUG_LOG("%s", "game saved");
+}
+
+void save_player(player_t *player, FILE *file) {
+	DEBUG_LOG("%s", "saving player");
+	if(!player) {
+		DEBUG_LOG("%s", "player null");
+	}
 	fwrite(&player->level, sizeof(int), 1, file);
 	fwrite(&player->xp, sizeof(int), 1, file);
 	fwrite(&player->health, sizeof(int), 1, file);
@@ -65,9 +70,15 @@ void save_player(player_t *player, char *name) {
 	fwrite(&player->global_y, sizeof(int), 1, file);
 	
 	fwrite(&player->inventory_count, sizeof(int), 1, file);
-	fwrite(player->inventory, sizeof(item_t), player->inventory_count, file);
+	for(int i = 0; i < player->inventory_count; i++) {
+		fwrite(&player->inventory[i].id, sizeof(item_ids_t), 1, file);
+		fwrite(&player->inventory[i].stack, sizeof(int), 1, file);
+	}
 	fwrite(&player->nearby_loot_count, sizeof(int), 1, file);
-	fwrite(player->nearby_loot, sizeof(item_t), player->nearby_loot_count, file);
+	for(int i = 0; i < player->nearby_loot_count; i++) {
+		fwrite(&player->nearby_loot[i]->id, sizeof(item_ids_t), 1, file);
+		fwrite(&player->nearby_loot[i]->stack, sizeof(int), 1, file);
+	}
 	
 	fwrite(&player->mana, sizeof(int), 1, file);
 	fwrite(&player->max_mana, sizeof(int), 1, file);
@@ -84,19 +95,57 @@ void save_player(player_t *player, char *name) {
 	fwrite(&player->state, sizeof(player_state_t), 1, file);
 	fwrite(&player->inventory_manager, sizeof(inventory_manager_t), 1, file);
 	
-	fclose(file);
+	DEBUG_LOG("%s", "player saved");
 }
 
-void save_world(world_t *world, char *name) {
+void save_world(world_t *world, FILE *file) {
+	for(int x = 0; x < WORLD_WIDTH; x++) {
+		for(int y = 0; y < WORLD_HEIGHT; y++) {
+			if(!world->room[x][y]->is_created) {
+				continue;
+			}
+			save_room(world->room[x][y], file);
+		}
+	}
+	DEBUG_LOG("%s", "rooms saved saving other things");
+	fwrite(&world->seed, sizeof(int), 1, file);
 	
+	fwrite(&world->messages_size, sizeof(int), 1, file);
+	
+	for(int i = 0; i < world->messages_size; i++) {
+		int len = strlen(world->messages[i]) + 1;
+		DEBUG_LOG("%d", len);
+		fwrite(world->messages[i], sizeof(char), len, file);
+	}
+	
+	fwrite(&world->max_message_storage, sizeof(int), 1, file);
+	fwrite(&world->turn_order_size, sizeof(int), 1, file);
+	fwrite(world->turn_order, sizeof(int), world->turn_order_size, file);
+	fwrite(&world->room_template_count, sizeof(int), 1, file);
+	fwrite(&world->room_templates, sizeof(room_template_t), world->room_template_count, file);
 }
 
-void save_enemies(enemy_t *enemies, char *name) {
-	
-}
-
-void save_rooms(room_t *room, char *name) {
-	
+void save_room(room_t *room, FILE *file) {
+	fwrite(room->room_file_name, sizeof(char), ROOM_FILE_NAME_MAX_SIZE, file);
+	for(int x = 0; x < ROOM_WIDTH; x++) {
+		for(int y = 0; y < ROOM_HEIGHT; y++) {
+			if(room->tiles[y][x] != NULL) {
+				// fwrite(&room->tiles[y][x]->floor, sizeof(char), 1, file);
+				fwrite(&room->tiles[y][x]->item_count, sizeof(int), 1, file);
+				for(int i = 0; i < room->tiles[y][x]->item_count; i++) {
+					fwrite(&room->tiles[y][x]->items[i]->id, sizeof(item_ids_t), 1, file);
+					fwrite(&room->tiles[y][x]->items[i]->stack, sizeof(int), 1, file);
+				}
+			} 
+		}
+	}
+	fwrite(&room->current_enemy_count, sizeof(int), 1, file);
+	fwrite(room->enemies, sizeof(enemy_t), room->current_enemy_count, file);
+	fwrite(&room->is_created, sizeof(bool), 1, file);
+	fwrite(&room->global_time, sizeof(int), 1, file);
+	fwrite(&room->biome, sizeof(biome_t), 1, file);
+	fwrite(&room->is_main_path, sizeof(bool), 1, file);
+	fwrite(&room->door_mask, sizeof(unsigned int), 1, file);
 }
 
 void load_player(player_t *player, char *name) {

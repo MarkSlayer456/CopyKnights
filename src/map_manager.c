@@ -273,6 +273,7 @@ room_t *load_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data, it
 	read(fd, buf, 512);
 	int i = 0;
 
+	strcpy(room->room_file_name, file);
 	char *tok = strtok(buf, "\n");
 	while(tok != NULL) {
 		DEBUG_LOG("tok = %s | i = %d", tok, i);
@@ -281,6 +282,7 @@ room_t *load_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data, it
 				case POTENTIAL_ENEMY_SPAWN_CHAR:
 					room->enemies[room->current_enemy_count] = enemy_spawn(enemy_generate_type(&map_seed, enemy_data, room->biome), enemy_data, j, i, room->biome);
 					room->tiles[i][j]->floor = EMPTY;
+					room->tiles[i][j]->item_count = 0;
 					room->current_enemy_count++;
 					break;
 				case POTENTIAL_CHEST_SPAWN_CHAR:
@@ -289,10 +291,12 @@ room_t *load_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data, it
 					break;
 				case POTENTIAL_ITEM_SPAWN_CHAR:
 					item_spawn(item_generate_type(&map_seed, item_data, room->biome), room->biome, room->tiles[i][j], item_data);
+					room->tiles[i][j]->item_count++;
 					room->tiles[i][j]->floor = EMPTY;
 					break;
 				default:
 					room->tiles[i][j]->floor = tok[j];
+					room->tiles[i][j]->item_count = 0;
 					break;
 			}
 		}

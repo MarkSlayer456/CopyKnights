@@ -11,11 +11,14 @@ void ensure_save_folder();
 
 void save_game(world_t *world, player_t *player, char *name);
 
-void save_player(player_t *player, char *name);
-void save_world(world_t *world, char *name);
-void save_enemies(enemy_t *enemy, char *name);
-void save_rooms(room_t *room, char *name);
+void save_player(player_t *player, FILE *file);
+void save_world(world_t *world, FILE *file);
+void save_room(room_t *room, FILE *file);
 
 void load_player(player_t *player, char *name);
+
+void load_world(world_t *world, char *name);
+
+void load_room_save(room_t *room, FILE *file);
 
 #endif

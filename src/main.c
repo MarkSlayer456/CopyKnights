@@ -164,11 +164,22 @@ int main(int argc, char *argv[]) {
 	world->turn_order_size = 0;
 	for(int y = 0; y < WORLD_HEIGHT; y++) {
 		for(int x = 0; x < WORLD_WIDTH; x++) {
-			world->room[y][x] = calloc(1, sizeof(room_t));
+			world->room[x][y] = calloc(1, sizeof(room_t));
+			for(int tile_y = 0; tile_y < ROOM_HEIGHT; tile_y++) {
+				for(int tile_x = 0; tile_x < ROOM_WIDTH; tile_x++) {
+					world->room[x][y]->tiles[tile_y][tile_x] = calloc(1, sizeof(tile_t));
+				}
+			}
+			for(int i = 0; i < MAX_ENEMIES_PER_LEVEL; i++) {
+				world->room[x][y]->enemies[i] = calloc(1, sizeof(enemy_t));
+			}
 		}
 	}
-	
+	room_template_t empty = {0};
 	world->seed = TEST_SEED;
+	for(int i = 0; i < 128; i++) {
+		world->room_templates[i] = empty;
+	}
 	
 	room_t *first = setup_first_room(&world->seed, 0, 0, world->enemy_data, world->item_data, world);
 	first->enemies[0] = enemy_spawn(BAT, world->enemy_data, 1, 1, first->biome);
@@ -204,11 +215,13 @@ int main(int argc, char *argv[]) {
     world->turn_order_size = 0;
 	
 	// TODO for testing only
-	save_player(player, "");
-	player_t *save_test = malloc(sizeof(player_t));
-	load_player(save_test, "");
-	
-	DEBUG_LOG("x, y: %d, %d", save_test->x, save_test->y);
+	// save_player(player, "");
+		// save_game(world, player, "");
+		// player_t *save_test = malloc(sizeof(player_t));
+		// load_player(save_test, "");
+		
+		// DEBUG_LOG("x, y: %d, %d", save_test->x, save_test->y);
+	// end of testing only
 	for(;;) {
 		calculate_light(world, player);
 		generate_turn_order_display(world, player);
