@@ -30,6 +30,8 @@ typedef struct weapon_stats {
 	stat_modifier_t modifier_stats[MAX_ARMOR_MODIFIERS];
 	int modifier_count;
 	bool equipped;
+	bool two_handed;
+	bool main_hand;
 } weapon_stats_t;
 
 typedef struct food_stats {

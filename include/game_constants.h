@@ -91,7 +91,7 @@
 #define DOOR_SPAWN_CHAR						'/'
 
 #define MAX_ENEMIES_PER_TILE				8
-#define MAX_ITEMS_PER_TILE					2
+#define MAX_ITEMS_PER_TILE					8
 #define ROOM_FILE_NAME_MAX_SIZE				128
 #define MAX_ITEMS_NEARBY_PLAYER				MAX_ITEMS_PER_TILE*9
 #define MAX_ENEMIES							100

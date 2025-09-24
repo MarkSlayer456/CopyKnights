@@ -8,6 +8,12 @@
 #include "game_constants.h"
 #include "map_manager.h"
 #include "functions.h"
+#include <strings.h>
+
+#ifdef _WIN32
+#define strcasecmp _stricmp
+#define strncasecmp _strnicmp
+#endif
 
 type_map_t rarity_map[] = {
     {RARITY_COMMON_NAME, COMMON},
@@ -154,7 +160,8 @@ item_ids_t item_get_id(const char *name) {
 
 stats_t get_stat(const char *name) {
     for(int i = 0; i < stats_map_len; i++) {
-        if(strcmp(name, stats_map[i].name) == 0) {
+        DEBUG_LOG("%s, %s", name, stats_map[i].name);
+        if(strcasecmp(name, stats_map[i].name) == 0) {
             return stats_map[i].value;
         }
     }
@@ -176,10 +183,9 @@ int use_item(player_t *player)
 	int success = 0;
 	if(player->inventory[player->inventory_manager.inv_selector].stack > 0) {
         if(player->inventory[player->inventory_manager.inv_selector].value_type == VALUE_TYPE_ARMOR) {
-            player->equipment.armor = &player->inventory[player->inventory_manager.inv_selector];
+            success = handle_armor_change(player, &player->inventory[player->inventory_manager.inv_selector]);
         } else if(player->inventory[player->inventory_manager.inv_selector].value_type == VALUE_TYPE_WEAPON) {
-            player->equipment.main_hand = &player->inventory[player->inventory_manager.inv_selector]; 
-            //TODO off_hand and two handed weapons
+            success = handle_weapon_change(player, &player->inventory[player->inventory_manager.inv_selector]);
         } else if(player->inventory[player->inventory_manager.inv_selector].value_type == VALUE_TYPE_FOOD) {
             //TODO effects with durations
             player_increase_health(player, player->inventory[player->inventory_manager.inv_selector].stat_type.food.heal_amount);
@@ -201,6 +207,132 @@ int use_item(player_t *player)
 	return success;
 }
 
+int handle_armor_change(player_t *player, item_t *new_armor) {
+    if(player->equipment.armor == new_armor) {
+        for(int i = 0; i < MAX_ARMOR_MODIFIERS; i++) {
+            sub_player_equipment_stats(player, player->equipment.armor->stat_type.armor.modifier_stats[i].stat, player->equipment.armor->stat_type.armor.modifier_stats[i].modifier);
+        }
+        player->equipment.armor->stat_type.armor.equipped = false;
+        player->equipment.armor = NULL;
+    } else {
+        if(player->equipment.armor != NULL) {
+            for(int i = 0; i < MAX_ARMOR_MODIFIERS; i++) {
+                sub_player_equipment_stats(player, player->equipment.armor->stat_type.armor.modifier_stats[i].stat, player->equipment.armor->stat_type.armor.modifier_stats[i].modifier);
+            }
+        }
+        player->equipment.armor = new_armor;
+        player->equipment.armor->stat_type.armor.equipped = true;
+        for(int i = 0; i < MAX_ARMOR_MODIFIERS; i++) {
+            add_player_equipment_stats(player, player->equipment.armor->stat_type.armor.modifier_stats[i].stat, player->equipment.armor->stat_type.armor.modifier_stats[i].modifier);
+        }
+    }
+    return 1;
+}
+
+int handle_weapon_change(player_t *player, item_t *new_weapon) {
+    if(player->inventory[player->inventory_manager.inv_selector].stat_type.weapon.main_hand == true) {
+        if(player->equipment.main_hand == new_weapon) {
+            if(player->equipment.main_hand->stat_type.weapon.two_handed == true) {
+                player->equipment.off_hand->stat_type.weapon.equipped = false;
+                player->equipment.off_hand = NULL;
+            }
+            for(int i = 0; i < MAX_ARMOR_MODIFIERS; i++) {
+                sub_player_equipment_stats(player, player->equipment.main_hand->stat_type.weapon.modifier_stats[i].stat, player->equipment.main_hand->stat_type.weapon.modifier_stats[i].modifier);
+            }
+            player->equipment.main_hand->stat_type.weapon.equipped = false;
+            player->equipment.main_hand = NULL;
+        } else {
+            if(player->inventory[player->inventory_manager.inv_selector].stat_type.weapon.two_handed == true) {
+                if(player->equipment.main_hand != NULL) {
+                    for(int i = 0; i < MAX_ARMOR_MODIFIERS; i++) {
+                        sub_player_equipment_stats(player, player->equipment.main_hand->stat_type.weapon.modifier_stats[i].stat, player->equipment.main_hand->stat_type.weapon.modifier_stats[i].modifier);
+                    }
+                }
+                player->equipment.main_hand = new_weapon; 
+                player->equipment.off_hand = new_weapon;
+                player->equipment.main_hand->stat_type.weapon.equipped = true;
+                player->equipment.off_hand->stat_type.weapon.equipped = true;
+                for(int i = 0; i < MAX_ARMOR_MODIFIERS; i++) {
+                    add_player_equipment_stats(player, player->equipment.main_hand->stat_type.weapon.modifier_stats[i].stat, player->equipment.main_hand->stat_type.weapon.modifier_stats[i].modifier);
+                }
+            } else {
+                if(player->equipment.main_hand != NULL) {
+                    if(player->equipment.main_hand->stat_type.weapon.two_handed == true) {
+                        player->equipment.off_hand->stat_type.weapon.equipped = false;
+                        player->equipment.off_hand = NULL;
+                    }
+                    for(int i = 0; i < MAX_ARMOR_MODIFIERS; i++) {
+                        sub_player_equipment_stats(player, player->equipment.main_hand->stat_type.weapon.modifier_stats[i].stat, player->equipment.main_hand->stat_type.weapon.modifier_stats[i].modifier);
+                    }
+                }
+                player->equipment.main_hand = new_weapon;
+                player->equipment.main_hand->stat_type.weapon.equipped = false;
+            }
+        }
+    } else if(player->equipment.off_hand == new_weapon) {
+        for(int i = 0; i < MAX_ARMOR_MODIFIERS; i++) {
+            sub_player_equipment_stats(player, player->equipment.off_hand->stat_type.weapon.modifier_stats[i].stat, player->equipment.off_hand->stat_type.weapon.modifier_stats[i].modifier);
+        }
+        player->equipment.off_hand->stat_type.weapon.equipped = false;
+        player->equipment.off_hand = NULL;
+    } else {
+        if(player->equipment.off_hand != NULL) {
+            for(int i = 0; i < MAX_ARMOR_MODIFIERS; i++) {
+                sub_player_equipment_stats(player, player->equipment.off_hand->stat_type.weapon.modifier_stats[i].stat, player->equipment.off_hand->stat_type.weapon.modifier_stats[i].modifier);
+            }
+        }
+        player->equipment.off_hand = new_weapon;
+        player->equipment.off_hand->stat_type.weapon.equipped = true;
+        for(int i = 0; i < MAX_ARMOR_MODIFIERS; i++) {
+            add_player_equipment_stats(player, player->equipment.off_hand->stat_type.weapon.modifier_stats[i].stat, player->equipment.off_hand->stat_type.weapon.modifier_stats[i].modifier);
+        }
+    }
+    return 1;
+}
+
+void add_player_equipment_stats(player_t *player, stats_t stat, int modifier) {
+    switch(stat) {
+        case STRENGTH:
+            player->strength += modifier;
+            break;
+        case DEXTERITY:
+            player->dexterity += modifier;
+            break;
+        case INTELLIGENCE:
+            player->intelligence += modifier;
+            break;
+        case CONSTITUTION:
+            player->constitution += modifier;
+            break;
+        case SPEED:
+            player->speed += modifier;
+            break;
+        case NULL_STAT:
+            break;
+    }
+}
+
+void sub_player_equipment_stats(player_t *player, stats_t stat, int modifier) {
+    switch(stat) {
+        case STRENGTH:
+            player->strength -= modifier;
+            break;
+        case DEXTERITY:
+            player->dexterity -= modifier;
+            break;
+        case INTELLIGENCE:
+            player->intelligence -= modifier;
+            break;
+        case CONSTITUTION:
+            player->constitution -= modifier;
+            break;
+        case SPEED:
+            player->speed -= modifier;
+            break;
+        case NULL_STAT:
+            break;
+    }
+}
 
 int use_teleport_scroll(player_t *player)
 {

@@ -106,10 +106,14 @@ void load_armor_effects(world_t *world) {
 			item_data[i].stat_type.armor.modifier_stats[idx].stat = get_stat(target_stat);
 			item_data[i].stat_type.armor.equipped = false;
 			item_data[i].stat_type.armor.modifier_count++;
+			DEBUG_LOG("Loaded Armor Stats: %d, %d", 
+					item_data[i].stat_type.armor.modifier_stats[idx].stat, 
+					item_data[i].stat_type.armor.modifier_stats[idx].modifier);
 			break;
 		}
 		row++;
 	}
+	
 	load_armor_spawn_data(world);
 }
 

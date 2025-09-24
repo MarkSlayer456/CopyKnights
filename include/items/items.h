@@ -11,6 +11,12 @@ rarity_t get_rarity(const char *name);
 // returns 1 on success and 0 on fail
 int use_item(player_t *player);
 
+int handle_armor_change(player_t *player, item_t *new_armor);
+int handle_weapon_change(player_t *player, item_t *new_weapon);
+
+void add_player_equipment_stats(player_t *player, stats_t stat, int modifier);
+void sub_player_equipment_stats(player_t *player, stats_t stat, int modifier);
+
 int use_teleport_scroll(player_t *player);
 int use_health_potion(player_t *player);
 int use_apple(player_t *player);

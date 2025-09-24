@@ -130,16 +130,24 @@ void load_weapon_data(world_t *world) {
 				case 4:
 					item_data[world->item_data_count].stat_type.weapon.intelligence_requirement = atoi(token);
 					break;
+				case 5:
+					item_data[world->item_data_count].stat_type.weapon.two_handed = atoi(token);
+					break;
+				case 6:
+					item_data[world->item_data_count].stat_type.weapon.main_hand = atoi(token);
+					break;
 			}
 			token = strtok(NULL, ",");
 			col++;
 		}
 		snprintf(item_data[world->item_data_count].desc, MAX_ITEM_DESC_LEN, 
-				 "attack damage: %d\nstrength requirement: %d\ndexterity requirement: %d\nintelligence requirement: %d", 
+				 "attack damage: %d\nstrength requirement: %d\ndexterity requirement: %d\nintelligence requirement: %d\ntwo handed: %d\nmain hand: %d", 
 				item_data[world->item_data_count].stat_type.weapon.attack, 
 				item_data[world->item_data_count].stat_type.weapon.strength_requirement, 
 				item_data[world->item_data_count].stat_type.weapon.dexterity_requirement, 
-				item_data[world->item_data_count].stat_type.weapon.intelligence_requirement);
+				item_data[world->item_data_count].stat_type.weapon.intelligence_requirement,
+				item_data[world->item_data_count].stat_type.weapon.two_handed,
+				 item_data[world->item_data_count].stat_type.weapon.main_hand);
 		
 		DEBUG_LOG("Loaded Weapon Data: %d, %s, %d, %s",
 				item_data[world->item_data_count].id, item_data[world->item_data_count].name,

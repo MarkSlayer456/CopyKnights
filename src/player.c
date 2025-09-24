@@ -263,22 +263,22 @@ void player_check_level_up(player_t *player, const class_data_t *class_data) {
 		player->level++;
 		for(int i = 0; i < MAX_CLASSES; i++) {
 			if(class_data[i].type == player->player_class) {
-				int base_strength = class_data[i].base_strength;
-				int base_dexterity = class_data[i].base_dexterity;
-				int base_intelligence = class_data[i].base_intelligence;
-				int base_constitution = class_data[i].base_constitution;
-				int base_speed = class_data[i].base_speed;
+				// int base_strength = class_data[i].base_strength;
+				// int base_dexterity = class_data[i].base_dexterity;
+				// int base_intelligence = class_data[i].base_intelligence;
+				// int base_constitution = class_data[i].base_constitution;
+				// int base_speed = class_data[i].base_speed;
 				
 				float growth_strength = class_data[i].growth_strength;
 				float growth_dexterity = class_data[i].growth_dexterity;
 				float growth_intelligence = class_data[i].growth_intelligence;
 				float growth_constitution = class_data[i].growth_constitution;
 				float growth_speed = class_data[i].growth_speed;
-				player->strength = base_strength + ((int)(growth_strength * level));
-				player->dexterity = base_dexterity + ((int)(growth_dexterity * level));
-				player->intelligence = base_intelligence + ((int)(growth_intelligence * level));
-				player->constitution = base_constitution + ((int)(growth_constitution * level));
-				player->speed = base_speed + ((int)(growth_speed * level));
+				player->strength += ((int)(growth_strength * level));
+				player->dexterity += ((int)(growth_dexterity * level));
+				player->intelligence += ((int)(growth_intelligence * level));
+				player->constitution += ((int)(growth_constitution * level));
+				player->speed += ((int)(growth_speed * level));
 				break;
 			}
 		}

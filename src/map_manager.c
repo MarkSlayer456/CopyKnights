@@ -21,7 +21,7 @@ void calculate_main_path(unsigned int *seed, world_t *world) {
 	unsigned int exit_door = 0x0;
 	while(main_x < 100 && main_y < 100) {
 		room_t *room = world->room[main_x][main_y];
-		DEBUG_LOG("main_path: (%d, %d)", main_x, main_y);
+		// DEBUG_LOG("main_path: (%d, %d)", main_x, main_y);
 		room->is_main_path = true;
 		if(main_x == 1) {
 			room->door_mask = starting_entrance_door;
