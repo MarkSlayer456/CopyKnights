@@ -274,11 +274,11 @@ void player_check_level_up(player_t *player, const class_data_t *class_data) {
 				float growth_intelligence = class_data[i].growth_intelligence;
 				float growth_constitution = class_data[i].growth_constitution;
 				float growth_speed = class_data[i].growth_speed;
-				player->strength += ((int)(growth_strength * level));
-				player->dexterity += ((int)(growth_dexterity * level));
-				player->intelligence += ((int)(growth_intelligence * level));
-				player->constitution += ((int)(growth_constitution * level));
-				player->speed += ((int)(growth_speed * level));
+				player->strength += ((int)(growth_strength));
+				player->dexterity += ((int)(growth_dexterity));
+				player->intelligence += ((int)(growth_intelligence));
+				player->constitution += ((int)(growth_constitution));
+				player->speed += ((int)(growth_speed));
 				break;
 			}
 		}

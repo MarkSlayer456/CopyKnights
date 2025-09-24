@@ -39,12 +39,12 @@ void hud_update_player_health(player_t *player) {
 	// this will break if any stats are over 3 digits
 	getyx(hud, y, x);
 	wmove(hud, y+1, 0);
-	snprintf(buf, sizeof(buf), "Str: %d | Dex: %d | Int: %d", player->strength, player->dexterity, player->intelligence);
+	snprintf(buf, sizeof(buf), "Str: %d | Dex: %d | Int: %d", (int)player->strength, (int)player->dexterity, (int)player->intelligence);
 	waddstr(hud, buf);
 	
 	getyx(hud, y, x);
 	wmove(hud, y+1, 0);
-	snprintf(buf, sizeof(buf), "Constitution: %d | Speed: %d", player->constitution, player->speed);
+	snprintf(buf, sizeof(buf), "Constitution: %d | Speed: %d", (int)player->constitution, (int)player->speed);
 	waddstr(hud, buf);
 
 	getyx(hud, y, x);

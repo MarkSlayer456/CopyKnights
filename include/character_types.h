@@ -58,11 +58,11 @@ typedef struct player {
 	int xp;
 	int health;
 	int max_health;
-	int strength;
-	int dexterity;
-	int intelligence;
-	int constitution;
-	int speed;
+	float strength;
+	float dexterity;
+	float intelligence;
+	float constitution;
+	float speed;
 	int x; // each knight has it's only pos
 	int y; // each knight has it's only pos
 	int global_x; // pos on the map
