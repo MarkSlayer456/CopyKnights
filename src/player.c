@@ -378,12 +378,24 @@ void player_take_loot_item(room_t *room, player_t *player) {
 	if (end_y >= ROOM_HEIGHT) end_y = ROOM_HEIGHT - 1;
 	if (end_x >= ROOM_WIDTH) end_x = ROOM_WIDTH - 1;
 	
+	bool found = false;
 	for(int y = start_y; y <= end_y; y++) {
 		for(int x = start_x; x <= end_x; x++) {
-				item_t *item = room->tiles[y][x]->items[player->inventory_manager.loot_selector];
-				item->stack = 0;
-				room->tiles[y][x]->item_count--;
+			for(int i = 0; i < room->tiles[y][x]->item_count; i++) {
+				item_t *item = room->tiles[y][x]->items[i];
+				if(item == selected_item) {
+					found = true;
+					memset(item, 0, sizeof(item_t));
+					item = NULL;
+					room->tiles[y][x]->item_count--;
+					if(player->inventory_manager.loot_selector > 0) {
+						player->inventory_manager.loot_selector--;
+					}
+					break;
+				}
+			}
 		}
+		if(found) break;
 	}
 	// need to repopulate the array
 	player_get_nearby_loot(room, player);

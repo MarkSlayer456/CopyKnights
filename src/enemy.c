@@ -66,7 +66,7 @@ enemy_t *enemy_spawn(enemy_type_t type, const enemy_data_t *enemy_data, int x, i
     if(enemy_data == NULL) return NULL;
     DEBUG_LOG("%s", "spawning enemy...");
     int i = 0;
-    while(i < MAX_ENEMIES) {
+    while(i < MAX_ENEMIES_PER_LEVEL) {
         if(enemy_data[i].type != type) {
             i++;
             continue;
@@ -270,12 +270,16 @@ void load_enemy_data(enemy_data_t *enemy_data) {
 void enemy_kill(enemy_t *enemy, world_t *world, const player_t *player) 
 {
     room_t *room = world->room[player->global_x][player->global_y];
-	// int found = 0;
-	for(int i = 0; i < room->current_enemy_count; i++) {
-		if(enemy == room->enemies[i]) {
-			room->enemies[i] = NULL;
+	for(int i = 0; i < MAX_ENEMIES_PER_LEVEL; i++) {
+		if(enemy && enemy == room->enemies[i]) {
+            enemy_t *tmp = room->enemies[i];
+            for(int j = i; j < room->current_enemy_count-1; j++) {
+                room->enemies[j] = room->enemies[j+1];
+            }
+            free(tmp);
+            room->enemies[room->current_enemy_count-1] = NULL;
             room->current_enemy_count--;
-            i--;
+            break;
 		}
 	}
 }
@@ -358,6 +362,12 @@ char enemy_check_dir(enemy_t *enemy, world_t *world, player_t *player, direction
     if(dir == DOWN) y++;
     if(dir == UP) y--;
     room_t *room = world->room[player->global_x][player->global_y];
+    for(int i = 0; i < room->current_enemy_count; i++) {
+        enemy_t *tmp = room->enemies[i];
+        if(tmp->x == x && tmp->y == y) {
+            return tmp->symbol;
+        }
+    }
     if(x > 0 && y > 0) {
         return room->tiles[y][x]->floor;
     }

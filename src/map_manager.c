@@ -286,8 +286,12 @@ room_t *load_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data, it
 					room->current_enemy_count++;
 					break;
 				case POTENTIAL_CHEST_SPAWN_CHAR:
+					room->tiles[i][j]->floor = tok[j];
+					room->tiles[i][j]->item_count = 0;
 					break;
 				case POTENTIAL_TRAP_SPAWN_CHAR:
+					room->tiles[i][j]->floor = tok[j];
+					room->tiles[i][j]->item_count = 0;
 					break;
 				case POTENTIAL_ITEM_SPAWN_CHAR:
 					item_spawn(item_generate_type(&map_seed, item_data, room->biome), room->biome, room->tiles[i][j], item_data);

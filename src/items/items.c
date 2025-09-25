@@ -202,7 +202,9 @@ int use_item(player_t *player)
             }
             remove_item(player);
         }
-		player_close_inventory(player);
+        if(success) {
+            player_close_inventory(player);
+        }
 	}
 	return success;
 }
@@ -243,17 +245,23 @@ int handle_weapon_change(player_t *player, item_t *new_weapon) {
             player->equipment.main_hand = NULL;
         } else {
             if(player->inventory[player->inventory_manager.inv_selector].stat_type.weapon.two_handed == true) {
-                if(player->equipment.main_hand != NULL) {
-                    for(int i = 0; i < MAX_ARMOR_MODIFIERS; i++) {
-                        sub_player_equipment_stats(player, player->equipment.main_hand->stat_type.weapon.modifier_stats[i].stat, player->equipment.main_hand->stat_type.weapon.modifier_stats[i].modifier);
+                if(player->strength >= new_weapon->stat_type.weapon.strength_requirement &&
+                    player->dexterity >= new_weapon->stat_type.weapon.dexterity_requirement &&
+                    player->intelligence >= new_weapon->stat_type.weapon.intelligence_requirement) {
+                    if(player->equipment.main_hand != NULL) {
+                        for(int i = 0; i < MAX_ARMOR_MODIFIERS; i++) {
+                            sub_player_equipment_stats(player, player->equipment.main_hand->stat_type.weapon.modifier_stats[i].stat, player->equipment.main_hand->stat_type.weapon.modifier_stats[i].modifier);
+                        }
                     }
-                }
-                player->equipment.main_hand = new_weapon; 
-                player->equipment.off_hand = new_weapon;
-                player->equipment.main_hand->stat_type.weapon.equipped = true;
-                player->equipment.off_hand->stat_type.weapon.equipped = true;
-                for(int i = 0; i < MAX_ARMOR_MODIFIERS; i++) {
-                    add_player_equipment_stats(player, player->equipment.main_hand->stat_type.weapon.modifier_stats[i].stat, player->equipment.main_hand->stat_type.weapon.modifier_stats[i].modifier);
+                    player->equipment.main_hand = new_weapon; 
+                    player->equipment.off_hand = new_weapon;
+                    player->equipment.main_hand->stat_type.weapon.equipped = true;
+                    player->equipment.off_hand->stat_type.weapon.equipped = true;
+                    for(int i = 0; i < MAX_ARMOR_MODIFIERS; i++) {
+                        add_player_equipment_stats(player, player->equipment.main_hand->stat_type.weapon.modifier_stats[i].stat, player->equipment.main_hand->stat_type.weapon.modifier_stats[i].modifier);
+                    }
+                } else {
+                    return 0;
                 }
             } else {
                 if(player->equipment.main_hand != NULL) {
@@ -276,15 +284,19 @@ int handle_weapon_change(player_t *player, item_t *new_weapon) {
         player->equipment.off_hand->stat_type.weapon.equipped = false;
         player->equipment.off_hand = NULL;
     } else {
-        if(player->equipment.off_hand != NULL) {
-            for(int i = 0; i < MAX_ARMOR_MODIFIERS; i++) {
-                sub_player_equipment_stats(player, player->equipment.off_hand->stat_type.weapon.modifier_stats[i].stat, player->equipment.off_hand->stat_type.weapon.modifier_stats[i].modifier);
+        if(player->strength >= new_weapon->stat_type.weapon.strength_requirement &&
+            player->dexterity >= new_weapon->stat_type.weapon.dexterity_requirement &&
+            player->intelligence >= new_weapon->stat_type.weapon.intelligence_requirement) {
+            if(player->equipment.off_hand != NULL) {
+                for(int i = 0; i < MAX_ARMOR_MODIFIERS; i++) {
+                    sub_player_equipment_stats(player, player->equipment.off_hand->stat_type.weapon.modifier_stats[i].stat, player->equipment.off_hand->stat_type.weapon.modifier_stats[i].modifier);
+                }
             }
-        }
-        player->equipment.off_hand = new_weapon;
-        player->equipment.off_hand->stat_type.weapon.equipped = true;
-        for(int i = 0; i < MAX_ARMOR_MODIFIERS; i++) {
-            add_player_equipment_stats(player, player->equipment.off_hand->stat_type.weapon.modifier_stats[i].stat, player->equipment.off_hand->stat_type.weapon.modifier_stats[i].modifier);
+            player->equipment.off_hand = new_weapon;
+            player->equipment.off_hand->stat_type.weapon.equipped = true;
+            for(int i = 0; i < MAX_ARMOR_MODIFIERS; i++) {
+                add_player_equipment_stats(player, player->equipment.off_hand->stat_type.weapon.modifier_stats[i].stat, player->equipment.off_hand->stat_type.weapon.modifier_stats[i].modifier);
+            }
         }
     }
     return 1;

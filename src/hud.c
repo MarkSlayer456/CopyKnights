@@ -76,7 +76,7 @@ void hud_update_nearby_enemies(world_t *world, player_t *player) {
 	}
 	waddstr(hud, str6);
 	
-	for(int i = 0; i < MAX_ENEMIES_PER_LEVEL; i++) {
+	for(int i = 0; i < room->current_enemy_count; i++) {
 		if(!room->enemies[i]) continue;
 		if(room->enemies[i]->x > player->x-detect_radius && room->enemies[i]->x < player->x+detect_radius &&
 			room->enemies[i]->y > player->y-(detect_radius) && room->enemies[i]->y < player->y+(detect_radius)) {
