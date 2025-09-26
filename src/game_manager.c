@@ -395,6 +395,92 @@ void turn_order_enter_new_room(world_t *world, player_t *player) {
 	}
 }
 
+void draw_main_menu(WINDOW *main_menu, menu_manager_t *menu_manager) {
+	werase(main_menu);
+	
+	menu_manager->dests_count = 0;
+	
+	char display_str[16] = "";
+	
+	int y_pos = 0;
+	menu_manager->dests[y_pos] = GAME;
+	menu_manager->dests_count++;
+	char new_game[9] = "New Game";
+	wmove(main_menu, y_pos++, 0);
+	if(menu_manager->dests[menu_manager->cursor_pos] == GAME) {
+		snprintf(display_str, sizeof(display_str), ">>%s", new_game);
+		waddstr(main_menu, display_str);
+	} else {
+		waddstr(main_menu, new_game);
+	}
+	menu_manager->dests[y_pos] = LOAD_MENU;
+	menu_manager->dests_count++;
+	char load_game[11] = "Load Game";
+	wmove(main_menu, y_pos++, 0);
+	if(menu_manager->dests[menu_manager->cursor_pos] == LOAD_MENU) {
+		snprintf(display_str, sizeof(display_str), ">>%s", load_game);
+		waddstr(main_menu, display_str);
+	} else {
+		waddstr(main_menu, load_game);
+	}
+	menu_manager->dests[y_pos] = LOG_BOOK_MENU;
+	menu_manager->dests_count++;
+	char log_book[9] = "Log Book";
+	wmove(main_menu, y_pos++, 0);
+	if(menu_manager->dests[menu_manager->cursor_pos] == LOG_BOOK_MENU) {
+		snprintf(display_str, sizeof(display_str), ">>%s", log_book);
+		waddstr(main_menu, display_str);
+	} else {
+		waddstr(main_menu, log_book);
+	}
+	
+	wnoutrefresh(main_menu);
+	doupdate();
+}
+
+void manage_menu_input(char c, menu_manager_t *menu_manager, world_t *world) {
+	if (c == ERR) {
+		return;
+	}
+	int x = c;
+	if(c == 27) {
+		c = getch();
+		if(c == 91) { // is not a ctrl arrow key
+			c = getch();	
+			x = ARROW_KEY_MOD + c;
+		}
+	}
+	switch(x) {
+		case LEFT_ARROW:
+			break;
+		case RIGHT_ARROW:
+			break;
+		case UP_ARROW:
+			if(menu_manager->cursor_pos - 1 < 0) { 
+				menu_manager->cursor_pos = menu_manager->dests_count-1;
+			} else {
+				menu_manager->cursor_pos--;
+			}
+			break;
+		case DOWN_ARROW:
+			if(menu_manager->cursor_pos + 1 < menu_manager->dests_count) { 
+				menu_manager->cursor_pos++;
+			} else {
+				menu_manager->cursor_pos = 0;
+			}
+			break;
+		case CTRL_Q:
+			shutdown(world);
+			break;
+		case ENTER_KEY:
+			// TODO probablly want a switch statement here
+			if(menu_manager->dests[menu_manager->cursor_pos] == GAME) {
+				menu_manager->current_menu = GAME;
+			}
+			break;
+	}
+}
+
 void end_game(world_t *world, player_t *player) {
     shutdown(world); //TODO this obvisouly isn't what should happpen
 }

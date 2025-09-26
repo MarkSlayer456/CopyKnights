@@ -37,4 +37,10 @@ typedef struct world {
 	room_template_t room_templates[128];
 } world_t;
 
+typedef struct {
+	enum menu current_menu;
+	int cursor_pos;
+	enum menu dests[MAX_MENUS]; // where each button takes the user
+	int dests_count;
+} menu_manager_t;
 #endif

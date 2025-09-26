@@ -272,6 +272,8 @@
 
 #define STARTING_OIL					100
 
+#define MAX_MENUS					16
+
 #define HUD_WIDTH					59
 #define HUD_HEIGHT					24
 

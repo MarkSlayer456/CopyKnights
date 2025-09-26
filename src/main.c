@@ -28,6 +28,7 @@
 	oil is your friend without you won't last long
 */
 
+WINDOW *main_menu;
 WINDOW *hud; // gives player useful information
 WINDOW *action_bar; // OLG player's inventory/spells menu, maybe a help menu in the future
 WINDOW *error; // USED FOR ERROR CHECKING ONLY
@@ -47,7 +48,10 @@ int main(int argc, char *argv[]) {
 	inventory_hud = newwin(INVENTORY_HEIGHT, INVENTORY_WIDTH, 0, 0);
 	inventory_desc_hud = newwin(INVENTORY_HEIGHT, INVENTORY_WIDTH, INVENTORY_HEIGHT, 0);
     error = newwin(25, 25, 51, 30);
+	main_menu = newwin(SCREEN_HEIGHT, SCREEN_WIDTH, 0, 0);
     
+	menu_manager_t menu_manager = {.current_menu = MAIN_MENU, .cursor_pos = 0};
+	
     refresh();
     wrefresh(hud);
     wrefresh(error);
@@ -223,27 +227,43 @@ int main(int argc, char *argv[]) {
 		// DEBUG_LOG("x, y: %d, %d", save_test->x, save_test->y);
 	// end of testing only
 	for(;;) {
-		calculate_light(world, player);
-		generate_turn_order_display(world, player);
-    	draw(world, player);
-		player_get_nearby_loot(world->room[player->global_x][player->global_y], player);
-		
-		int actor = pick_next_actor(world, player);
-		assert(actor != INVALID_ACTOR_INDEX);
-		if(actor == PLAYER_TURN_ORDER_INDEX) {
-			lantern_update_dimming(&player->lantern);
-			bool run = false;
-			char c;
-			while(run == false) {
-				c = getch();
-				run = manage_input(c, world, player);
+		switch(menu_manager.current_menu) {
+			case GAME:
+				calculate_light(world, player);
+				generate_turn_order_display(world, player);
 				draw(world, player);
+				player_get_nearby_loot(world->room[player->global_x][player->global_y], player);
+				
+				int actor = pick_next_actor(world, player);
+				assert(actor != INVALID_ACTOR_INDEX);
+				if(actor == PLAYER_TURN_ORDER_INDEX) {
+					lantern_update_dimming(&player->lantern);
+					bool run = false;
+					char c;
+					while(run == false) {
+						c = getch();
+						run = manage_input(c, world, player);
+						draw(world, player);
+					}
+				} else if(actor >= 0) {
+					enemy_t *enemy = world->room[player->global_x][player->global_y]->enemies[actor];
+					if(enemy != NULL) {
+						enemy_decide_move(enemy, world, player);
+					}
+				}
+				break;
+			case MAIN_MENU: { // this bracket must be here and it infuriates me
+				draw_main_menu(main_menu, &menu_manager);
+				char c = getch();
+				manage_menu_input(c, &menu_manager, world);
 			}
-		} else if(actor >= 0) {
-			enemy_t *enemy = world->room[player->global_x][player->global_y]->enemies[actor];
-			if(enemy != NULL) {
-				enemy_decide_move(enemy, world, player);
-			}
+				break;
+			case LOAD_MENU:
+				break;
+			case LOG_BOOK_MENU:
+				break;
+			case NULL_MENU:
+				break;
 		}
     }
     endwin();

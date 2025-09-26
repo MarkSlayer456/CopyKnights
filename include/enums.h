@@ -1,6 +1,14 @@
 #ifndef ENUMS_H_
 #define ENUMS_H_
 
+enum menu {
+	NULL_MENU = -1,
+	MAIN_MENU,
+	LOAD_MENU,
+	LOG_BOOK_MENU,
+	GAME
+};
+
 typedef enum biome {
 	BIOME_NULL = -1,
 	CAVE,

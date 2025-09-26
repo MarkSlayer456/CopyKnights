@@ -26,6 +26,10 @@ void turn_order_enter_new_room(world_t *world, player_t *player);
 
 void generate_turn_order_display(world_t *world, player_t *player);
 
+void draw_main_menu(WINDOW *main_menu, menu_manager_t *menu_manager);
+
+void manage_menu_input(char c, menu_manager_t *menu_manager, world_t *world);
+
 void end_game(world_t *world, player_t *player);
 
 void shutdown(world_t *world);
