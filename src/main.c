@@ -88,8 +88,8 @@ int main(int argc, char *argv[]) {
 	
 	world->max_message_storage = DEFAULT_MAX_MESSAGE_STORAGE;
 	world->messages_size = 0;
-	world->messages = calloc(DEFAULT_MAX_MESSAGE_STORAGE, sizeof(char *));
-	for(int i = 0; i < DEFAULT_MAX_MESSAGE_STORAGE; i++) {
+	world->messages = calloc(world->max_message_storage, sizeof(char *));
+	for(int i = 0; i < world->max_message_storage; i++) {
 		world->messages[i] = calloc(MAX_MESSAGE_LENGTH, sizeof(char));
 	}
 	
@@ -156,9 +156,6 @@ int main(int argc, char *argv[]) {
 	for(int i = 0; i < INV_SIZE; i++) {
 		player->inventory[i] = blank;
 	}
-	// player_add_to_inv(player, test_item1);
-	// player_add_to_inv(player, test_item2);
-	// player_add_to_inv(player, test_item3);
 	
 	player->lantern.power = 5;
 	player->lantern.is_on = true;
@@ -217,6 +214,8 @@ int main(int argc, char *argv[]) {
 	
 	world->win = win;
     world->turn_order_size = 0;
+	
+	load_game(world, player, "");
 	
 	// TODO for testing only
 	// save_player(player, "");

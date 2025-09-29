@@ -311,3 +311,41 @@ room_t *load_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data, it
 
 	return room;
 }
+
+void load_room_floor_tiles(room_t *room) {
+	char *file = calloc(128, sizeof(char));
+	
+	strcpy(file, room->room_file_name);
+	
+	int fd = open(file, O_RDONLY);
+	if(fd < 0) {
+		DEBUG_LOG("an error occured loading file %s\n", file);
+		exit(0);
+	}
+	char *buf = calloc(512, sizeof(char));
+	read(fd, buf, 512);
+	int i = 0;
+	
+	room->is_created = true;
+	strcpy(room->room_file_name, file);
+	char *tok = strtok(buf, "\n");
+	while(tok != NULL) {
+		DEBUG_LOG("tok = %s | i = %d", tok, i);
+		for(int j = 0; j < strlen(tok); j++) {
+			switch(tok[j]) {
+				case POTENTIAL_ENEMY_SPAWN_CHAR:
+				case POTENTIAL_CHEST_SPAWN_CHAR:
+				case POTENTIAL_TRAP_SPAWN_CHAR:
+				case POTENTIAL_ITEM_SPAWN_CHAR:
+					room->tiles[i][j]->floor = EMPTY;
+					break;
+				default:
+					room->tiles[i][j]->floor = tok[j];
+					break;
+			}
+		}
+		tok = strtok(NULL, "\n");
+		i++;
+	}
+	close(fd);
+}

@@ -238,6 +238,7 @@ void display_combat_message(world_t *world, player_t *player, const char *str) {
 	// strncpy(world->messages[current_size], str, MAX_MESSAGE_LENGTH-1);
 	snprintf(world->messages[current_size], MAX_MESSAGE_LENGTH, "[Combat] %s", str);
 	world->messages_size++;
+	//TODO max_message_storage
 }
 
 void display_world_message(world_t *world, player_t *player, const char *str) {
@@ -256,6 +257,7 @@ void display_world_message(world_t *world, player_t *player, const char *str) {
 	// strncpy(world->messages[current_size], str, MAX_MESSAGE_LENGTH-1);
 	snprintf(world->messages[current_size], MAX_MESSAGE_LENGTH, "[World] %s", str);
 	world->messages_size++;
+	//TODO max_message_storage
 }
 
 bool is_opaque(room_t *room, int x, int y) {

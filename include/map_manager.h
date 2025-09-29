@@ -13,4 +13,6 @@ room_t *generate_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data
 room_t *load_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data, item_data_t *item_data, world_t *world);
 
 room_t *setup_first_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data, item_data_t *item_data, world_t *world);
+
+void load_room_floor_tiles(room_t *room);
 #endif
