@@ -55,7 +55,7 @@ void load_game(world_t *world, player_t *player, char *name) {
 	FILE *file = fopen(get_save_path(), "rb");
 	if(!file) return;
 	load_world(world, file);
-	load_player(player, file);
+	load_player(player, file, world->item_data);
 	fclose(file);
 	DEBUG_LOG("%s", "game loaded");
 }
@@ -161,7 +161,7 @@ void save_room(room_t *room, FILE *file) {
 	fwrite(&room->door_mask, sizeof(unsigned int), 1, file);
 }
 
-void load_player(player_t *player, FILE *file) {
+void load_player(player_t *player, FILE *file, item_data_t *item_data) {
 	fread(&player->level, sizeof(int), 1, file);
 	fread(&player->xp, sizeof(int), 1, file);
 	fread(&player->health, sizeof(int), 1, file);
@@ -180,6 +180,7 @@ void load_player(player_t *player, FILE *file) {
 	for(int i = 0; i < player->inventory_count; i++) {
 		fread(&player->inventory[i].id, sizeof(item_ids_t), 1, file);
 		fread(&player->inventory[i].stack, sizeof(int), 1, file);
+		load_item_from_data(&player->inventory[i], item_data);
 	}
 	fread(&player->nearby_loot_count, sizeof(int), 1, file);
 	for(int i = 0; i < player->nearby_loot_count; i++) {
@@ -211,7 +212,7 @@ void load_world(world_t *world, FILE *file) {
 			fread(&next_room_x, sizeof(int), 1, file);
 			fread(&next_room_y, sizeof(int), 1, file);
 			if(y == next_room_y && x == next_room_x) {
-				load_room_save(world->room[x][y], file);
+				load_room_save(world->room[x][y], file, world->item_data);
 			}
 		}
 	}
@@ -233,7 +234,7 @@ void load_world(world_t *world, FILE *file) {
 	fread(&world->room_templates, sizeof(room_template_t), world->room_template_count, file);
 }
 
-void load_room_save(room_t *room, FILE *file) {
+void load_room_save(room_t *room, FILE *file, item_data_t *item_data) {
 	fread(room->room_file_name, sizeof(char), ROOM_FILE_NAME_MAX_SIZE, file);
 	for(int x = 0; x < ROOM_WIDTH; x++) {
 		for(int y = 0; y < ROOM_HEIGHT; y++) {
@@ -243,6 +244,7 @@ void load_room_save(room_t *room, FILE *file) {
 				room->tiles[y][x]->items[i] = calloc(1, sizeof(item_t));
 				fread(&room->tiles[y][x]->items[i]->id, sizeof(item_ids_t), 1, file);
 				fread(&room->tiles[y][x]->items[i]->stack, sizeof(int), 1, file);
+				load_item_from_data(room->tiles[y][x]->items[i], item_data);
 			}
 		}
 	}

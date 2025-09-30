@@ -349,3 +349,32 @@ void load_room_floor_tiles(room_t *room) {
 	}
 	close(fd);
 }
+
+void load_item_from_data(item_t *item, item_data_t *item_data) {
+	item_ids_t id = item->id;
+	for(int i = 0; i < MAX_ITEMS; i++) {
+		if(!item) continue;
+		if(item_data[i].id == BLANK) continue;
+		if(item_data[i].id == id) {
+			strcpy(item->name, item_data[i].name);
+			strcpy(item->desc, item_data[i].desc);
+			item->value_type = item_data[i].value_type;
+			switch(item_data[i].value_type) {
+				case VALUE_TYPE_NONE:
+					break;
+				case VALUE_TYPE_ARMOR:
+					item->stat_type.armor = item_data[i].stat_type.armor;
+					break;
+				case VALUE_TYPE_WEAPON:
+					item->stat_type.weapon = item_data[i].stat_type.weapon;
+					break;
+				case VALUE_TYPE_FOOD:
+					item->stat_type.food = item_data[i].stat_type.food;
+					break;
+				case VALUE_TYPE_SCROLL:
+					item->stat_type.scroll = item_data[i].stat_type.scroll;
+					break;
+			}
+		}
+	}
+}
