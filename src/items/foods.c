@@ -85,7 +85,7 @@ void load_foods_effects(world_t *world) {
 			}
 			int idx = item_data[i].stat_type.food.modifier_count;
 			
-			item_data[i].stat_type.food.modifier_stats[idx].modifier = atoi(value);
+			item_data[i].stat_type.food.modifier_stats[idx].modifier = (int16_t)atoi(value);
 			item_data[i].stat_type.food.modifier_stats[idx].stat = get_stat(target_stat);
 			item_data[i].stat_type.food.modifier_count++;
 			break;
@@ -123,10 +123,10 @@ void load_foods_data(world_t *world) {
 					break;
 				case 1:
 					item_data[world->item_data_count].value_type = VALUE_TYPE_FOOD;
-					item_data[world->item_data_count].stat_type.food.heal_amount = atoi(token);
+					item_data[world->item_data_count].stat_type.food.heal_amount = (int16_t)atoi(token);
 					break;
 				case 2:
-					item_data[world->item_data_count].stat_type.food.mana_heal_amount = atoi(token);
+					item_data[world->item_data_count].stat_type.food.mana_heal_amount = (int16_t)atoi(token);
 					break;
 			}
 			token = strtok(NULL, ",");

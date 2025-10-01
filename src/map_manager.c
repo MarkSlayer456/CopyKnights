@@ -359,6 +359,7 @@ void load_item_from_data(item_t *item, item_data_t *item_data) {
 			strcpy(item->name, item_data[i].name);
 			strcpy(item->desc, item_data[i].desc);
 			item->value_type = item_data[i].value_type;
+			//TODO there are more values than this
 			switch(item_data[i].value_type) {
 				case VALUE_TYPE_NONE:
 					break;

@@ -81,7 +81,7 @@ void load_weapon_effects(world_t *world) {
 			}
 			int idx = item_data[i].stat_type.weapon.modifier_count;
 			
-			item_data[i].stat_type.weapon.modifier_stats[idx].modifier = atoi(value);
+			item_data[i].stat_type.weapon.modifier_stats[idx].modifier = (int16_t)atoi(value);
 			item_data[i].stat_type.weapon.modifier_stats[idx].stat = get_stat(target_stat);
 			item_data[i].stat_type.weapon.equipped = false;
 			item_data[i].stat_type.weapon.modifier_count++;
@@ -119,16 +119,16 @@ void load_weapon_data(world_t *world) {
 					item_data[world->item_data_count].value_type = VALUE_TYPE_WEAPON;
 					break;
 				case 1:
-					item_data[world->item_data_count].stat_type.weapon.attack = atoi(token);
+					item_data[world->item_data_count].stat_type.weapon.attack = (int16_t)atoi(token);
 					break;
 				case 2:
-					item_data[world->item_data_count].stat_type.weapon.strength_requirement = atoi(token);
+					item_data[world->item_data_count].stat_type.weapon.strength_requirement = (int16_t)atoi(token);
 					break;
 				case 3:
-					item_data[world->item_data_count].stat_type.weapon.dexterity_requirement= atoi(token);
+					item_data[world->item_data_count].stat_type.weapon.dexterity_requirement= (int16_t)atoi(token);
 					break;
 				case 4:
-					item_data[world->item_data_count].stat_type.weapon.intelligence_requirement = atoi(token);
+					item_data[world->item_data_count].stat_type.weapon.intelligence_requirement = (int16_t)atoi(token);
 					break;
 				case 5:
 					item_data[world->item_data_count].stat_type.weapon.two_handed = atoi(token);

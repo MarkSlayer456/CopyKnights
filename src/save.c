@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 #include "map_manager.h"
 
 #ifdef _WIN32
@@ -83,6 +84,11 @@ void save_player(player_t *player, FILE *file) {
 	for(int i = 0; i < player->inventory_count; i++) {
 		fwrite(&player->inventory[i].id, sizeof(item_ids_t), 1, file);
 		fwrite(&player->inventory[i].stack, sizeof(int), 1, file);
+		if(player->inventory[i].value_type == VALUE_TYPE_WEAPON) {
+			fwrite(&player->inventory[i].stat_type.weapon.equipped, sizeof(bool), 1, file);
+		} else if(player->inventory[i].value_type == VALUE_TYPE_ARMOR) {
+			fwrite(&player->inventory[i].stat_type.armor.equipped, sizeof(bool), 1, file);
+		}
 	}
 	fwrite(&player->nearby_loot_count, sizeof(int), 1, file);
 	for(int i = 0; i < player->nearby_loot_count; i++) {
@@ -143,14 +149,14 @@ void save_room(room_t *room, FILE *file) {
 	for(int x = 0; x < ROOM_WIDTH; x++) {
 		for(int y = 0; y < ROOM_HEIGHT; y++) {
 			// fwrite(&room->tiles[y][x]->floor, sizeof(char), 1, file);
-			fwrite(&room->tiles[y][x]->item_count, sizeof(int), 1, file);
+			fwrite(&room->tiles[y][x]->item_count, sizeof(int8_t), 1, file);
 			for(int i = 0; i < room->tiles[y][x]->item_count; i++) {
 				fwrite(&room->tiles[y][x]->items[i]->id, sizeof(item_ids_t), 1, file);
 				fwrite(&room->tiles[y][x]->items[i]->stack, sizeof(int), 1, file);
 			}
 		}
 	}
-	fwrite(&room->current_enemy_count, sizeof(int), 1, file);
+	fwrite(&room->current_enemy_count, sizeof(int8_t), 1, file);
 	for (int i = 0; i < room->current_enemy_count; i++) {
 		fwrite(room->enemies[i], sizeof(enemy_t), 1, file);
 	}
@@ -158,7 +164,7 @@ void save_room(room_t *room, FILE *file) {
 	fwrite(&room->global_time, sizeof(int), 1, file);
 	fwrite(&room->biome, sizeof(biome_t), 1, file);
 	fwrite(&room->is_main_path, sizeof(bool), 1, file);
-	fwrite(&room->door_mask, sizeof(unsigned int), 1, file);
+	fwrite(&room->door_mask, sizeof(uint8_t), 1, file);
 }
 
 void load_player(player_t *player, FILE *file, item_data_t *item_data) {
@@ -181,6 +187,23 @@ void load_player(player_t *player, FILE *file, item_data_t *item_data) {
 		fread(&player->inventory[i].id, sizeof(item_ids_t), 1, file);
 		fread(&player->inventory[i].stack, sizeof(int), 1, file);
 		load_item_from_data(&player->inventory[i], item_data);
+		if(player->inventory[i].value_type == VALUE_TYPE_WEAPON) {
+			fread(&player->inventory[i].stat_type.weapon.equipped, sizeof(bool), 1, file);
+			DEBUG_LOG("main_hand: %d, Equipped: %d", player->inventory[i].stat_type.weapon.main_hand, player->inventory[i].stat_type.weapon.equipped);
+			if(player->inventory[i].stat_type.weapon.equipped) {
+				if(player->inventory[i].stat_type.weapon.main_hand) {
+					player->equipment.main_hand = &player->inventory[i];
+				} else {
+					player->equipment.off_hand = &player->inventory[i];
+				}
+			}
+			
+		} else if(player->inventory[i].value_type == VALUE_TYPE_ARMOR) {
+			fread(&player->inventory[i].stat_type.armor.equipped, sizeof(bool), 1, file);
+			if(player->inventory[i].stat_type.armor.equipped) {
+				player->equipment.armor = &player->inventory[i];
+			}
+		}
 	}
 	fread(&player->nearby_loot_count, sizeof(int), 1, file);
 	for(int i = 0; i < player->nearby_loot_count; i++) {
@@ -239,7 +262,7 @@ void load_room_save(room_t *room, FILE *file, item_data_t *item_data) {
 	for(int x = 0; x < ROOM_WIDTH; x++) {
 		for(int y = 0; y < ROOM_HEIGHT; y++) {
 			// fwrite(&room->tiles[y][x]->floor, sizeof(char), 1, file);
-			fread(&room->tiles[y][x]->item_count, sizeof(int), 1, file);
+			fread(&room->tiles[y][x]->item_count, sizeof(int8_t), 1, file);
 			for(int i = 0; i < room->tiles[y][x]->item_count; i++) {
 				room->tiles[y][x]->items[i] = calloc(1, sizeof(item_t));
 				fread(&room->tiles[y][x]->items[i]->id, sizeof(item_ids_t), 1, file);
@@ -248,7 +271,7 @@ void load_room_save(room_t *room, FILE *file, item_data_t *item_data) {
 			}
 		}
 	}
-	fread(&room->current_enemy_count, sizeof(int), 1, file);
+	fread(&room->current_enemy_count, sizeof(int8_t), 1, file);
 	for (int i = 0; i < room->current_enemy_count; i++) {
 		fread(room->enemies[i], sizeof(enemy_t), 1, file);
 	}
@@ -256,6 +279,6 @@ void load_room_save(room_t *room, FILE *file, item_data_t *item_data) {
 	fread(&room->global_time, sizeof(int), 1, file);
 	fread(&room->biome, sizeof(biome_t), 1, file);
 	fread(&room->is_main_path, sizeof(bool), 1, file);
-	fread(&room->door_mask, sizeof(unsigned int), 1, file);
+	fread(&room->door_mask, sizeof(uint8_t), 1, file);
 	load_room_floor_tiles(room);
 }

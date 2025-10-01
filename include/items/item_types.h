@@ -1,6 +1,7 @@
 #ifndef ITEM_TYPES_H_
 #define ITEM_TYPES_H_
 
+#include <stdint.h>
 #include "item_enums.h"
 #include "enums.h"
 
@@ -10,36 +11,36 @@ typedef struct type_map {
 } type_map_t;
 
 typedef struct stat_modifier {
-	int modifier;
+	int16_t modifier;
 	stats_t stat;
 } stat_modifier_t;
 
 typedef struct armor_stats {
 	armor_type_t type;
-	int defense;
+	int16_t defense;
 	stat_modifier_t modifier_stats[MAX_ARMOR_MODIFIERS];
-	int modifier_count;
+	int8_t modifier_count;
 	bool equipped;
 } armor_stats_t;
 
 typedef struct weapon_stats {
-	int attack;
-	int strength_requirement;
-	int dexterity_requirement;
-	int intelligence_requirement;
+	int16_t attack;
+	int16_t strength_requirement;
+	int16_t dexterity_requirement;
+	int16_t intelligence_requirement;
 	stat_modifier_t modifier_stats[MAX_ARMOR_MODIFIERS];
-	int modifier_count;
+	int8_t modifier_count;
 	bool equipped;
 	bool two_handed;
 	bool main_hand;
 } weapon_stats_t;
 
 typedef struct food_stats {
-	int heal_amount;
-	int mana_heal_amount;
+	int16_t heal_amount;
+	int16_t mana_heal_amount;
 	stat_modifier_t modifier_stats[MAX_ARMOR_MODIFIERS];
-	int modifier_count;
-	int duration;
+	int8_t modifier_count;
+	int16_t duration;
 } food_stats_t;
 
 typedef struct scroll_stats {

@@ -253,6 +253,12 @@ int handle_weapon_change(player_t *player, item_t *new_weapon) {
                             sub_player_equipment_stats(player, player->equipment.main_hand->stat_type.weapon.modifier_stats[i].stat, player->equipment.main_hand->stat_type.weapon.modifier_stats[i].modifier);
                         }
                     }
+                    if(player->equipment.main_hand != NULL) {
+                        player->equipment.main_hand->stat_type.weapon.equipped = false;
+                    }
+                    if(player->equipment.off_hand != NULL) {
+                        player->equipment.off_hand->stat_type.weapon.equipped = false;
+                    }
                     player->equipment.main_hand = new_weapon; 
                     player->equipment.off_hand = new_weapon;
                     player->equipment.main_hand->stat_type.weapon.equipped = true;
@@ -272,9 +278,10 @@ int handle_weapon_change(player_t *player, item_t *new_weapon) {
                     for(int i = 0; i < MAX_ARMOR_MODIFIERS; i++) {
                         sub_player_equipment_stats(player, player->equipment.main_hand->stat_type.weapon.modifier_stats[i].stat, player->equipment.main_hand->stat_type.weapon.modifier_stats[i].modifier);
                     }
+                    player->equipment.main_hand->stat_type.weapon.equipped = false;
                 }
                 player->equipment.main_hand = new_weapon;
-                player->equipment.main_hand->stat_type.weapon.equipped = false;
+                player->equipment.main_hand->stat_type.weapon.equipped = true;
             }
         }
     } else if(player->equipment.off_hand == new_weapon) {
@@ -291,6 +298,9 @@ int handle_weapon_change(player_t *player, item_t *new_weapon) {
                 for(int i = 0; i < MAX_ARMOR_MODIFIERS; i++) {
                     sub_player_equipment_stats(player, player->equipment.off_hand->stat_type.weapon.modifier_stats[i].stat, player->equipment.off_hand->stat_type.weapon.modifier_stats[i].modifier);
                 }
+            }
+            if(player->equipment.off_hand != NULL) {
+                player->equipment.off_hand->stat_type.weapon.equipped = false;
             }
             player->equipment.off_hand = new_weapon;
             player->equipment.off_hand->stat_type.weapon.equipped = true;
