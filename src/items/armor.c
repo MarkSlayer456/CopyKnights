@@ -106,6 +106,9 @@ void load_armor_effects(world_t *world) {
 			item_data[i].stat_type.armor.modifier_stats[idx].stat = get_stat(target_stat);
 			item_data[i].stat_type.armor.equipped = false;
 			item_data[i].stat_type.armor.modifier_count++;
+			char tmp_desc[MAX_ITEM_DESC_LEN];
+			snprintf(tmp_desc, MAX_ITEM_DESC_LEN, "%s: %d\n", target_stat, item_data[i].stat_type.armor.modifier_stats[idx].modifier);
+			strcat(item_data[i].desc, tmp_desc);
 			DEBUG_LOG("Loaded Armor Stats: %d, %d", 
 					item_data[i].stat_type.armor.modifier_stats[idx].stat, 
 					item_data[i].stat_type.armor.modifier_stats[idx].modifier);
@@ -154,7 +157,9 @@ void load_armor_data(world_t *world) {
 			token = strtok(NULL, ",");
 			col++;
 		}
-		snprintf(item_data[world->item_data_count].desc, MAX_ITEM_DESC_LEN, "+%03d defense", item_data[world->item_data_count].stat_type.armor.defense);
+		snprintf(item_data[world->item_data_count].desc, MAX_ITEM_DESC_LEN, 
+				"defense: %d\n",  
+				item_data[world->item_data_count].stat_type.armor.defense);
 		DEBUG_LOG("Loaded Armor Data: %d, %s, %d, %d, %s", 
 				item_data[world->item_data_count].id, 
 				item_data[world->item_data_count].name, 

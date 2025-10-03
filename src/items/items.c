@@ -190,6 +190,7 @@ int use_item(player_t *player)
             //TODO effects with durations
             player_increase_health(player, player->inventory[player->inventory_manager.inv_selector].stat_type.food.heal_amount);
             player_increase_mana(player, player->inventory[player->inventory_manager.inv_selector].stat_type.food.mana_heal_amount);
+            success = 1;
         } else {
             switch(player->inventory[player->inventory_manager.inv_selector].id) {
                 case BLANK:

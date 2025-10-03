@@ -130,6 +130,7 @@ void save_world(world_t *world, FILE *file) {
 	fwrite(&world->seed, sizeof(int), 1, file);
 	
 	fwrite(&world->messages_size, sizeof(int), 1, file);
+	fwrite(&world->max_message_storage, sizeof(int), 1, file);
 	
 	for(int i = 0; i < world->messages_size; i++) {
 		int len = strlen(world->messages[i]) + 1;
@@ -137,7 +138,6 @@ void save_world(world_t *world, FILE *file) {
 		fwrite(world->messages[i], sizeof(char), len, file);
 	}
 	
-	fwrite(&world->max_message_storage, sizeof(int), 1, file);
 	fwrite(&world->turn_order_size, sizeof(int), 1, file);
 	fwrite(world->turn_order, sizeof(int), world->turn_order_size, file);
 	fwrite(&world->room_template_count, sizeof(int), 1, file);
@@ -242,6 +242,12 @@ void load_world(world_t *world, FILE *file) {
 	fread(&world->seed, sizeof(int), 1, file);
 	
 	fread(&world->messages_size, sizeof(int), 1, file);
+	fread(&world->max_message_storage, sizeof(int), 1, file);
+	
+	world->messages = calloc(world->max_message_storage, sizeof(char *));
+	for(int i = 0; i < world->max_message_storage; i++) {
+		world->messages[i] = calloc(MAX_MESSAGE_LENGTH, sizeof(char));
+	}
 	
 	for(int i = 0; i < world->messages_size; i++) {
 		int len;
@@ -250,7 +256,6 @@ void load_world(world_t *world, FILE *file) {
 		fread(world->messages[i], sizeof(char), len, file);
 	}
 	
-	fread(&world->max_message_storage, sizeof(int), 1, file);
 	fread(&world->turn_order_size, sizeof(int), 1, file);
 	fread(world->turn_order, sizeof(int), world->turn_order_size, file);
 	fread(&world->room_template_count, sizeof(int), 1, file);
