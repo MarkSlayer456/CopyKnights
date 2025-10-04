@@ -30,9 +30,6 @@ typedef struct weapon_stats {
 	stats_t scaling_stat2;
 	enum grade stat1_grade;
 	enum grade stat2_grade;
-	int16_t strength_requirement;
-	int16_t dexterity_requirement;
-	int16_t intelligence_requirement;
 	stat_modifier_t modifier_stats[MAX_ARMOR_MODIFIERS];
 	int8_t modifier_count;
 	bool equipped;

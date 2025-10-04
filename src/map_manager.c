@@ -103,23 +103,24 @@ void calculate_door_masks(world_t *world) {
 	for(int i = 1; i <= TOTAL_ROOM_COUNT; i++) {
 		char folder[32] = "";
 		int room_num = i;
-		// TODO this is just wrong, only ever runs through the caves
 		if(i <= CAVE_ROOM_COUNT) {
 			strcat(folder, CAVE_NAME);
-		} else if(i <= BOG_ROOM_COUNT) {
+		} else if(i <= BOG_ROOM_COUNT + CAVE_ROOM_COUNT) {
 			room_num = room_num - CAVE_ROOM_COUNT;
 			strcat(folder, BOG_NAME);
-		} else if(i <= CATACOMBS_ROOM_COUNT) {
+		} else if(i <= CATACOMBS_ROOM_COUNT + CAVE_ROOM_COUNT + BOG_ROOM_COUNT) {
 			room_num = room_num - CAVE_ROOM_COUNT - BOG_ROOM_COUNT;
 			strcat(folder, CATACOMBS_NAME);
-		} else if(i <= ANCIENT_CITY_ROOM_COUNT) {
+		} else if(i <= ANCIENT_CITY_ROOM_COUNT + CAVE_ROOM_COUNT + BOG_ROOM_COUNT + CATACOMBS_ROOM_COUNT) {
 			room_num = room_num - CAVE_ROOM_COUNT - BOG_ROOM_COUNT - CATACOMBS_ROOM_COUNT;
 			strcat(folder, ANCIENT_CITY_NAME);
-		} else if(i <= ARCANE_LABYRINTH_ROOM_COUNT) {
+		} else if(i <= ARCANE_LABYRINTH_ROOM_COUNT + CAVE_ROOM_COUNT + BOG_ROOM_COUNT 
+			+ CATACOMBS_ROOM_COUNT + ANCIENT_CITY_ROOM_COUNT) {
 			room_num = room_num - CAVE_ROOM_COUNT - BOG_ROOM_COUNT - CATACOMBS_ROOM_COUNT
 						- ANCIENT_CITY_ROOM_COUNT;
 			strcat(folder, ARCANE_LABYRINTH_NAME);
-		} else if(i <= VOID_HOLLOW_ROOM_COUNT) {
+			} else if(i <= VOID_HOLLOW_ROOM_COUNT + CAVE_ROOM_COUNT + BOG_ROOM_COUNT 
+				+ CATACOMBS_ROOM_COUNT + ANCIENT_CITY_ROOM_COUNT + ARCANE_LABYRINTH_ROOM_COUNT) {
 			room_num = room_num - CAVE_ROOM_COUNT - BOG_ROOM_COUNT - CATACOMBS_ROOM_COUNT
 			- ANCIENT_CITY_ROOM_COUNT - ARCANE_LABYRINTH_ROOM_COUNT;
 			strcat(folder, VOID_HOLLOW_NAME);
@@ -127,6 +128,7 @@ void calculate_door_masks(world_t *world) {
 		
 		snprintf(file, 96, "./data/rooms/%s/room%d.ck.txt", folder, room_num);
 		
+		DEBUG_LOG("biome %d: %s", i, folder);
 		world->room_templates[world->room_template_count].biome = get_biome(folder);
 		
 		int fd = open(file, O_RDONLY);
@@ -243,7 +245,7 @@ room_t *load_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data, it
 	if(x != 0 || y != 0) {
 		for(int i = 0; i < world->room_template_count; i++) {
 			//TODO biomes need to match as well
-			if(room->door_mask == world->room_templates[i].mask) {
+			if(room->door_mask == world->room_templates[i].mask && room->biome == world->room_templates[i].biome) {
 				strcpy(templates[template_count].filename, world->room_templates[i].filename);
 				templates[template_count].mask |= world->room_templates[i].mask;
 				template_count++;

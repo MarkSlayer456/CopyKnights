@@ -66,6 +66,15 @@
 #define DEFAULT_MAX_MESSAGE_STORAGE				128
 #define MAX_MESSAGE_LENGTH						59
 #define MAX_MESSAGE_LENGTH_WITHOUT_PREFIX		47
+
+// these are how far down each biome goes
+#define CAVE_DEPTH							10
+#define BOG_DEPTH							20
+#define CATACOMBS_DEPTH						30
+#define ANCIENT_CITY_DEPTH					40
+#define ARCANE_LABYRINTH_DEPTH				50
+#define VOID_HOLLOW_DEPTH					60
+
 #define CAVE_ROOM_COUNT						20
 #define BOG_ROOM_COUNT						2
 #define CATACOMBS_ROOM_COUNT				1

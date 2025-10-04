@@ -144,18 +144,9 @@ void load_weapon_data(world_t *world) {
 					stat2_grade = token[0];
 					break;
 				case 7:
-					item_data[world->item_data_count].stat_type.weapon.strength_requirement = (int16_t)atoi(token);
-					break;
-				case 8:
-					item_data[world->item_data_count].stat_type.weapon.dexterity_requirement= (int16_t)atoi(token);
-					break;
-				case 9:
-					item_data[world->item_data_count].stat_type.weapon.intelligence_requirement = (int16_t)atoi(token);
-					break;
-				case 10:
 					item_data[world->item_data_count].stat_type.weapon.two_handed = atoi(token);
 					break;
-				case 11:
+				case 8:
 					item_data[world->item_data_count].stat_type.weapon.main_hand = atoi(token);
 					break;
 			}
@@ -164,28 +155,22 @@ void load_weapon_data(world_t *world) {
 		}
 		if(item_data[world->item_data_count].stat_type.weapon.scaling_stat2 != NULL_STAT) {
 			snprintf(item_data[world->item_data_count].desc, MAX_ITEM_DESC_LEN, 
-					"damage: %d - %d\nscaling stats: %s (%c), %s (%c)\nstrength requirement: %d\ndexterity requirement: %d\nintelligence requirement: %d\ntwo handed: %d\nmain hand: %d", 
+					"damage: %d - %d\nscaling stats: %s (%c), %s (%c)\ntwo handed: %d\nmain hand: %d", 
 					item_data[world->item_data_count].stat_type.weapon.min_attack,
 					item_data[world->item_data_count].stat_type.weapon.max_attack, 
 					stat_name1,
 					stat1_grade,
 					stat_name2,
 					stat2_grade,
-					item_data[world->item_data_count].stat_type.weapon.strength_requirement, 
-					item_data[world->item_data_count].stat_type.weapon.dexterity_requirement, 
-					item_data[world->item_data_count].stat_type.weapon.intelligence_requirement,
 					item_data[world->item_data_count].stat_type.weapon.two_handed,
 					item_data[world->item_data_count].stat_type.weapon.main_hand);
 		} else {
 			snprintf(item_data[world->item_data_count].desc, MAX_ITEM_DESC_LEN, 
-					"damage: %d - %d\nscaling stat: %s (%c)\nstrength requirement: %d\ndexterity requirement: %d\nintelligence requirement: %d\ntwo handed: %d\nmain hand: %d", 
+					"damage: %d - %d\nscaling stat: %s (%c)\ntwo handed: %d\nmain hand: %d", 
 					item_data[world->item_data_count].stat_type.weapon.min_attack,
 					item_data[world->item_data_count].stat_type.weapon.max_attack, 
 					stat_name1,
 					stat1_grade,
-					item_data[world->item_data_count].stat_type.weapon.strength_requirement, 
-					item_data[world->item_data_count].stat_type.weapon.dexterity_requirement, 
-					item_data[world->item_data_count].stat_type.weapon.intelligence_requirement,
 					item_data[world->item_data_count].stat_type.weapon.two_handed,
 					item_data[world->item_data_count].stat_type.weapon.main_hand);
 		}
