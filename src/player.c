@@ -243,9 +243,104 @@ void player_attack(player_t *player, world_t *world, direction_t dir) {
 	player_exit_attack_state(player, world);
 	enemy_t *enemy = player_get_dir_enemy(player, world, dir);
 	if(!enemy) return;
-	int raw_damage = player->strength; //TODO this will change later
+	
+	item_t *main_hand = player->equipment.main_hand;
+	if(!main_hand) {
+		int unarmed_damage = 1;
+		char message[MAX_MESSAGE_LENGTH_WITHOUT_PREFIX];
+		snprintf(message, MAX_MESSAGE_LENGTH_WITHOUT_PREFIX, "You attacked for %d", unarmed_damage);
+		display_combat_message(world, player, message);
+		if(enemy_decrease_health(enemy, world, player, unarmed_damage)) {
+			player_add_xp(player, 100, world->class_data);
+		}
+		return;
+	}
+	int raw_damage = 0;
+	weapon_stats_t *weapon = &main_hand->stat_type.weapon;
+	double required_stat = weapon->min_attack + weapon->max_attack;
+	if(weapon->scaling_stat2 == NULL_STAT) {
+		double scaling_factor = 0.0f;
+		switch(weapon->scaling_stat1) {
+			case STRENGTH:
+				scaling_factor = player->strength / required_stat;
+				break;
+			case DEXTERITY:
+				scaling_factor = player->dexterity / required_stat;
+				break;
+			case INTELLIGENCE:
+				scaling_factor = player->intelligence / required_stat;
+				break;
+			case CONSTITUTION:
+				scaling_factor = player->constitution / required_stat;
+				break;
+			case SPEED:
+				scaling_factor = player->speed / required_stat;
+				break;
+			case NULL_STAT:
+				break;
+		}
+		if(scaling_factor > 1) scaling_factor = 1;
+		double stat_weight = scaling_factor * get_percent_from_grade(weapon->stat1_grade);
+		double rand_weight = (((double)rand() / RAND_MAX) * (1-get_percent_from_grade(weapon->stat1_grade)));
+		raw_damage = ceil(weapon->max_attack * (stat_weight + rand_weight));
+	} else {
+		double scaling_factor_stat1 = 0.0f;
+		double scaling_factor_stat2 = 0.0f;
+		switch(weapon->scaling_stat1) {
+			case STRENGTH:
+				scaling_factor_stat1 = player->strength / required_stat;
+				break;
+			case DEXTERITY:
+				scaling_factor_stat1 = player->dexterity / required_stat;
+				break;
+			case INTELLIGENCE:
+				scaling_factor_stat1 = player->intelligence / required_stat;
+				break;
+			case CONSTITUTION:
+				scaling_factor_stat1 = player->constitution / required_stat;
+				break;
+			case SPEED:
+				scaling_factor_stat1 = player->speed / required_stat;
+				break;
+			case NULL_STAT:
+				break;
+		}
+		switch(weapon->scaling_stat2) {
+			case STRENGTH:
+				scaling_factor_stat2 = player->strength / required_stat;
+				break;
+			case DEXTERITY:
+				scaling_factor_stat2 = player->dexterity / required_stat;
+				break;
+			case INTELLIGENCE:
+				scaling_factor_stat2 = player->intelligence / required_stat;
+				break;
+			case CONSTITUTION:
+				scaling_factor_stat2 = player->constitution / required_stat;
+				break;
+			case SPEED:
+				scaling_factor_stat2 = player->speed / required_stat;
+				break;
+			case NULL_STAT:
+				break;
+		}
+		if(scaling_factor_stat1 > 1) scaling_factor_stat1 = 1;
+		if(scaling_factor_stat2 > 1) scaling_factor_stat2 = 1;
+		double stat1_weight = scaling_factor_stat1 * get_percent_from_grade(weapon->stat1_grade);
+		double stat2_weight = scaling_factor_stat2 * get_percent_from_grade(weapon->stat2_grade);
+		double rand_weight = (((double)rand() / RAND_MAX) * 1-(get_percent_from_grade(weapon->stat1_grade)+get_percent_from_grade(weapon->stat2_grade)));
+		raw_damage = ceil(weapon->max_attack * (stat1_weight + stat2_weight + rand_weight));
+	}
+	
+	raw_damage = MAX(weapon->min_attack, raw_damage);
+	if(raw_damage > weapon->max_attack) raw_damage = weapon->max_attack;
+	DEBUG_LOG("raw damage: %d", raw_damage);
 	int damage = raw_damage * (DEFENSE_SCALING_CONSTANT)/(DEFENSE_SCALING_CONSTANT+enemy->defense);
 	damage = MAX(1, damage);
+	DEBUG_LOG("actual damage: %d", damage);
+	char message[MAX_MESSAGE_LENGTH_WITHOUT_PREFIX];
+	snprintf(message, MAX_MESSAGE_LENGTH_WITHOUT_PREFIX, "You attacked for %d", damage);
+	display_combat_message(world, player, message);
 	if(enemy_decrease_health(enemy, world, player, damage)) {
 		player_add_xp(player, 100, world->class_data);
 	}
@@ -286,7 +381,7 @@ void player_check_level_up(player_t *player, const class_data_t *class_data) {
 }
 
 void player_enter_attack_state(player_t *player, world_t *world) {
-	display_combat_message(world, player, ATTACK_DIRECTION_MESSAGE);
+	// display_combat_message(world, player, ATTACK_DIRECTION_MESSAGE);
 	player->state = PLAYER_STATE_ATTACKING;
 }
 

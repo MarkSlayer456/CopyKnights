@@ -7,7 +7,7 @@
 
 typedef struct type_map {
 	const char *name;
-	item_ids_t value;
+	int16_t value;
 } type_map_t;
 
 typedef struct stat_modifier {
@@ -24,7 +24,12 @@ typedef struct armor_stats {
 } armor_stats_t;
 
 typedef struct weapon_stats {
-	int16_t attack;
+	int16_t max_attack;
+	int16_t min_attack;
+	stats_t scaling_stat1;
+	stats_t scaling_stat2;
+	enum grade stat1_grade;
+	enum grade stat2_grade;
 	int16_t strength_requirement;
 	int16_t dexterity_requirement;
 	int16_t intelligence_requirement;

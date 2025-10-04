@@ -299,8 +299,8 @@ bool enemy_decrease_health(enemy_t *enemy, world_t *world, const player_t *playe
 
 void enemy_attack(enemy_t *enemy, player_t *player, world_t *world)
 {
-    char *message = calloc(MAX_MESSAGE_LENGTH_WITHOUT_PREFIX, sizeof(char));
-    snprintf(message, MAX_MESSAGE_LENGTH_WITHOUT_PREFIX, "%s attacked for %d", enemy->name, enemy->strength);
+    char message[MAX_MESSAGE_LENGTH_WITHOUT_PREFIX];
+    snprintf(message, MAX_MESSAGE_LENGTH_WITHOUT_PREFIX, "[%c] attacked for %d", enemy->symbol, enemy->strength);
     display_combat_message(world, player, message);
     player_decrease_health(player, world, enemy->strength);
 }

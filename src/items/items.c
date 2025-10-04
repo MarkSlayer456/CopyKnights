@@ -15,6 +15,16 @@
 #define strncasecmp _strnicmp
 #endif
 
+type_map_t grade_map[] = {
+    {GRADE_A_NAME, A},
+    {GRADE_B_NAME, B},
+    {GRADE_C_NAME, C},
+    {GRADE_D_NAME, D},
+    {GRADE_F_NAME, F},
+};
+
+const int grade_map_len = sizeof(grade_map) / sizeof(grade_map[0]);
+
 type_map_t rarity_map[] = {
     {RARITY_COMMON_NAME, COMMON},
     {RARITY_UNCOMMOM_NAME, UNCOMMON},
@@ -158,6 +168,15 @@ item_ids_t item_get_id(const char *name) {
 	return BLANK;
 }
 
+enum grade get_grade(const char *name) {
+    for(int i = 0; i < grade_map_len; i++) {
+        if(strcasecmp(name, grade_map[i].name) == 0) {
+            return grade_map[i].value;
+        }
+    }
+    return Z;
+}
+
 stats_t get_stat(const char *name) {
     for(int i = 0; i < stats_map_len; i++) {
         DEBUG_LOG("%s, %s", name, stats_map[i].name);
@@ -175,6 +194,24 @@ rarity_t get_rarity(const char *name) {
         }
     }
     return NULL_RARITY;
+}
+
+double get_percent_from_grade(enum grade g) {
+    switch(g) {
+        case A:
+            return GRADE_A_PERCENT;
+        case B:
+            return GRADE_B_PERCENT;
+        case C:
+            return GRADE_C_PERCENT;
+        case D:
+            return GRADE_D_PERCENT;
+        case F:
+            return GRADE_F_PERCENT;
+        case Z:
+            return GRADE_Z_PERCENT;
+    }
+    return GRADE_Z_PERCENT;
 }
 
 // returns 1 on success and 0 on fail

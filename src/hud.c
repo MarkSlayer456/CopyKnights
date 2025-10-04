@@ -221,7 +221,6 @@ void display_inventory_desc_hud(world_t *world, player_t *player) {
 			char *token = strtok(desc_copy, "\n");
 			while(token) {
 				wmove(inventory_desc_hud, y, x);
-				DEBUG_LOG("%s", token);
 				waddstr(inventory_desc_hud, token);
 				y++;
 				token = strtok(NULL, "\n");
@@ -243,7 +242,6 @@ void display_inventory_desc_hud(world_t *world, player_t *player) {
 			char *token = strtok(desc_copy, "\n");
 			while(token) {
 				wmove(inventory_desc_hud, y, (INVENTORY_WIDTH/2)+x);
-				DEBUG_LOG("%s", token);
 				waddstr(inventory_desc_hud, token);
 				y++;
 				token = strtok(NULL, "\n");

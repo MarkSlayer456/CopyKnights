@@ -1,6 +1,15 @@
 #ifndef ENUMS_H_
 #define ENUMS_H_
 
+enum grade {
+	Z = -1,
+	A,
+	B,
+	C,
+	D,
+	F
+};
+
 enum menu {
 	NULL_MENU = -1,
 	MAIN_MENU,

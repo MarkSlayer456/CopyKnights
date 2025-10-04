@@ -1,64 +1,64 @@
-name,attack,strength requirement,dexterity requirement,intelligence requirement,two handed,main hand
-Black Stone Sword,5,5,0,0,0,1
-Bronze Sword,10,10,0,0,0,1
-Iron Sword,15,15,0,0,0,1
-Steel Sword,20,20,0,0,0,1
-Mithril Sword,25,25,0,0,1
-Soulcrust Sword,30,30,0,0,0,1
-Terracite Sword,35,35,0,0,0,1
-Gravemarrow Sword,45,40,5,5,0,1
-Voidmarrow Sword,55,45,0,0,0,1
-Black Stone Spear,5,0,5,0,0,1
-Bronze Spear,10,0,10,0,0,1
-Iron Spear,15,0,15,0,0,1
-Steel Spear,20,0,20,0,0,1
-Mithril Spear,25,0,25,0,0,1
-Soulcrust Spear,30,0,30,0,0,1
-Terracite Spear,35,0,35,0,0,1
-Gravemarrow Spear,45,0,40,0,0,1
-Voidmarrow Spear,55,0,45,0,0,1
-Black Stone Mace,5,3,2,0,0,1
-Bronze Mace,10,6,4,0,0,1
-Iron Mace,15,9,6,0,0,1
-Steel Mace,20,12,8,0,0,1
-Mithril Mace,25,15,10,0,0,1
-Soulcrust Mace,30,18,12,0,0,1
-Terracite Mace,35,21,14,0,0,1
-Gravemarrow Mace,45,24,16,0,0,1
-Voidmarrow Mace,55,27,18,0,0,1
-Black Stone Axe,5,5,0,0,0,1
-Bronze Axe,10,10,0,0,0,1
-Iron Axe,15,15,0,0,0,1
-Steel Axe,20,20,0,0,0,1
-Mithril Axe,25,25,0,0,0,1
-Soulcrust Axe,30,30,0,0,0,1
-Terracite Axe,35,35,0,0,0,1
-Gravemarrow Axe,45,40,0,0,0,1
-Voidmarrow Axe,55,45,0,0,0,1
-Black Stone Pickaxe,5,5,0,0,1,1
-Bronze Pickaxe,10,10,0,0,1,1
-Iron Pickaxe,15,15,0,0,1,1
-Steel Pickaxe,20,20,0,0,1,1
-Mithril Pickaxe,25,25,0,0,1,1
-Soulcrust Pickaxe,30,30,0,0,1,1
-Terracite Pickaxe,35,35,0,0,1,1
-Gravemarrow Pickaxe,45,40,0,0,1,1
-Voidmarrow Pickaxe,55,45,0,0,1,1
-Black Stone Bow,5,0,5,0,1,1
-Bronze Bow,10,0,10,0,1,1
-Iron Bow,15,0,15,0,1,1
-Steel Bow,20,0,20,0,1,1
-Mithril Bow,25,0,25,0,1,1
-Soulcrust Bow,30,0,30,0,1,1
-Terracite Bow,35,0,35,0,1,1
-Gravemarrow Bow,45,0,40,0,1,1
-Voidmarrow Bow,55,0,45,0,1,1
-Black Stone Staff,5,0,0,5,1,1
-Bronze Staff,10,0,0,10,1,1
-Iron Staff,15,0,0,15,1,1
-Steel Staff,20,0,0,20,1,1
-Mithril Staff,25,0,0,25,1,1
-Soulcrust Staff,30,0,0,30,1,1
-Terracite Staff,35,0,0,35,1,1
-Gravemarrow Staff,45,0,0,40,1,1
-Voidmarrow Staff,55,0,0,45,1,1
+name,max attack,min attack,scaling skill 1,skill 1 scale,scaling skill 2,skill 2 scale,strength requirement,dexterity requirement,intelligence requirement,two handed,main hand
+Black Stone Sword,5,1,STRENGTH,A,NULL,Z,5,0,0,0,1
+Bronze Sword,10,2,STRENGTH,A,NULL,Z,10,0,0,0,1
+Iron Sword,15,3,STRENGTH,A,NULL,Z,15,0,0,0,1
+Steel Sword,20,4,STRENGTH,A,NULL,Z,20,0,0,0,1
+Mithril Sword,25,5,STRENGTH,A,NULL,Z,25,0,0,0,1
+Soulcrust Sword,30,6,STRENGTH,A,NULL,Z,30,0,0,0,1
+Terracite Sword,35,7,STRENGTH,A,NULL,Z,35,0,0,0,1
+Gravemarrow Sword,45,9,STRENGTH,A,NULL,Z,40,5,5,0,1
+Voidmarrow Sword,55,11,STRENGTH,A,NULL,Z,45,0,0,0,1
+Black Stone Spear,5,1,DEXTERITY,A,NULL,Z,0,5,0,0,1
+Bronze Spear,10,2,DEXTERITY,A,NULL,Z,0,10,0,0,1
+Iron Spear,15,3,DEXTERITY,A,NULL,Z,0,15,0,0,1
+Steel Spear,20,4,DEXTERITY,A,NULL,Z,0,20,0,0,1
+Mithril Spear,25,5,DEXTERITY,A,NULL,Z,0,25,0,0,1
+Soulcrust Spear,30,6,DEXTERITY,A,NULL,Z,0,30,0,0,1
+Terracite Spear,35,7,DEXTERITY,A,NULL,Z,0,35,0,0,1
+Gravemarrow Spear,45,9,DEXTERITY,A,NULL,Z,0,40,0,0,1
+Voidmarrow Spear,55,11,DEXTERITY,A,NULL,Z,0,45,0,0,1
+Black Stone Mace,5,1,DEXTERITY,C,STRENGTH,C,3,2,0,0,1
+Bronze Mace,10,2,DEXTERITY,C,STRENGTH,C,6,4,0,0,1
+Iron Mace,15,3,DEXTERITY,C,STRENGTH,C,6,0,0,0,1
+Steel Mace,20,4,DEXTERITY,C,STRENGTH,C,12,8,0,0,1
+Mithril Mace,25,5,DEXTERITY,C,STRENGTH,C,15,10,0,0,1
+Soulcrust Mace,30,6,DEXTERITY,C,STRENGTH,C,18,12,0,0,1
+Terracite Mace,35,7,DEXTERITY,C,STRENGTH,C,21,14,0,0,1
+Gravemarrow Mace,45,9,DEXTERITY,C,STRENGTH,C,24,16,0,0,1
+Voidmarrow Mace,55,11,DEXTERITY,C,STRENGTH,C,27,18,0,0,1
+Black Stone Axe,5,1,STRENGTH,A,NULL,Z,5,0,0,0,1
+Bronze Axe,10,2,STRENGTH,A,NULL,Z,10,0,0,0,1
+Iron Axe,15,3,STRENGTH,A,NULL,Z,15,0,0,0,1
+Steel Axe,20,4,STRENGTH,A,NULL,Z,20,0,0,0,1
+Mithril Axe,25,5,STRENGTH,A,NULL,Z,25,0,0,0,1
+Soulcrust Axe,30,6,STRENGTH,A,NULL,Z,30,0,0,0,1
+Terracite Axe,35,7,STRENGTH,A,NULL,Z,35,0,0,0,1
+Gravemarrow Axe,45,9,STRENGTH,A,NULL,Z,40,0,0,0,1
+Voidmarrow Axe,55,11,STRENGTH,A,NULL,Z,45,0,0,0,1
+Black Stone Pickaxe,5,1,DEXTERITY,C,STRENGTH,B,5,0,0,1,1
+Bronze Pickaxe,10,2,DEXTERITY,C,STRENGTH,B,10,0,0,1,1
+Iron Pickaxe,15,3,DEXTERITY,C,STRENGTH,B,15,0,0,1,1
+Steel Pickaxe,20,4,DEXTERITY,C,STRENGTH,B,20,0,0,1,1
+Mithril Pickaxe,25,5,DEXTERITY,C,STRENGTH,B,25,0,0,1,1
+Soulcrust Pickaxe,30,6,DEXTERITY,C,STRENGTH,B,30,0,0,1,1
+Terracite Pickaxe,35,7,DEXTERITY,C,STRENGTH,B,35,0,0,1,1
+Gravemarrow Pickaxe,45,9,DEXTERITY,C,STRENGTH,B,40,0,0,1,1
+Voidmarrow Pickaxe,55,11,DEXTERITY,C,STRENGTH,B,45,0,0,1,1
+Black Stone Bow,5,1,DEXTERITY,A,NULL,Z,0,5,0,1,1
+Bronze Bow,10,2,DEXTERITY,A,NULL,Z,0,10,0,1,1
+Iron Bow,15,3,DEXTERITY,A,NULL,Z,0,15,0,1,1
+Steel Bow,20,4,DEXTERITY,A,NULL,Z,0,20,0,1,1
+Mithril Bow,25,5,DEXTERITY,A,NULL,Z,0,25,0,1,1
+Soulcrust Bow,30,6,DEXTERITY,A,NULL,Z,0,30,0,1,1
+Terracite Bow,35,7,DEXTERITY,A,NULL,Z,0,35,0,1,1
+Gravemarrow Bow,45,9,DEXTERITY,A,NULL,Z,0,40,0,1,1
+Voidmarrow Bow,55,11,DEXTERITY,A,NULL,Z,0,45,0,1,1
+Black Stone Staff,5,1,INTELLIGENCE,A,NULL,Z,0,0,5,1,1
+Bronze Staff,10,2,INTELLIGENCE,A,NULL,Z,0,0,10,1,1
+Iron Staff,15,3,INTELLIGENCE,A,NULL,Z,0,0,15,1,1
+Steel Staff,20,4,INTELLIGENCE,A,NULL,Z,0,0,20,1,1
+Mithril Staff,25,5,INTELLIGENCE,A,NULL,Z,0,0,25,1,1
+Soulcrust Staff,30,6,INTELLIGENCE,A,NULL,Z,0,0,30,1,1
+Terracite Staff,35,7,INTELLIGENCE,A,NULL,Z,0,0,35,1,1
+Gravemarrow Staff,45,9,INTELLIGENCE,A,NULL,Z,0,0,40,1,1
+Voidmarrow Staff,55,11,INTELLIGENCE,A,NULL,Z,0,0,45,1,1

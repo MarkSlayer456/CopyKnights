@@ -175,6 +175,19 @@
 #define CONSTITUTION_NAME					"Constitution"
 #define SPEED_NAME							"Speed"
 
+// weapon scaling grades
+#define GRADE_A_NAME						"A"
+#define GRADE_B_NAME						"B"
+#define GRADE_C_NAME						"C"
+#define GRADE_D_NAME						"D"
+#define GRADE_F_NAME						"F"
+#define GRADE_A_PERCENT						.80
+#define GRADE_B_PERCENT						.50
+#define GRADE_C_PERCENT						.40
+#define GRADE_D_PERCENT						.30
+#define GRADE_F_PERCENT						.20
+#define GRADE_Z_PERCENT						0.0
+
 // rarities
 #define RARITY_COMMON_NAME					"Common"
 #define RARITY_UNCOMMOM_NAME				"Uncommon"

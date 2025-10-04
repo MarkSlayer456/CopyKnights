@@ -242,6 +242,7 @@ room_t *load_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data, it
 	int template_count = 0;
 	if(x != 0 || y != 0) {
 		for(int i = 0; i < world->room_template_count; i++) {
+			//TODO biomes need to match as well
 			if(room->door_mask == world->room_templates[i].mask) {
 				strcpy(templates[template_count].filename, world->room_templates[i].filename);
 				templates[template_count].mask |= world->room_templates[i].mask;

@@ -6,7 +6,11 @@ item_ids_t item_get_id(const char *name);
 
 stats_t get_stat(const char *name);
 
+enum grade get_grade(const char *name);
+
 rarity_t get_rarity(const char *name);
+
+double get_percent_from_grade(enum grade g);
 
 // returns 1 on success and 0 on fail
 int use_item(player_t *player);
