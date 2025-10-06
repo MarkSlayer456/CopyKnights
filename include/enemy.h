@@ -18,11 +18,15 @@ enemy_type_t enemy_generate_type(unsigned int *seed, enemy_data_t *enemy_data, b
 
 void load_enemy_data(enemy_data_t *enemy_data);
 
+void load_enemy_drop_data(enemy_data_t *enemy_data);
+
 void load_biome_data(enemy_data_t *enemy_data);
 
 biome_t get_biome(const char *name);
 
 void enemy_kill(enemy_t *enemy, world_t *world, const player_t *player);
+
+void enemy_handle_death_drops(enemy_t *enemy, enemy_data_t *enemy_data, item_data_t *item_data, tile_t *tile);
 
 bool enemy_decrease_health(enemy_t *enemy, world_t *world, const player_t *player, int amount);
 

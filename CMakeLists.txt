@@ -9,14 +9,14 @@ file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/data
 
 add_executable(ck ${sources})
 
-target_compile_options(ck PUBLIC -Wall -g -Werror -std=c99 -pedantic)
+target_compile_options(ck PUBLIC -Wall -fsanitize=undefined -g -Werror -std=c99 -pedantic)
 target_include_directories(ck PUBLIC include/)
 file(COPY ${data} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/data)
 
 
 find_package(Curses REQUIRED)
 target_include_directories(ck PUBLIC ${Curses_INCLUDE_DIR})
-target_link_libraries(ck PUBLIC m ncurses ${Curses_LIBRARIES})
+target_link_libraries(ck PUBLIC m ncurses ${Curses_LIBRARIES} ubsan)
 
 add_custom_target(run
     COMMAND valgrind --track-origins=yes --leak-check=full --log-file=log ./ck

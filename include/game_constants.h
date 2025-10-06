@@ -142,6 +142,8 @@
 #define CHICKEN_DINNER_NAME			"Chicken Dinner"
 #define CHICKEN_DINNER_HEAL_AMOUNT	500
 
+#define OIL_NAME							"Oil"
+
 #define PLAYER_MIN_VISION_RANGE				2
 
 // heavy armor

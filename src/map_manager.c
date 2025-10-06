@@ -128,7 +128,6 @@ void calculate_door_masks(world_t *world) {
 		
 		snprintf(file, 96, "./data/rooms/%s/room%d.ck.txt", folder, room_num);
 		
-		DEBUG_LOG("biome %d: %s", i, folder);
 		world->room_templates[world->room_template_count].biome = get_biome(folder);
 		
 		int fd = open(file, O_RDONLY);

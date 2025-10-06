@@ -11,6 +11,7 @@
 #include <assert.h>
 #include "types.h"
 #include "functions.h"
+#include "items/items.h"
 
 extern char walk_chars[WALK_CHAR_LENGTH];
 enemy_type_map_t biome_type_map[] = {
@@ -222,6 +223,7 @@ void load_enemy_data(enemy_data_t *enemy_data) {
         int col = 0;
         char *token = strtok(line, ",");
         while(token) {
+            enemy_data[row].drop_table.drops = NULL;
             switch(col) {
                 case 0:
                     enemy_data[row].type = enemy_get_type(token);
@@ -267,9 +269,65 @@ void load_enemy_data(enemy_data_t *enemy_data) {
     
 }
 
+void load_enemy_drop_data(enemy_data_t *enemy_data) {
+    FILE *fp = fopen("./data/enemy_drops.csv", "r");
+    if(!fp) {
+        perror("enemy_drops.csv File open failed");
+        return;
+    }
+    
+    char line[2048];
+    
+    if(fgets(line, sizeof(line), fp) == NULL) {
+        fclose(fp);
+        return;
+    }
+    
+    while(fgets(line, sizeof(line), fp)) {
+        line[strcspn(line, "\n")] = '\0';
+        char *enemy_name = strtok(line, ",");
+        char *item_name = strtok(NULL, ",");
+        char *drop_chance_str = strtok(NULL, ",");
+        char *min_quantity_str = strtok(NULL, ",");
+        char *max_quantity_str = strtok(NULL, ",");
+        
+        if(!enemy_name || !item_name || !drop_chance_str || !min_quantity_str || !max_quantity_str) {
+            continue;
+        }
+        
+        DEBUG_LOG("drop for: %s, %s", enemy_name, item_name);
+        
+        enemy_type_t enemy_type = enemy_get_type(enemy_name);
+        item_ids_t item_id = item_get_id(item_name);
+        float drop_chance = atof(drop_chance_str);
+        int min_quantity = atoi(min_quantity_str);
+        int max_quantity = atoi(max_quantity_str);
+        
+        DEBUG_LOG("DROPS DATA: %d %d", enemy_type, item_id);
+        
+        int i = 0;
+        while(i < MAX_ENEMIES) {
+            if(enemy_type != enemy_data[i].type) {
+                i++;
+                continue;
+            }
+            
+            int drop_count = enemy_data[i].drop_table.drop_count;
+            enemy_data[i].drop_table.drops = realloc(enemy_data[i].drop_table.drops, sizeof(item_drop_t) * (drop_count+1));
+            enemy_data[i].drop_table.drops[drop_count].id = item_id;
+            enemy_data[i].drop_table.drops[drop_count].drop_chance = drop_chance;
+            enemy_data[i].drop_table.drops[drop_count].min_quantity = min_quantity;
+            enemy_data[i].drop_table.drops[drop_count].max_quantity = max_quantity;
+            enemy_data[i].drop_table.drop_count++;
+            break;
+        }
+    }
+}
+
 void enemy_kill(enemy_t *enemy, world_t *world, const player_t *player) 
 {
     room_t *room = world->room[player->global_x][player->global_y];
+    enemy_handle_death_drops(enemy, world->enemy_data, world->item_data, room->tiles[enemy->y][enemy->x]);
 	for(int i = 0; i < MAX_ENEMIES_PER_LEVEL; i++) {
 		if(enemy && enemy == room->enemies[i]) {
             enemy_t *tmp = room->enemies[i];
@@ -283,6 +341,21 @@ void enemy_kill(enemy_t *enemy, world_t *world, const player_t *player)
 		}
 	}
 }
+
+void enemy_handle_death_drops(enemy_t *enemy, enemy_data_t *enemy_data, item_data_t *item_data, tile_t *tile) {
+    for(int i = 0; i < MAX_ENEMIES; i++) {
+        if(enemy_data[i].type == enemy->type) {
+            int drop_count = enemy_data[i].drop_table.drop_count;
+            if(drop_count == 0) return;
+            int index = rand() % drop_count;
+            item_drop_t *drop = enemy_data[i].drop_table.drops;
+            int quantity = (rand() % (drop[index].max_quantity - drop[index].min_quantity + 1)) + drop[index].min_quantity;
+            drop_item(tile, item_data, drop[index].id, quantity);
+            break;
+        }
+    }
+}
+
 /*
  * returns true on kill returns false otherwise
  */

@@ -63,6 +63,7 @@ type_map_t item_type_map[] = {
     {HEALTH_POTION_NAME, HEALTH_POTION},
     {APPLE_NAME, APPLE},
     {CHICKEN_DINNER_NAME, CHICKEN_DINNER},
+    {OIL_NAME, OIL},
     
     {BLACKSTONE_ARMOR_NAME, BLACKSTONE_ARMOR},
     {BRONZE_ARMOR_NAME, BRONZE_ARMOR},
@@ -462,3 +463,37 @@ item_ids_t item_generate_type(unsigned int *seed, item_data_t *item_data, biome_
     return items[random_number];
 }
 
+void drop_item(tile_t *tile, item_data_t *item_data, item_ids_t item_id, int quantity) {
+    if(tile->item_count > MAX_ITEMS_PER_TILE) {
+        // TODO move to adjacent tile or something
+    }
+    item_t *item = tile->items[tile->item_count++];
+    for(int i = 0; i < MAX_ITEMS; i++) {
+        if(!item) continue;
+        if(item_data[i].id == BLANK) continue;
+        if(item_data[i].id == item_id) {
+            strcpy(item->name, item_data[i].name);
+            strcpy(item->desc, item_data[i].desc);
+            item->id = item_id;
+            item->stack = 1;
+            item->value_type = item_data[i].value_type;
+            switch(item_data[i].value_type) {
+                case VALUE_TYPE_NONE:
+                    break;
+                case VALUE_TYPE_ARMOR:
+                    item->stat_type.armor = item_data[i].stat_type.armor;
+                    break;
+                case VALUE_TYPE_WEAPON:
+                    item->stat_type.weapon = item_data[i].stat_type.weapon;
+                    break;
+                case VALUE_TYPE_FOOD:
+                    item->stat_type.food = item_data[i].stat_type.food;
+                    break;
+                case VALUE_TYPE_SCROLL:
+                    item->stat_type.scroll = item_data[i].stat_type.scroll;
+                    break;
+            }
+            break; 
+        }
+    }
+}

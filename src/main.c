@@ -97,6 +97,7 @@ int main(int argc, char *argv[]) {
 	world->room_template_count = 0;
 	
 	load_enemy_data(world->enemy_data);
+	load_enemy_drop_data(world->enemy_data);
 	load_class_data(world->class_data);
 	load_armor_data(world);
 	load_weapon_data(world);

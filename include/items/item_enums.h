@@ -26,12 +26,16 @@ typedef enum armor_type {
 
 // names should be limited to 32 characters
 typedef enum item_ids {
+	
 	// items
 	BLANK,
 	TELEPORT_SCROLL,
 	HEALTH_POTION,
 	APPLE,
 	CHICKEN_DINNER,
+	
+	// oil
+	OIL,
 	
 	// heavy armors
 	BLACKSTONE_ARMOR,

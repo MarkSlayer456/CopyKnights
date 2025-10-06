@@ -2,6 +2,18 @@
 
 #define CHARACTER_TYPES_H_
 
+typedef struct {
+	item_ids_t id;
+	float drop_chance;
+	int min_quantity;
+	int max_quantity;
+} item_drop_t;
+
+typedef struct {
+	item_drop_t *drops;
+	int drop_count;
+} drop_table_t;
+
 typedef struct location {
 	int x;
 	int y;
@@ -119,6 +131,7 @@ typedef struct enemy_data {
 	bool can_spawn[NUMBER_OF_BIOMES];
 	int highest_level[NUMBER_OF_BIOMES];
 	int lowest_level[NUMBER_OF_BIOMES];
+	drop_table_t drop_table;
 } enemy_data_t;
 
 typedef struct enemy_type_map {
