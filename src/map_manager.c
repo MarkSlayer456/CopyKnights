@@ -381,3 +381,25 @@ void load_item_from_data(item_t *item, item_data_t *item_data) {
 		}
 	}
 }
+
+void remove_item_from_tile(tile_t *tile, item_t *item) {
+	bool found = false;
+	item_t *tmp = NULL;
+	for(int i = 0; i < tile->item_count; i++) {
+		if(tile->items[i] == item) {
+			found = true;
+			memset(tile->items[i], 0, sizeof(item_t));
+			tmp = tile->items[i];
+		}
+		if(found && i < tile->item_count - 1) {
+			tile->items[i] = tile->items[i+1];
+		}
+	}
+	if(found) {
+		memset(tmp, 0, sizeof(item_t));
+		tile->item_count--;
+		tile->items[tile->item_count] = tmp;
+		
+		
+	}
+}

@@ -32,6 +32,7 @@ typedef enum item_ids {
 	TELEPORT_SCROLL,
 	HEALTH_POTION,
 	APPLE,
+	ROTTEN_APPLE,
 	CHICKEN_DINNER,
 	
 	// oil

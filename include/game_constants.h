@@ -141,6 +141,7 @@
 #define APPLE_HEAL_AMOUNT			5
 #define CHICKEN_DINNER_NAME			"Chicken Dinner"
 #define CHICKEN_DINNER_HEAL_AMOUNT	500
+#define ROTTEN_APPLE_NAME 					"Rotten Apple"
 
 #define OIL_NAME							"Oil"
 

@@ -303,7 +303,7 @@ void load_enemy_drop_data(enemy_data_t *enemy_data) {
         int min_quantity = atoi(min_quantity_str);
         int max_quantity = atoi(max_quantity_str);
         
-        DEBUG_LOG("DROPS DATA: %d %d", enemy_type, item_id);
+        DEBUG_LOG("DROPS DATA: %d %d %f", enemy_type, item_id, drop_chance);
         
         int i = 0;
         while(i < MAX_ENEMIES) {
@@ -346,11 +346,18 @@ void enemy_handle_death_drops(enemy_t *enemy, enemy_data_t *enemy_data, item_dat
     for(int i = 0; i < MAX_ENEMIES; i++) {
         if(enemy_data[i].type == enemy->type) {
             int drop_count = enemy_data[i].drop_table.drop_count;
-            if(drop_count == 0) return;
-            int index = rand() % drop_count;
             item_drop_t *drop = enemy_data[i].drop_table.drops;
-            int quantity = (rand() % (drop[index].max_quantity - drop[index].min_quantity + 1)) + drop[index].min_quantity;
-            drop_item(tile, item_data, drop[index].id, quantity);
+            if(drop_count == 0) return;
+            // int index = rand() % drop_count;
+            for(int index = 0; index < drop_count; index++) {
+                float chance = (float) rand() / (float) RAND_MAX;
+                DEBUG_LOG("drop chance: %f", drop[index].drop_chance);
+                DEBUG_LOG("chance roll: %f", chance);
+                if(drop[index].drop_chance >= chance) {
+                    int quantity = (rand() % (drop[index].max_quantity - drop[index].min_quantity + 1)) + drop[index].min_quantity;
+                    drop_item(tile, item_data, drop[index].id, quantity);
+                }
+            }
             break;
         }
     }

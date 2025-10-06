@@ -19,6 +19,7 @@
 #include "items/armor.h"
 #include "items/weapons.h"
 #include "items/foods.h"
+#include "items/misc.h"
 #include "save.h"
 
 /*
@@ -102,6 +103,7 @@ int main(int argc, char *argv[]) {
 	load_armor_data(world);
 	load_weapon_data(world);
 	load_foods_data(world);
+	load_misc_data(world);
 	
 	player_t *player = calloc(1, sizeof(player_t));
 	

@@ -62,6 +62,7 @@ type_map_t item_type_map[] = {
     
     {HEALTH_POTION_NAME, HEALTH_POTION},
     {APPLE_NAME, APPLE},
+    {ROTTEN_APPLE_NAME, ROTTEN_APPLE},
     {CHICKEN_DINNER_NAME, CHICKEN_DINNER},
     {OIL_NAME, OIL},
     
@@ -162,7 +163,7 @@ const int item_type_map_len = sizeof(item_type_map) / sizeof(item_type_map[0]);
 
 item_ids_t item_get_id(const char *name) {
 	for(int i = 0; i < item_type_map_len; i++) {
-		if(strcmp(name, item_type_map[i].name) == 0) {
+		if(strcasecmp(name, item_type_map[i].name) == 0) {
 			return item_type_map[i].value;
 		}
 	}
@@ -226,8 +227,10 @@ int use_item(player_t *player)
             success = handle_weapon_change(player, &player->inventory[player->inventory_manager.inv_selector]);
         } else if(player->inventory[player->inventory_manager.inv_selector].value_type == VALUE_TYPE_FOOD) {
             //TODO effects with durations
+            remove_item(player);
             player_increase_health(player, player->inventory[player->inventory_manager.inv_selector].stat_type.food.heal_amount);
             player_increase_mana(player, player->inventory[player->inventory_manager.inv_selector].stat_type.food.mana_heal_amount);
+            
             success = 1;
         } else {
             switch(player->inventory[player->inventory_manager.inv_selector].id) {
@@ -414,7 +417,7 @@ int use_chicken_dinner(player_t *player)
 
 void remove_item(player_t *player)
 {
-	player->inventory[player->inventory_manager.inv_selector].stack -= 1;
+	player->inventory[player->inventory_manager.inv_selector].stack--;
 	if(player->inventory[player->inventory_manager.inv_selector].stack <= 0) {
 		player_organize_inv(player, player->inventory_manager.inv_selector);
 	}
@@ -464,8 +467,9 @@ item_ids_t item_generate_type(unsigned int *seed, item_data_t *item_data, biome_
 }
 
 void drop_item(tile_t *tile, item_data_t *item_data, item_ids_t item_id, int quantity) {
-    if(tile->item_count > MAX_ITEMS_PER_TILE) {
+    if(tile->item_count >= MAX_ITEMS_PER_TILE) {
         // TODO move to adjacent tile or something
+        return;
     }
     item_t *item = tile->items[tile->item_count++];
     for(int i = 0; i < MAX_ITEMS; i++) {
@@ -475,7 +479,7 @@ void drop_item(tile_t *tile, item_data_t *item_data, item_ids_t item_id, int qua
             strcpy(item->name, item_data[i].name);
             strcpy(item->desc, item_data[i].desc);
             item->id = item_id;
-            item->stack = 1;
+            item->stack = quantity;
             item->value_type = item_data[i].value_type;
             switch(item_data[i].value_type) {
                 case VALUE_TYPE_NONE:

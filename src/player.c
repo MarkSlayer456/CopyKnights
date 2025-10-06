@@ -453,6 +453,10 @@ void player_close_inventory(player_t *player) {
 }
 
 bool player_add_to_inv(player_t *player, item_t item) {
+	if(item.id == OIL) {
+		player->oil += item.stack;
+		return true;
+	}
 	if(player->inventory_count < INV_SIZE) {
 		player->inventory[player->inventory_count++] = item;
 		return true;
@@ -468,27 +472,32 @@ void player_take_loot_item(room_t *room, player_t *player) {
 	int end_y = player->y + 1;
 	int end_x = player->x + 1;
 	
-	if (start_y < 0) start_y = 0;
-	if (start_x < 0) start_x = 0;
-	if (end_y >= ROOM_HEIGHT) end_y = ROOM_HEIGHT - 1;
-	if (end_x >= ROOM_WIDTH) end_x = ROOM_WIDTH - 1;
+	if(start_y < 0) start_y = 0;
+	if(start_x < 0) start_x = 0;
+	if(end_y >= ROOM_HEIGHT) end_y = ROOM_HEIGHT - 1;
+	if(end_x >= ROOM_WIDTH) end_x = ROOM_WIDTH - 1;
 	
 	bool found = false;
 	for(int y = start_y; y <= end_y; y++) {
 		for(int x = start_x; x <= end_x; x++) {
 			for(int i = 0; i < room->tiles[y][x]->item_count; i++) {
 				item_t *item = room->tiles[y][x]->items[i];
+				DEBUG_LOG("searching for item index: %d", i);
+				DEBUG_LOG("selected_item: %p, %d ",(void *)selected_item, selected_item->id);
+				DEBUG_LOG("item: %p, %d", (void *)item, item->id);
 				if(item == selected_item) {
-					found = true;
-					memset(item, 0, sizeof(item_t));
-					item = NULL;
-					room->tiles[y][x]->item_count--;
-					if(player->inventory_manager.loot_selector > 0) {
-						player->inventory_manager.loot_selector--;
-					}
+					remove_item_from_tile(room->tiles[y][x], item);
+					// DEBUG_LOG("%s", "item found!");
+					// found = true;
+					// memset(item, 0, sizeof(item_t));
+					// room->tiles[y][x]->item_count--;
+					// if(player->inventory_manager.loot_selector > 0) {
+					// 	player->inventory_manager.loot_selector--;
+					// }
 					break;
 				}
 			}
+			if(found) break;
 		}
 		if(found) break;
 	}
@@ -499,16 +508,15 @@ void player_take_loot_item(room_t *room, player_t *player) {
 
 void player_get_nearby_loot(room_t *room, player_t *player) {
 	player_clear_nearby_loot(player);
-	player->nearby_loot_count = 0;
 	int start_y = player->y - 1;
 	int start_x = player->x - 1;
 	int end_y = player->y + 1;
 	int end_x = player->x + 1;
 	
-	if (start_y < 0) start_y = 0;
-	if (start_x < 0) start_x = 0;
-	if (end_y >= ROOM_HEIGHT) end_y = ROOM_HEIGHT - 1;
-	if (end_x >= ROOM_WIDTH) end_x = ROOM_WIDTH - 1;
+	if(start_y < 0) start_y = 0;
+	if(start_x < 0) start_x = 0;
+	if(end_y >= ROOM_HEIGHT) end_y = ROOM_HEIGHT - 1;
+	if(end_x >= ROOM_WIDTH) end_x = ROOM_WIDTH - 1;
 	
 	for(int y = start_y; y <= end_y; y++) {
 		for(int x = start_x; x <= end_x; x++) {
@@ -522,8 +530,10 @@ void player_get_nearby_loot(room_t *room, player_t *player) {
 }
 
 void player_clear_nearby_loot(player_t *player) {
+	for(int i = 0; i < player->nearby_loot_count; i++) {
+		player->nearby_loot[i] = NULL;
+	}
 	player->nearby_loot_count = 0;
-	player->nearby_loot[0] = NULL;
 }
 
 // removes an item from the inventory list and reorganizes, not used to decrease item count
@@ -534,12 +544,8 @@ void player_organize_inv(player_t *player, int loc)
 	}
 	item_t blank = {BLANK_NAME, "does nothing", BLANK, 0};
 	player->inventory[INV_SIZE-1] = blank;
+	player->inventory_count--;
 	while(player->inventory[player->inventory_manager.inv_selector].id == BLANK && player->inventory_manager.inv_selector > 0) {
 		player_cycle_inv_selector_up(player);
 	}
 }
-
-
-
-
-

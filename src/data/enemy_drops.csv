@@ -1,0 +1,4 @@
+enemy type,item type,drop chance,minimum quantity,maximum quantity
+BAT,Apple,.1,1,1
+BAT,Rotten Apple,.3,1,1
+BAT,Oil,.2,1,3
