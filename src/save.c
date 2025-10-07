@@ -20,7 +20,7 @@ const char *get_save_path() {
 	return path;
 	#else
 	static char path[512];
-	snprintf(path, sizeof(path), "%s/.CopyKnights/save.bin", getenv("HOME"));
+	snprintf(path, sizeof(path), "%s/.CopyKnights/", getenv("HOME"));
 	return path;
 	#endif
 }
@@ -44,21 +44,29 @@ void ensure_save_folder() {
 }
 
 void save_game(world_t *world, player_t *player, char *name) {
-	FILE *file = fopen(get_save_path(), "wb");
-	if(!file) return;
+	char path[512];
+	snprintf(path, sizeof(path), "%s%s", get_save_path(), name);
+	FILE *file = fopen(path, "wb");
+	if(!file) {
+		DEBUG_LOG("saving error: failed reading file: %s", path);
+	}
 	save_world(world, file);
 	save_player(player, file);
 	fclose(file);
-	DEBUG_LOG("%s", "game saved");
+	DEBUG_LOG("game saved: %s", path);
 }
 
 void load_game(world_t *world, player_t *player, char *name) {
-	FILE *file = fopen(get_save_path(), "rb");
-	if(!file) return;
+	char path[512];
+	snprintf(path, sizeof(path), "%s%s", get_save_path(), name);
+	FILE *file = fopen(path, "rb");
+	if(!file) {
+		DEBUG_LOG("loading error: failed reading file: %s", path);
+	}
 	load_world(world, file);
 	load_player(player, file, world->item_data);
 	fclose(file);
-	DEBUG_LOG("%s", "game loaded");
+	DEBUG_LOG("game loaded: %s", path);
 }
 
 void save_player(player_t *player, FILE *file) {

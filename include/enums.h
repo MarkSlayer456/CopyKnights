@@ -14,6 +14,7 @@ enum menu {
 	NULL_MENU = -1,
 	MAIN_MENU,
 	LOAD_MENU,
+	SAVE_MENU,
 	LOG_BOOK_MENU,
 	GAME
 };

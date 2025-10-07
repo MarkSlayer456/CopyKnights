@@ -53,6 +53,15 @@ int main(int argc, char *argv[]) {
     
 	menu_manager_t menu_manager = {.current_menu = MAIN_MENU, .cursor_pos = 0};
 	
+	load_menu_t load_menu;
+	load_menu.win = newwin(SCREEN_HEIGHT, SCREEN_WIDTH, 0, 0);
+	load_menu.filename_count = 0;
+	load_menu.filename_size = 16;
+	load_menu.cursor_pos = 0;
+	load_menu.filename = calloc(load_menu.filename_size, sizeof(char[SAVE_FILE_MAX_LEN]));
+
+	generate_load_menu_list(&load_menu);
+	
     refresh();
     wrefresh(hud);
     wrefresh(error);
@@ -72,6 +81,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	world_t *world = malloc(sizeof(world_t));
+	world->is_player_turn = false;
 	world->enemy_data = calloc(MAX_ENEMIES, sizeof(enemy_data_t));
 	for(int row = 0; row < MAX_ENEMIES; row++) {
 		for(int i = 0; i < NUMBER_OF_BIOMES; i++) {
@@ -218,7 +228,7 @@ int main(int argc, char *argv[]) {
 	world->win = win;
     world->turn_order_size = 0;
 	
-	load_game(world, player, "");
+	// load_game(world, player, "save.bin");
 	
 	// TODO for testing only
 	// save_player(player, "");
@@ -235,16 +245,18 @@ int main(int argc, char *argv[]) {
 				generate_turn_order_display(world, player);
 				draw(world, player);
 				player_get_nearby_loot(world->room[player->global_x][player->global_y], player);
-				
-				int actor = pick_next_actor(world, player);
-				assert(actor != INVALID_ACTOR_INDEX);
-				if(actor == PLAYER_TURN_ORDER_INDEX) {
+				int actor = INVALID_ACTOR_INDEX;
+				if(!world->is_player_turn) {
+					actor = pick_next_actor(world, player);
+					assert(actor != INVALID_ACTOR_INDEX);
+				}
+				if(world->is_player_turn || actor == PLAYER_TURN_ORDER_INDEX) {
 					lantern_update_dimming(&player->lantern);
 					bool run = false;
 					char c;
 					while(run == false) {
 						c = getch();
-						run = manage_input(c, world, player);
+						run = manage_input(c, world, player, &menu_manager);
 						draw(world, player);
 					}
 				} else if(actor >= 0) {
@@ -258,13 +270,24 @@ int main(int argc, char *argv[]) {
 				draw_main_menu(main_menu, &menu_manager);
 				char c = getch();
 				manage_menu_input(c, &menu_manager, world);
+				break;
 			}
+			case LOAD_MENU: {
+				draw_load_menu(&load_menu);
+				char c = getch();
+				manage_load_menu_input(c, &load_menu, world, player, &menu_manager);
 				break;
-			case LOAD_MENU:
+			}
+			case SAVE_MENU: {
+				char buf[SAVE_FILE_MAX_LEN];
+				display_and_manage_save_menu(main_menu, buf, SAVE_FILE_MAX_LEN, world, player, &menu_manager);
 				break;
+			}
 			case LOG_BOOK_MENU:
 				break;
 			case NULL_MENU:
+				menu_manager.current_menu = MAIN_MENU;
+				DEBUG_LOG("%s", "WARNING: NULL_MENU WAS SET, RESETTING TO MAIN_MENU");
 				break;
 		}
     }

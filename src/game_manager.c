@@ -9,6 +9,8 @@
 #include <ncurses.h>
 #include <stdlib.h>
 #include <string.h>
+#include <dirent.h>
+#include <ctype.h>
 #include "types.h"
 #include "lantern.h"
 #include "save.h"
@@ -83,7 +85,7 @@ void draw(world_t *world, player_t *player) {
 }
 
 // TODO change this function it's not written well
-bool manage_input(char c, world_t *world, player_t *player) {
+bool manage_input(char c, world_t *world, player_t *player, menu_manager_t *menu_manager) {
 	room_t *room = world->room[player->global_x][player->global_y];
 	if (c == ERR) {
 		return true;
@@ -117,8 +119,10 @@ bool manage_input(char c, world_t *world, player_t *player) {
 				player_enter_attack_state(player, world);
 				return false;
 			case CTRL_S:
-				save_game(world, player, "");
-				return false;
+				menu_manager->current_menu = SAVE_MENU;
+				world->is_player_turn = true;
+				// save_game(world, player, "save.bin");
+				return true;
 			case KEY_F_MINE:
 				if(lantern_increase_power(&player->lantern, &player->oil) == false) {
 					display_world_message(world, player, LANTERN_CAN_AFFORD_REFUEL);
@@ -129,10 +133,12 @@ bool manage_input(char c, world_t *world, player_t *player) {
 				break;
 			case KEY_I:
 				player_open_inventory(player);
+				return false;
 				break;
 			default:
 				break;
-		}	
+		}
+		world->is_player_turn = false;
 		return true;
 	} else if(player->state == PLAYER_STATE_INVENTORY) {
 		switch(x) {
@@ -150,11 +156,11 @@ bool manage_input(char c, world_t *world, player_t *player) {
 				break;
 			case ENTER_KEY:
 				use_item(player);
-				break;
+				return true;
 			case KEY_I:
 				//TODO reset defaults
 				player_close_inventory(player);
-				break;
+				return false;
 			case KEY_B:
 				//TODO reset defaults
 				player_close_inventory(player);
@@ -162,6 +168,7 @@ bool manage_input(char c, world_t *world, player_t *player) {
 			default:
 				break;
 		}
+		world->is_player_turn = false;
 		// hud_update_action_bar(player, world->room[player->global_x][player->global_y]);
 		return false;
 	} else if(player->state == PLAYER_STATE_LOOTING) { 
@@ -312,6 +319,10 @@ void calculate_light(world_t *world, player_t *player) {
 	}
 }
 
+void remove_points_from_actor() {	
+	
+}
+
 int pick_next_actor(world_t *world, player_t *player) {
 	int idx = INVALID_ACTOR_INDEX;
 	int fastest = 0;
@@ -440,8 +451,86 @@ void draw_main_menu(WINDOW *main_menu, menu_manager_t *menu_manager) {
 	doupdate();
 }
 
+void generate_load_menu_list(load_menu_t *load_menu) {
+	DIR *dir = opendir(get_save_path());
+	
+	if(!dir) {
+		perror("opendir failed");
+		return;
+	}
+	struct dirent *entry;
+	while((entry = readdir(dir)) != NULL) {
+		if(strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+			continue;
+		}
+		if(load_menu->filename_count >= load_menu->filename_size) {
+			load_menu->filename_count *= 2;
+			load_menu->filename = realloc(load_menu->filename, load_menu->filename_count * sizeof(char[SAVE_FILE_MAX_LEN]));
+		}
+		strcpy(load_menu->filename[load_menu->filename_count], entry->d_name);
+		load_menu->filename_count++;
+	}
+}
+
+void draw_load_menu(const load_menu_t *load_menu) {
+	werase(load_menu->win);
+	char display_str[256];
+	for(int i = 0; i < load_menu->filename_count; i++) {
+		wmove(load_menu->win, i, 0);
+		if(i == load_menu->cursor_pos) {
+			snprintf(display_str, sizeof(display_str), ">>%s", load_menu->filename[i]);
+		} else {
+			snprintf(display_str, sizeof(display_str), "%s", load_menu->filename[i]);
+		}
+		waddstr(load_menu->win, display_str);
+	}
+	wnoutrefresh(load_menu->win);
+	doupdate();
+}
+
+void manage_load_menu_input(char c, load_menu_t *load_menu, world_t *world, player_t *player, menu_manager_t *menu_manager) {
+	if(c == ERR) {
+		return;
+	}
+	int x = c;
+	if(c == 27) {
+		c = getch();
+		if(c == 91) { // is not a ctrl arrow key
+			c = getch();	
+			x = ARROW_KEY_MOD + c;
+		}
+	}
+	switch(x) {
+		case LEFT_ARROW:
+			break;
+		case RIGHT_ARROW:
+			break;
+		case UP_ARROW:
+			if(load_menu->cursor_pos - 1 < 0) { 
+				load_menu->cursor_pos = load_menu->filename_count-1;
+			} else {
+				load_menu->cursor_pos--;
+			}
+			break;
+		case DOWN_ARROW:
+			if(load_menu->cursor_pos + 1 < load_menu->filename_count) { 
+				load_menu->cursor_pos++;
+			} else {
+				load_menu->cursor_pos = 0;
+			}
+			break;
+		case CTRL_Q:
+			shutdown(world);
+			break;
+		case ENTER_KEY:
+			load_game(world, player, load_menu->filename[load_menu->cursor_pos]);
+			menu_manager->current_menu = GAME;
+			break;
+	}
+}
+
 void manage_menu_input(char c, menu_manager_t *menu_manager, world_t *world) {
-	if (c == ERR) {
+	if(c == ERR) {
 		return;
 	}
 	int x = c;
@@ -478,8 +567,40 @@ void manage_menu_input(char c, menu_manager_t *menu_manager, world_t *world) {
 			// TODO probablly want a switch statement here
 			if(menu_manager->dests[menu_manager->cursor_pos] == GAME) {
 				menu_manager->current_menu = GAME;
+			} else if(menu_manager->dests[menu_manager->cursor_pos] == LOAD_MENU) {
+				menu_manager->current_menu = LOAD_MENU;
 			}
 			break;
+	}
+}
+
+void display_and_manage_save_menu(WINDOW *win, char *buf, int max_len, world_t *world, player_t *player, menu_manager_t *menu_manager) {
+	werase(win);
+	memset(buf, 0, max_len);
+	int ch;
+	int len = 0;
+	int y = 1;
+	int x = 0;
+	waddstr(win, SAVE_MENU_PROMPT);
+	wmove(win, y, x);
+	touchwin(win);
+	wrefresh(win);
+	while((ch = wgetch(win)) != ESC_KEY) {
+		if(isprint(ch) && len < max_len-1) {
+			buf[len++] = ch;
+			mvwaddch(win, y, x + len - 1, ch);
+		} else if(ch == KEY_BACKSPACE || ch == 127 || ch == '\b') {
+			len--;
+			buf[len] = '\0';
+			mvwaddch(win, y, x + len, ' ');
+			wmove(win, y, x + len);
+		} else if(ch == ENTER_KEY) {
+			save_game(world, player, buf);
+			menu_manager->current_menu = GAME;
+			break;
+		}
+		wnoutrefresh(win);
+		doupdate();
 	}
 }
 

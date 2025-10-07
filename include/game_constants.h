@@ -26,6 +26,8 @@
 #define DOOR_BLOCKED_MESSAGE					"This door won't seem to budge!"
 #define ATTACK_DIRECTION_MESSAGE				"choose a direction to attack!"
 
+#define SAVE_MENU_PROMPT						"Name your save file (press enter to confirm or esc to cancel):"
+
 #define ARROW_KEY_MOD							1000
 #define DOWN_ARROW								ARROW_KEY_MOD + 66
 #define UP_ARROW								ARROW_KEY_MOD + 65
@@ -297,7 +299,9 @@
 
 #define STARTING_OIL					100
 
-#define MAX_MENUS					16
+#define MAX_MENUS						16
+
+#define SAVE_FILE_MAX_LEN				64
 
 #define HUD_WIDTH					59
 #define HUD_HEIGHT					24

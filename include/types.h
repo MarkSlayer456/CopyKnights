@@ -35,12 +35,22 @@ typedef struct world {
 	int *turn_order; // -1 for player, index for enemies
 	int room_template_count;
 	room_template_t room_templates[128];
+	bool is_player_turn; // this is used to save the player's turn, mostly for the save funcationality to work
 } world_t;
 
+//TODO I want to redo this
 typedef struct {
 	enum menu current_menu;
 	int cursor_pos;
 	enum menu dests[MAX_MENUS]; // where each button takes the user
 	int dests_count;
 } menu_manager_t;
+
+typedef struct {
+	WINDOW *win;
+	char (*filename)[SAVE_FILE_MAX_LEN];
+	uint8_t filename_count; // how many save files
+	uint8_t filename_size; // current size of filename
+	uint8_t cursor_pos;
+} load_menu_t;
 #endif

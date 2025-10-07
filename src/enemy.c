@@ -351,8 +351,6 @@ void enemy_handle_death_drops(enemy_t *enemy, enemy_data_t *enemy_data, item_dat
             // int index = rand() % drop_count;
             for(int index = 0; index < drop_count; index++) {
                 float chance = (float) rand() / (float) RAND_MAX;
-                DEBUG_LOG("drop chance: %f", drop[index].drop_chance);
-                DEBUG_LOG("chance roll: %f", chance);
                 if(drop[index].drop_chance >= chance) {
                     int quantity = (rand() % (drop[index].max_quantity - drop[index].min_quantity + 1)) + drop[index].min_quantity;
                     drop_item(tile, item_data, drop[index].id, quantity);
