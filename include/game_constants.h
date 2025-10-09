@@ -294,6 +294,7 @@
 #define BASE_INTELLIGENCE				10
 #define BASE_CONSTITUTION				10
 #define BASE_SPEED						10
+#define BASE_CRIT_CHANCE				.05
 
 #define MAX_CLASSES						32
 

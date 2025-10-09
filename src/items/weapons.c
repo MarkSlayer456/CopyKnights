@@ -144,9 +144,12 @@ void load_weapon_data(world_t *world) {
 					stat2_grade = token[0];
 					break;
 				case 7:
-					item_data[world->item_data_count].stat_type.weapon.two_handed = atoi(token);
+					item_data[world->item_data_count].stat_type.weapon.crit_chance = atof(token);
 					break;
 				case 8:
+					item_data[world->item_data_count].stat_type.weapon.two_handed = atoi(token);
+					break;
+				case 9:
 					item_data[world->item_data_count].stat_type.weapon.main_hand = atoi(token);
 					break;
 			}

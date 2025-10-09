@@ -236,6 +236,30 @@ enemy_t *player_get_dir_enemy(player_t *player, world_t *world, direction_t dir)
     return NULL;
 }
 
+double get_weapon_stat_scaling_factor(player_t *player, stats_t stat, double required_stat) {
+	double scaling_factor = 0.0f;
+	switch(stat) {
+		case STRENGTH:
+			scaling_factor = player->strength / required_stat;
+			break;
+		case DEXTERITY:
+			scaling_factor = player->dexterity / required_stat;
+			break;
+		case INTELLIGENCE:
+			scaling_factor = player->intelligence / required_stat;
+			break;
+		case CONSTITUTION:
+			scaling_factor = player->constitution / required_stat;
+			break;
+		case SPEED:
+			scaling_factor = player->speed / required_stat;
+			break;
+		case NULL_STAT:
+			break;
+	}
+	return scaling_factor;
+}
+
 /**
  * attacks in a given direction doesn't matter if there is an enemy there or not
  */
@@ -243,7 +267,7 @@ void player_attack(player_t *player, world_t *world, direction_t dir) {
 	player_exit_attack_state(player, world);
 	enemy_t *enemy = player_get_dir_enemy(player, world, dir);
 	if(!enemy) return;
-	
+	int xp = (enemy->health + enemy->strength) * 5; // TODO this needs changed
 	item_t *main_hand = player->equipment.main_hand;
 	if(!main_hand) {
 		int unarmed_damage = 1;
@@ -251,90 +275,37 @@ void player_attack(player_t *player, world_t *world, direction_t dir) {
 		snprintf(message, MAX_MESSAGE_LENGTH_WITHOUT_PREFIX, "You attacked for %d", unarmed_damage);
 		display_combat_message(world, player, message);
 		if(enemy_decrease_health(enemy, world, player, unarmed_damage)) {
-			player_add_xp(player, 100, world->class_data);
+			player_add_xp(player, xp, world->class_data);
 		}
 		return;
 	}
 	int raw_damage = 0;
 	weapon_stats_t *weapon = &main_hand->stat_type.weapon;
 	double required_stat = weapon->min_attack + weapon->max_attack;
-	if(weapon->scaling_stat2 == NULL_STAT) {
-		double scaling_factor = 0.0f;
-		switch(weapon->scaling_stat1) {
-			case STRENGTH:
-				scaling_factor = player->strength / required_stat;
-				break;
-			case DEXTERITY:
-				scaling_factor = player->dexterity / required_stat;
-				break;
-			case INTELLIGENCE:
-				scaling_factor = player->intelligence / required_stat;
-				break;
-			case CONSTITUTION:
-				scaling_factor = player->constitution / required_stat;
-				break;
-			case SPEED:
-				scaling_factor = player->speed / required_stat;
-				break;
-			case NULL_STAT:
-				break;
-		}
-		if(scaling_factor > 1) scaling_factor = 1;
-		double stat_weight = scaling_factor * get_percent_from_grade(weapon->stat1_grade);
-		double rand_weight = (((double)rand() / RAND_MAX) * (1-get_percent_from_grade(weapon->stat1_grade)));
-		raw_damage = ceil(weapon->max_attack * (stat_weight + rand_weight));
-	} else {
-		double scaling_factor_stat1 = 0.0f;
-		double scaling_factor_stat2 = 0.0f;
-		switch(weapon->scaling_stat1) {
-			case STRENGTH:
-				scaling_factor_stat1 = player->strength / required_stat;
-				break;
-			case DEXTERITY:
-				scaling_factor_stat1 = player->dexterity / required_stat;
-				break;
-			case INTELLIGENCE:
-				scaling_factor_stat1 = player->intelligence / required_stat;
-				break;
-			case CONSTITUTION:
-				scaling_factor_stat1 = player->constitution / required_stat;
-				break;
-			case SPEED:
-				scaling_factor_stat1 = player->speed / required_stat;
-				break;
-			case NULL_STAT:
-				break;
-		}
-		switch(weapon->scaling_stat2) {
-			case STRENGTH:
-				scaling_factor_stat2 = player->strength / required_stat;
-				break;
-			case DEXTERITY:
-				scaling_factor_stat2 = player->dexterity / required_stat;
-				break;
-			case INTELLIGENCE:
-				scaling_factor_stat2 = player->intelligence / required_stat;
-				break;
-			case CONSTITUTION:
-				scaling_factor_stat2 = player->constitution / required_stat;
-				break;
-			case SPEED:
-				scaling_factor_stat2 = player->speed / required_stat;
-				break;
-			case NULL_STAT:
-				break;
-		}
-		if(scaling_factor_stat1 > 1) scaling_factor_stat1 = 1;
+	
+	double scaling_factor_stat1 = get_weapon_stat_scaling_factor(player, weapon->scaling_stat1, required_stat);
+	if(scaling_factor_stat1 > 1) scaling_factor_stat1 = 1;
+	
+	if(weapon->scaling_stat2 != NULL_STAT) {
+		double scaling_factor_stat2 = get_weapon_stat_scaling_factor(player, weapon->scaling_stat2, required_stat);
 		if(scaling_factor_stat2 > 1) scaling_factor_stat2 = 1;
 		double stat1_weight = scaling_factor_stat1 * get_percent_from_grade(weapon->stat1_grade);
 		double stat2_weight = scaling_factor_stat2 * get_percent_from_grade(weapon->stat2_grade);
 		double rand_weight = (((double)rand() / RAND_MAX) * 1-(get_percent_from_grade(weapon->stat1_grade)+get_percent_from_grade(weapon->stat2_grade)));
 		raw_damage = ceil(weapon->max_attack * (stat1_weight + stat2_weight + rand_weight));
+	} else {
+		double stat_weight = scaling_factor_stat1 * get_percent_from_grade(weapon->stat1_grade);
+		double rand_weight = (((double)rand() / RAND_MAX) * (1-get_percent_from_grade(weapon->stat1_grade)));
+		raw_damage = ceil(weapon->max_attack * (stat_weight + rand_weight));
 	}
 	
 	raw_damage = MAX(weapon->min_attack, raw_damage);
 	if(raw_damage > weapon->max_attack) raw_damage = weapon->max_attack;
 	DEBUG_LOG("raw damage: %d", raw_damage);
+	if(player_did_crit(player_get_total_crit_chance(weapon))) {
+		raw_damage *= 2;
+		display_combat_message(world, player, "You land a crit");
+	}
 	int damage = raw_damage * (DEFENSE_SCALING_CONSTANT)/(DEFENSE_SCALING_CONSTANT+enemy->defense);
 	damage = MAX(1, damage);
 	DEBUG_LOG("actual damage: %d", damage);
@@ -342,8 +313,18 @@ void player_attack(player_t *player, world_t *world, direction_t dir) {
 	snprintf(message, MAX_MESSAGE_LENGTH_WITHOUT_PREFIX, "You attacked for %d", damage);
 	display_combat_message(world, player, message);
 	if(enemy_decrease_health(enemy, world, player, damage)) {
-		player_add_xp(player, 100, world->class_data);
+		player_add_xp(player, xp, world->class_data);
 	}
+}
+
+bool player_did_crit(double total_crit_chance) {
+	double roll = (double)rand() / RAND_MAX;
+	return roll < total_crit_chance;
+}
+
+double player_get_total_crit_chance(weapon_stats_t *weapon) {
+	// TODO doesn't account for 2 weaopns
+	return BASE_CRIT_CHANCE + weapon->crit_chance;
 }
 
 int xp_to_level_up(int level) {
@@ -482,9 +463,7 @@ void player_take_loot_item(room_t *room, player_t *player) {
 		for(int x = start_x; x <= end_x; x++) {
 			for(int i = 0; i < room->tiles[y][x]->item_count; i++) {
 				item_t *item = room->tiles[y][x]->items[i];
-				DEBUG_LOG("searching for item index: %d", i);
 				DEBUG_LOG("selected_item: %p, %d ",(void *)selected_item, selected_item->id);
-				DEBUG_LOG("item: %p, %d", (void *)item, item->id);
 				if(item == selected_item) {
 					remove_item_from_tile(room->tiles[y][x], item);
 					// DEBUG_LOG("%s", "item found!");

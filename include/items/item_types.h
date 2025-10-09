@@ -32,6 +32,7 @@ typedef struct weapon_stats {
 	enum grade stat2_grade;
 	stat_modifier_t modifier_stats[MAX_ARMOR_MODIFIERS];
 	int8_t modifier_count;
+	double crit_chance;
 	bool equipped;
 	bool two_handed;
 	bool main_hand;

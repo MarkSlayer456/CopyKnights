@@ -220,6 +220,7 @@ double get_percent_from_grade(enum grade g) {
 int use_item(player_t *player)
 {
 	int success = 0;
+    DEBUG_LOG("current id: %d", player->inventory_manager.inv_selector);
 	if(player->inventory[player->inventory_manager.inv_selector].stack > 0) {
         if(player->inventory[player->inventory_manager.inv_selector].value_type == VALUE_TYPE_ARMOR) {
             success = handle_armor_change(player, &player->inventory[player->inventory_manager.inv_selector]);
@@ -331,8 +332,6 @@ int handle_weapon_change(player_t *player, item_t *new_weapon) {
             for(int i = 0; i < MAX_ARMOR_MODIFIERS; i++) {
                 sub_player_equipment_stats(player, player->equipment.off_hand->stat_type.weapon.modifier_stats[i].stat, player->equipment.off_hand->stat_type.weapon.modifier_stats[i].modifier);
             }
-        }
-        if(player->equipment.off_hand != NULL) {
             player->equipment.off_hand->stat_type.weapon.equipped = false;
         }
         player->equipment.off_hand = new_weapon;

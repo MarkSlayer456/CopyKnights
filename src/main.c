@@ -146,8 +146,8 @@ int main(int argc, char *argv[]) {
 			break;
 		}
 	}
-	player->health = player->constitution * 100;
-	player->max_health = player->constitution * 100;
+	player->health = player->constitution * 10;
+	player->max_health = player->constitution * 10;
 	player->global_x = 0;
 	player->global_y = 0;
 	player->action_points = 0;

@@ -399,7 +399,5 @@ void remove_item_from_tile(tile_t *tile, item_t *item) {
 		memset(tmp, 0, sizeof(item_t));
 		tile->item_count--;
 		tile->items[tile->item_count] = tmp;
-		
-		
 	}
 }
