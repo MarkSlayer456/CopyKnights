@@ -21,6 +21,7 @@
 #include "items/foods.h"
 #include "items/misc.h"
 #include "save.h"
+#include "traps.h"
 
 /*
 	Top down dungeon crawler
@@ -97,6 +98,11 @@ int main(int argc, char *argv[]) {
 		world->item_data[i] = (item_data_t){0};
 	}
 	
+	world->trap_data = calloc(MAX_TRAPS, sizeof(trap_data_t));
+	for(int i = 0; i < MAX_TRAPS; i++) {
+		world->trap_data[i] = (trap_data_t){0};
+	}
+	
 	world->max_message_storage = DEFAULT_MAX_MESSAGE_STORAGE;
 	world->messages_size = 0;
 	world->messages = calloc(world->max_message_storage, sizeof(char *));
@@ -106,6 +112,7 @@ int main(int argc, char *argv[]) {
 	
 	world->item_data_count = 0;
 	world->room_template_count = 0;
+	world->trap_data_count = 0;
 	
 	load_enemy_data(world->enemy_data);
 	load_enemy_drop_data(world->enemy_data);
@@ -114,6 +121,7 @@ int main(int argc, char *argv[]) {
 	load_weapon_data(world);
 	load_foods_data(world);
 	load_misc_data(world);
+	load_trap_data(world);
 	
 	player_t *player = calloc(1, sizeof(player_t));
 	
@@ -200,25 +208,6 @@ int main(int argc, char *argv[]) {
 	
 	first->current_enemy_count++;
 	
-	first->tiles[1][1]->items[0] = calloc(1, sizeof(item_t));
-	first->tiles[1][1]->items[1] = calloc(1, sizeof(item_t));
-	strcpy(first->tiles[1][1]->items[0]->name, APPLE_NAME);
-	first->tiles[1][1]->items[0]->stack = 1;
-	first->tiles[1][1]->items[0]->id = APPLE;
-	strcpy(first->tiles[1][1]->items[1]->name, APPLE_NAME);
-	first->tiles[1][1]->items[1]->stack = 1;
-	first->tiles[1][1]->items[1]->id = APPLE;
-	
-	first->tiles[10][1]->items[0] = calloc(1, sizeof(item_t));
-	item_t *item = first->tiles[10][1]->items[0];
-	strcpy(item->name, world->item_data[0].name);
-	item->stack = 1;
-	item->id = world->item_data[0].id;
-	strcpy(item->desc, "+4 armor");
-	item->value_type = world->item_data[0].value_type;
-	item->stat_type.armor.type = world->item_data[0].stat_type.armor.type;
-	item->stat_type.armor.defense = world->item_data[0].stat_type.armor.defense;
-	
 	world->room[0][0] = first;
 	
 	world->room[0][0]->door_mask = 0x6;
@@ -228,16 +217,6 @@ int main(int argc, char *argv[]) {
 	world->win = win;
     world->turn_order_size = 0;
 	
-	// load_game(world, player, "save.bin");
-	
-	// TODO for testing only
-	// save_player(player, "");
-		// save_game(world, player, "");
-		// player_t *save_test = malloc(sizeof(player_t));
-		// load_player(save_test, "");
-		
-		// DEBUG_LOG("x, y: %d, %d", save_test->x, save_test->y);
-	// end of testing only
 	for(;;) {
 		switch(menu_manager.current_menu) {
 			case GAME:

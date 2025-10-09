@@ -1,6 +1,14 @@
 #ifndef ENUMS_H_
 #define ENUMS_H_
 
+enum trap_id {
+	NULL_TRAP = -1,
+	TRAP_STALAGMITE,
+	TRAP_HOLE,
+	TRAP_MUD,
+	TRAP_TWISTED_ROOT
+};
+
 enum grade {
 	Z = -1,
 	A,

@@ -28,6 +28,8 @@ typedef struct world {
 	class_data_t *class_data;
 	item_data_t *item_data;
 	int item_data_count;
+	int trap_data_count;
+	trap_data_t *trap_data;
 	int messages_size;
 	char **messages;
 	int max_message_storage;

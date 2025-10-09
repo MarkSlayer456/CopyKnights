@@ -16,7 +16,17 @@
 #define PLAYER				'@'
 #define ITEM_SYMBOL			'*'
 
+/// traps ///
+
+#define TRAP_STALAGMITE_NAME					"Stalagmite"
+#define TRAP_HOLE_NAME							"Hole"
+#define TRAP_MUD_NAME							"Mud"
+#define TRAP_TWISTED_ROOT_NAME					"Twisted Root"
+
+/// end traps ///
+
 #define MAX_ITEMS								512
+#define MAX_TRAPS								32
 
 #define DEFENSE_SCALING_CONSTANT				50 // high defense less powerful, lower more powerful
 
