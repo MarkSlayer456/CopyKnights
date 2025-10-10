@@ -154,6 +154,7 @@
 #define CHICKEN_DINNER_NAME			"Chicken Dinner"
 #define CHICKEN_DINNER_HEAL_AMOUNT	500
 #define ROTTEN_APPLE_NAME 					"Rotten Apple"
+#define RAT_MEAT_NAME						"Rat Meat"
 
 #define OIL_NAME							"Oil"
 

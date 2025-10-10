@@ -347,7 +347,7 @@ void enemy_handle_death_drops(enemy_t *enemy, enemy_data_t *enemy_data, item_dat
         if(enemy_data[i].type == enemy->type) {
             int drop_count = enemy_data[i].drop_table.drop_count;
             item_drop_t *drop = enemy_data[i].drop_table.drops;
-            if(drop_count == 0) return;
+            if(drop_count == 0) continue;
             // int index = rand() % drop_count;
             for(int index = 0; index < drop_count; index++) {
                 float chance = (float) rand() / (float) RAND_MAX;

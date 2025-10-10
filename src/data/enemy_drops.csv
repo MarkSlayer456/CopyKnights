@@ -1,4 +1,8 @@
 enemy type,item type,drop chance,minimum quantity,maximum quantity
 BAT,Apple,.1,1,1
 BAT,Rotten Apple,.3,1,1
-BAT,Oil,.2,1,3
+BAT,Oil,.3,1,3
+RAT,Oil,.2,1,3
+RAT,Rat Meat,.5,1,1
+SKELETON,Oil,.5,3,7
+SKELETON,Chicken Dinner,.1,1,1

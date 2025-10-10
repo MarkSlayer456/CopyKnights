@@ -291,7 +291,7 @@ void player_attack(player_t *player, world_t *world, direction_t dir) {
 		if(scaling_factor_stat2 > 1) scaling_factor_stat2 = 1;
 		double stat1_weight = scaling_factor_stat1 * get_percent_from_grade(weapon->stat1_grade);
 		double stat2_weight = scaling_factor_stat2 * get_percent_from_grade(weapon->stat2_grade);
-		double rand_weight = (((double)rand() / RAND_MAX) * 1-(get_percent_from_grade(weapon->stat1_grade)+get_percent_from_grade(weapon->stat2_grade)));
+		double rand_weight = (((double)rand() / RAND_MAX) * (1-(get_percent_from_grade(weapon->stat1_grade)+get_percent_from_grade(weapon->stat2_grade))));
 		raw_damage = ceil(weapon->max_attack * (stat1_weight + stat2_weight + rand_weight));
 	} else {
 		double stat_weight = scaling_factor_stat1 * get_percent_from_grade(weapon->stat1_grade);

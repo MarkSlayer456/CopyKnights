@@ -34,6 +34,7 @@ typedef enum item_ids {
 	APPLE,
 	ROTTEN_APPLE,
 	CHICKEN_DINNER,
+	RAT_MEAT,
 	
 	// oil
 	OIL,

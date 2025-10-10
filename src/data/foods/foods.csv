@@ -1,7 +1,8 @@
 name,health,mana
-Health Potion,10,10
+Health Potion,100,100
 Apple,10,10
-Rotten Apple,5,5
-Chicken Dinner,10,10
+Rotten Apple,5,0
+Chicken Dinner,50,10
+Rat Meat,15,10
 
 

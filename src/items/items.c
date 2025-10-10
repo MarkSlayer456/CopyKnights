@@ -64,6 +64,7 @@ type_map_t item_type_map[] = {
     {APPLE_NAME, APPLE},
     {ROTTEN_APPLE_NAME, ROTTEN_APPLE},
     {CHICKEN_DINNER_NAME, CHICKEN_DINNER},
+    {RAT_MEAT_NAME, RAT_MEAT},
     {OIL_NAME, OIL},
     
     {BLACKSTONE_ARMOR_NAME, BLACKSTONE_ARMOR},
@@ -228,10 +229,9 @@ int use_item(player_t *player)
             success = handle_weapon_change(player, &player->inventory[player->inventory_manager.inv_selector]);
         } else if(player->inventory[player->inventory_manager.inv_selector].value_type == VALUE_TYPE_FOOD) {
             //TODO effects with durations
-            remove_item(player);
             player_increase_health(player, player->inventory[player->inventory_manager.inv_selector].stat_type.food.heal_amount);
             player_increase_mana(player, player->inventory[player->inventory_manager.inv_selector].stat_type.food.mana_heal_amount);
-            
+            remove_item(player);
             success = 1;
         } else {
             switch(player->inventory[player->inventory_manager.inv_selector].id) {
