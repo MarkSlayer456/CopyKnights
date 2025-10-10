@@ -38,6 +38,9 @@ typedef struct world {
 	int room_template_count;
 	room_template_t room_templates[128];
 	bool is_player_turn; // this is used to save the player's turn, mostly for the save funcationality to work
+	uint8_t buff_size;
+	uint8_t buff_count;
+	buff_t *buffs;
 } world_t;
 
 //TODO I want to redo this

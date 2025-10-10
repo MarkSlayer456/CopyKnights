@@ -311,6 +311,8 @@
 
 #define STARTING_OIL					100
 
+#define STARTING_BUFF_SIZE				16
+
 #define MAX_MENUS						16
 
 #define SAVE_FILE_MAX_LEN				64

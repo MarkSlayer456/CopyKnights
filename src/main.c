@@ -114,6 +114,10 @@ int main(int argc, char *argv[]) {
 	world->room_template_count = 0;
 	world->trap_data_count = 0;
 	
+	world->buff_size = STARTING_BUFF_SIZE;
+	world->buff_count = 0;
+	world->buffs = calloc(world->buff_size, sizeof(buff_t));
+	
 	load_enemy_data(world->enemy_data);
 	load_enemy_drop_data(world->enemy_data);
 	load_class_data(world->class_data);

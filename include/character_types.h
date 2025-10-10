@@ -139,4 +139,26 @@ typedef struct enemy_type_map {
 	enemy_type_t value;
 } enemy_type_map_t;
 
+// this will also be used to make debuffs with negative numbers
+typedef struct {
+	int turns_left; // how many turns until this buff wears off
+	int8_t damage;
+	float flat_strength;
+	float flat_dexterity;
+	float flat_intelligence;
+	float flat_constitution;
+	float flat_speed;
+	float percent_strength;
+	float percent_dexterity;
+	float percent_intelligence;
+	float percent_constitution;
+	float percent_speed;
+	bool applied;
+	enum target_type target_type_id;
+	union {
+		player_t *player;
+		enemy_t *enemy;
+	} target;
+} buff_t;
+
 #endif
