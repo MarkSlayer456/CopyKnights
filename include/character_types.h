@@ -142,6 +142,9 @@ typedef struct enemy_type_map {
 // this will also be used to make debuffs with negative numbers
 typedef struct {
 	int turns_left; // how many turns until this buff wears off
+	// if turns_left is -1 the effect will never end, could be useful for
+	// effects that have to be cleared by magic or armor and weapon effects
+	char name[BUFF_NAME_MAX_LEN];
 	int8_t damage;
 	float flat_strength;
 	float flat_dexterity;

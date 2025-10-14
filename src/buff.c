@@ -93,6 +93,38 @@ buff_t *buff_add_to_list(buff_t buff, buff_t *buff_array, int *buff_count, uint8
 	return buff_array;
 }
 
+void buff_combine(buff_t *buff1, buff_t *buff2) {
+	if(strcasecmp(buff1->name, buff2->name) == 0) {
+		if(buff1->target_type_id == buff2->target_type_id) {
+			bool match = false;
+			if(buff1->target_type_id == TARGET_PLAYER) {
+				// should only be one player but just in case
+				if(buff1->target.player == buff2->target.player) {
+					match = true;
+				} 
+			}
+		} else if(buff1->target_type_id == TARGET_ENEMY) {
+			if(buff1->target_type_id == ENEMY) {
+				if(buff1->target.enemy == buff2->target.enemy) {
+					match = true;
+				}
+			}
+		}
+		if(match) {
+			buff1->flat_strength += buff2->flat_strength;
+			buff1->flat_dexterity += buff2->flat_dexterity;
+			buff1->flat_intelligence += buff2->flat_intelligence;
+			buff1->flat_constitution += buff2->flat_constitution;
+			buff1->flat_speed += buff2->flat_speed;
+			buff1->percent_strength += buff2->percent_strength;
+			buff1->percent_dexterity += buff2->percent_dexterity;
+			buff1->percent_intelligence += buff2->percent_intelligence;
+			buff1->percent_constitution += buff2->percent_constitution;
+			buff1->percent_speed += buff2->percent_speed;
+		}
+	}
+}
+
 buff_t buff_create() {
 	buff_t buff = (buff_t){0};
 	return buff;

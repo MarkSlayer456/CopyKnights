@@ -315,6 +315,8 @@
 
 #define MAX_MENUS						16
 
+#define BUFF_NAME_MAX_LEN				64
+
 #define SAVE_FILE_MAX_LEN				64
 
 #define HUD_WIDTH					59
