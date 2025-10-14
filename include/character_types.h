@@ -2,6 +2,8 @@
 
 #define CHARACTER_TYPES_H_
 
+#include "items/item_types.h"
+
 typedef struct {
 	item_ids_t id;
 	float drop_chance;

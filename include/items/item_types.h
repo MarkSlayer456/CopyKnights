@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include "item_enums.h"
 #include "enums.h"
+#include "game_constants.h"
 
 typedef struct type_map {
 	const char *name;

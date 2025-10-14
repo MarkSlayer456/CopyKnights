@@ -1,4 +1,11 @@
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+#include <strings.h>
+#include <stdbool.h>
+#include "character_types.h"
 #include "buff.h"
+
 
 void buff_remove_effects(buff_t *buff_array, int buff_count) {
 	for(int i = 0; i < buff_count; i++) {
@@ -95,8 +102,8 @@ buff_t *buff_add_to_list(buff_t buff, buff_t *buff_array, int *buff_count, uint8
 
 void buff_combine(buff_t *buff1, buff_t *buff2) {
 	if(strcasecmp(buff1->name, buff2->name) == 0) {
+		bool match = false;
 		if(buff1->target_type_id == buff2->target_type_id) {
-			bool match = false;
 			if(buff1->target_type_id == TARGET_PLAYER) {
 				// should only be one player but just in case
 				if(buff1->target.player == buff2->target.player) {
@@ -104,10 +111,8 @@ void buff_combine(buff_t *buff1, buff_t *buff2) {
 				} 
 			}
 		} else if(buff1->target_type_id == TARGET_ENEMY) {
-			if(buff1->target_type_id == ENEMY) {
-				if(buff1->target.enemy == buff2->target.enemy) {
-					match = true;
-				}
+			if(buff1->target.enemy == buff2->target.enemy) {
+				match = true;
 			}
 		}
 		if(match) {
