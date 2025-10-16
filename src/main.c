@@ -22,6 +22,7 @@
 #include "items/misc.h"
 #include "save.h"
 #include "traps.h"
+#include "buff.h"
 
 /*
 	Top down dungeon crawler
@@ -113,7 +114,7 @@ int main(int argc, char *argv[]) {
 	world->item_data_count = 0;
 	world->room_template_count = 0;
 	world->trap_data_count = 0;
-	
+
 	world->buff_size = STARTING_BUFF_SIZE;
 	world->buff_count = 0;
 	world->buffs = calloc(world->buff_size, sizeof(buff_t));
@@ -221,6 +222,38 @@ int main(int argc, char *argv[]) {
 	world->win = win;
     world->turn_order_size = 0;
 	
+	// TODO for testing remove
+	buff_t buff = buff_create();
+	buff.turns_left = 3;
+	buff_set_type(&buff, BUFF_BLEED);
+	buff.damage = 1;
+	buff.target_type_id = TARGET_PLAYER;
+	buff.target.player = player;
+	world->buffs = buff_add_to_list(buff, world->buffs, &world->buff_count, &world->buff_size);
+
+	buff.turns_left = 8;
+	buff_set_type(&buff, BUFF_FROST);
+	buff.damage = 1;
+	buff.flat_speed = -4;
+	buff.target_type_id = TARGET_PLAYER;
+	buff.target.player = player;
+	world->buffs = buff_add_to_list(buff, world->buffs, &world->buff_count, &world->buff_size);
+	buff.flat_speed = 0;
+
+	buff.turns_left = 5;
+	buff_set_type(&buff, BUFF_POISON);
+	buff.damage = 1;
+	buff.target_type_id = TARGET_PLAYER;
+	buff.target.player = player;
+	world->buffs = buff_add_to_list(buff, world->buffs, &world->buff_count, &world->buff_size);
+
+	buff.turns_left = 10;
+	buff_set_type(&buff, BUFF_BURN);
+	buff.damage = 1;
+	buff.target_type_id = TARGET_PLAYER;
+	buff.target.player = player;
+	world->buffs = buff_add_to_list(buff, world->buffs, &world->buff_count, &world->buff_size);
+	////////////////////
 	for(;;) {
 		switch(menu_manager.current_menu) {
 			case GAME:
@@ -242,6 +275,7 @@ int main(int argc, char *argv[]) {
 						run = manage_input(c, world, player, &menu_manager);
 						draw(world, player);
 					}
+					buff_apply(world->buffs, &world->buff_count);
 				} else if(actor >= 0) {
 					enemy_t *enemy = world->room[player->global_x][player->global_y]->enemies[actor];
 					if(enemy != NULL) {

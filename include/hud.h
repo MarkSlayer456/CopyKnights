@@ -2,7 +2,7 @@
 #define HUD_H_
 #include "types.h"
 
-void hud_update_player_health(player_t *player);
+void hud_update_player_health(const player_t *player, const buff_t *buff_array, int buff_count);
 void hud_update_nearby_enemies(world_t *world, player_t *player);
 
 void hud_update_messages(world_t *world, player_t *player);

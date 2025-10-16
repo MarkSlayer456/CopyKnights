@@ -36,7 +36,7 @@ void draw(world_t *world, player_t *player) {
 	} else {
 		// TODO add just a hud_update() function so you don't have to call a bunch of different functions
 		room_t *room = world->room[player->global_x][player->global_y];
-		hud_update_player_health(player);
+		hud_update_player_health(player, world->buffs, world->buff_count);
 		hud_update_nearby_enemies(world, player);
 		// hud_update_menus(player, room);
 		hud_update_messages(world, player);

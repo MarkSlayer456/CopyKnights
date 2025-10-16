@@ -1,6 +1,16 @@
 #ifndef ENUMS_H_
 #define ENUMS_H_
 
+enum buff_type {
+	BUFF_NULL = -1,
+	BUFF_BLEED,
+	BUFF_BURN,
+	BUFF_FROST,
+	BUFF_POISON,
+	BUFF_BLACKENING,
+	BUFF_REGEN
+};
+
 enum target_type {
 	TARGET_PLAYER,
 	TARGET_ENEMY

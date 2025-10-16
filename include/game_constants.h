@@ -308,11 +308,18 @@
 
 #define STARTING_OIL					100
 
-#define STARTING_BUFF_SIZE				16
+#define STARTING_BUFF_SIZE			   8
+#define BUFF_NAME_MAX_LEN				4
+#define BUFF_NULL_NAME					"NIL"
+#define BUFF_BLEED_NAME					"BLD"
+#define BUFF_BURN_NAME					"BRN"
+#define BUFF_FROST_NAME					"ICE"
+#define BUFF_POISON_NAME				"PSN"
+#define BUFF_BLACKENING_NAME			"BLK"
+#define BUFF_HEAL_NAME					"RGN"
 
 #define MAX_MENUS						16
 
-#define BUFF_NAME_MAX_LEN				64
 
 #define SAVE_FILE_MAX_LEN				64
 
