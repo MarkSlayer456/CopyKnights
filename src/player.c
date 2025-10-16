@@ -520,6 +520,22 @@ void player_organize_inv(player_t *player, int loc)
 {
 	for(int i = loc; i < INV_SIZE-1; i++) {
 		player->inventory[i] = player->inventory[i + 1];
+		if(player->inventory[i].value_type == VALUE_TYPE_ARMOR) {
+			if(player->inventory[i].stat_type.armor.equipped == true) {
+				player->equipment.armor = &player->inventory[i];
+			}
+		} else if(player->inventory[i].value_type == VALUE_TYPE_WEAPON) {
+			if(player->inventory[i].stat_type.weapon.equipped == true) {
+				if(player->inventory[i].stat_type.weapon.main_hand == true) {
+						player->equipment.main_hand = &player->inventory[i];
+						if(player->inventory[i].stat_type.weapon.two_handed == true) {
+							player->equipment.off_hand = &player->inventory[i];
+						}
+				} else {
+					player->equipment.off_hand = &player->inventory[i + 1];
+				}
+			}
+		}
 	}
 	item_t blank = {BLANK_NAME, "does nothing", BLANK, 0};
 	player->inventory[INV_SIZE-1] = blank;

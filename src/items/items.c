@@ -396,24 +396,6 @@ int use_teleport_scroll(player_t *player)
 	return 0;
 }
 
-int use_health_potion(player_t *player)
-{
-	player_increase_health(player, HEALTH_POTION_HEAL_AMOUNT);
-	return 1;
-}
-
-int use_apple(player_t *player)
-{
-	player_increase_health(player, APPLE_HEAL_AMOUNT);
-	return 1;
-}
-
-int use_chicken_dinner(player_t *player)
-{
-	player_increase_health(player, CHICKEN_DINNER_HEAL_AMOUNT);
-	return 1;
-}
-
 void remove_item(player_t *player)
 {
 	player->inventory[player->inventory_manager.inv_selector].stack--;
