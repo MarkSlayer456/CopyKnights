@@ -412,11 +412,16 @@ void draw_main_menu(WINDOW *main_menu, menu_manager_t *menu_manager) {
 	werase(main_menu);
 	
 	menu_manager->dests_count = 0;
-	
+
 	char display_str[16] = "";
-	
+
 	int y_pos = 0;
-	menu_manager->dests[y_pos] = GAME;
+	wmove(main_menu, y_pos++, 0);
+	waddstr(main_menu, GAME_TITLE);
+	wmove(main_menu, y_pos++, 0);
+	waddstr(main_menu, MENU_DIVIDE_LINE);
+	int dest_pos = 0;
+	menu_manager->dests[dest_pos++] = GAME;
 	menu_manager->dests_count++;
 	char new_game[9] = "New Game";
 	wmove(main_menu, y_pos++, 0);
@@ -426,7 +431,7 @@ void draw_main_menu(WINDOW *main_menu, menu_manager_t *menu_manager) {
 	} else {
 		waddstr(main_menu, new_game);
 	}
-	menu_manager->dests[y_pos] = LOAD_MENU;
+	menu_manager->dests[dest_pos++] = LOAD_MENU;
 	menu_manager->dests_count++;
 	char load_game[11] = "Load Game";
 	wmove(main_menu, y_pos++, 0);
@@ -436,7 +441,7 @@ void draw_main_menu(WINDOW *main_menu, menu_manager_t *menu_manager) {
 	} else {
 		waddstr(main_menu, load_game);
 	}
-	menu_manager->dests[y_pos] = LOG_BOOK_MENU;
+	menu_manager->dests[dest_pos++] = LOG_BOOK_MENU;
 	menu_manager->dests_count++;
 	char log_book[9] = "Log Book";
 	wmove(main_menu, y_pos++, 0);
@@ -464,8 +469,8 @@ void generate_load_menu_list(load_menu_t *load_menu) {
 			continue;
 		}
 		if(load_menu->filename_count >= load_menu->filename_size) {
-			load_menu->filename_count *= 2;
-			load_menu->filename = realloc(load_menu->filename, load_menu->filename_count * sizeof(char[SAVE_FILE_MAX_LEN]));
+			load_menu->filename_size *= 2;
+			load_menu->filename = realloc(load_menu->filename, load_menu->filename_size * sizeof(char[SAVE_FILE_MAX_LEN]));
 		}
 		strcpy(load_menu->filename[load_menu->filename_count], entry->d_name);
 		load_menu->filename_count++;
@@ -474,15 +479,21 @@ void generate_load_menu_list(load_menu_t *load_menu) {
 
 void draw_load_menu(const load_menu_t *load_menu) {
 	werase(load_menu->win);
+	int y_pos = 0;
+	wmove(load_menu->win, y_pos++, 0);
+	waddstr(load_menu->win, LOAD_MENU_TITLE);
+	wmove(load_menu->win, y_pos++, 0);
+	waddstr(load_menu->win, MENU_DIVIDE_LINE);
 	char display_str[256];
-	for(int i = 0; i < load_menu->filename_count; i++) {
-		wmove(load_menu->win, i, 0);
+	for(int i = load_menu->cursor_offset; i < (LOAD_MENU_VISIBLE_ENTRIES + load_menu->cursor_offset); i++) {
+		wmove(load_menu->win, y_pos, 0);
 		if(i == load_menu->cursor_pos) {
 			snprintf(display_str, sizeof(display_str), ">>%s", load_menu->filename[i]);
 		} else {
 			snprintf(display_str, sizeof(display_str), "%s", load_menu->filename[i]);
 		}
 		waddstr(load_menu->win, display_str);
+		y_pos++;
 	}
 	wnoutrefresh(load_menu->win);
 	doupdate();
@@ -506,19 +517,22 @@ void manage_load_menu_input(char c, load_menu_t *load_menu, world_t *world, play
 		case RIGHT_ARROW:
 			break;
 		case UP_ARROW:
-			if(load_menu->cursor_pos - 1 < 0) { 
-				load_menu->cursor_pos = load_menu->filename_count-1;
-			} else {
+			if(load_menu->cursor_pos > 0) {
+				if(load_menu->cursor_pos - load_menu->cursor_offset == 0) {
+					load_menu->cursor_offset--;
+				}
 				load_menu->cursor_pos--;
 			}
 			break;
-		case DOWN_ARROW:
-			if(load_menu->cursor_pos + 1 < load_menu->filename_count) { 
-				load_menu->cursor_pos++;
-			} else {
-				load_menu->cursor_pos = 0;
+		case DOWN_ARROW: {
+				if(load_menu->cursor_pos + 1 < load_menu->filename_count) {
+					if(load_menu->cursor_pos - load_menu->cursor_offset >= LOAD_MENU_VISIBLE_ENTRIES-1) {
+						load_menu->cursor_offset++;
+					}
+					load_menu->cursor_pos++;
+				}
+				break;
 			}
-			break;
 		case CTRL_Q:
 			shutdown(world);
 			break;

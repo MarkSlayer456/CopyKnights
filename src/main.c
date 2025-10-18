@@ -60,6 +60,7 @@ int main(int argc, char *argv[]) {
 	load_menu.filename_count = 0;
 	load_menu.filename_size = 16;
 	load_menu.cursor_pos = 0;
+	load_menu.cursor_offset = 0;
 	load_menu.filename = calloc(load_menu.filename_size, sizeof(char[SAVE_FILE_MAX_LEN]));
 
 	generate_load_menu_list(&load_menu);

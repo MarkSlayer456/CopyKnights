@@ -1,22 +1,22 @@
 armor_name,target_stat,value
 Blackstone Armor,STRENGTH,2
-Blackstone Armor,SPEED,-2
+Blackstone Armor,SPEED,-1
 Bronze Armor,STRENGTH,5
-Bronze Armor,SPEED,-4
+Bronze Armor,SPEED,-2
 Iron Armor,STRENGTH,8
-Iron Armor,SPEED,-5
+Iron Armor,SPEED,-3
 Steel Armor,STRENGTH,10
-Steel Armor,SPEED,-6
+Steel Armor,SPEED,-4
 Mithril Armor,STRENGTH,12
-Mithril Armor,SPEED,-4
+Mithril Armor,SPEED,-2
 Soulcrust Armor,STRENGTH,16
-Soulcrust Armor,SPEED,-7
+Soulcrust Armor,SPEED,-5
 Terracite Armor,STRENGTH,18
-Terracite Armor,SPEED,-8
+Terracite Armor,SPEED,-6
 Gravemarrow Armor,STRENGTH,20
-Gravemarrow Armor,SPEED,-10
+Gravemarrow Armor,SPEED,-8
 Voidmarrow Armor,STRENGTH,25
-Voidmarrow Armor,SPEED,-10
+Voidmarrow Armor,SPEED,-8
 Rat Hide Armor,DEXTERITY,1
 Slime Armor,DEXTERITY,2
 Bog Iron Armor,DEXTERITY,2

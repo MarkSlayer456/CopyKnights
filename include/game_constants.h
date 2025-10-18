@@ -16,6 +16,10 @@
 #define PLAYER				'@'
 #define ITEM_SYMBOL			'*'
 
+#define GAME_TITLE								"The Hollow of Marrowfall"
+#define MENU_DIVIDE_LINE						"------------------------"
+#define LOAD_MENU_TITLE							"Save Files"
+
 /// traps ///
 
 #define TRAP_STALAGMITE_NAME					"Stalagmite"
@@ -339,6 +343,8 @@
 
 #define INVENTORY_HEIGHT			SCREEN_HEIGHT/2
 #define INVENTORY_WIDTH				SCREEN_WIDTH
+
+#define LOAD_MENU_VISIBLE_ENTRIES						SCREEN_HEIGHT-2
 
 // Lantern
 #define LANTERN_MAX_POWER								10

@@ -56,6 +56,7 @@ typedef struct {
 	char (*filename)[SAVE_FILE_MAX_LEN];
 	uint8_t filename_count; // how many save files
 	uint8_t filename_size; // current size of filename
+	uint8_t cursor_offset;
 	uint8_t cursor_pos;
 } load_menu_t;
 #endif
