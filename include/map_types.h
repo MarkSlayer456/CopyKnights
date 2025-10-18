@@ -26,6 +26,9 @@ typedef struct tile {
 	bool has_light; // does this tile have light
 	int8_t item_count; // number of items on this tile
 	item_t *items[MAX_ITEMS_PER_TILE]; // list of items on this tile
+	uint8_t deleted_trap_count;
+	uint8_t deleted_trap_x[MAX_TRAPS_PER_ROOM];
+	uint8_t deleted_trap_y[MAX_TRAPS_PER_ROOM];
 } tile_t;
 
 typedef struct room {

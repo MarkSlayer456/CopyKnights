@@ -37,7 +37,7 @@ WINDOW *action_bar; // OLG player's inventory/spells menu, maybe a help menu in 
 WINDOW *error; // USED FOR ERROR CHECKING ONLY
 WINDOW *inventory_hud; // player's inventory
 WINDOW *inventory_desc_hud; // player's description in the inventory
-char walk_chars[WALK_CHAR_LENGTH] = {EMPTY, '0', DOOR, MUD, CHEST}; // characters entites can walk on
+char walk_chars[WALK_CHAR_LENGTH] = {EMPTY, '0', '"', '^', DOOR, MUD, CHEST}; // characters entites can walk on
 
 int main(int argc, char *argv[]) {
     WINDOW *win;
@@ -210,7 +210,7 @@ int main(int argc, char *argv[]) {
 	}
 	
 	room_t *first = setup_first_room(&world->seed, 0, 0, world->enemy_data, world->item_data, world);
-	first->enemies[0] = enemy_spawn(BAT, world->enemy_data, 1, 1, first->biome);
+	first->enemies[0] = enemy_spawn(BAT, world->enemy_data, 1, 1, 0, 0, first->biome);
 	
 	first->current_enemy_count++;
 	
@@ -230,7 +230,6 @@ int main(int argc, char *argv[]) {
 				generate_turn_order_display(world, player);
 				draw(world, player);
 				player_get_nearby_loot(world->room[player->global_x][player->global_y], player);
-				buff_apply(world->buffs, &world->buff_count);
 				int actor = INVALID_ACTOR_INDEX;
 				if(!world->is_player_turn) {
 					actor = pick_next_actor(world, player);
@@ -246,6 +245,7 @@ int main(int argc, char *argv[]) {
 						draw(world, player);
 					}
 					traps_triggered_check(world, player);
+					buff_apply(world->buffs, &world->buff_count);
 				} else if(actor >= 0) {
 					enemy_t *enemy = world->room[player->global_x][player->global_y]->enemies[actor];
 					if(enemy != NULL) {

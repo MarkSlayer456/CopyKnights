@@ -62,7 +62,7 @@ enemy_t *enemy_create_temp(world_t *world)
 	return e;
 }
 
-enemy_t *enemy_spawn(enemy_type_t type, const enemy_data_t *enemy_data, int x, int y, biome_t biome)
+enemy_t *enemy_spawn(enemy_type_t type, const enemy_data_t *enemy_data, int x, int y, int global_x, int global_y, biome_t biome)
 {
     if(enemy_data == NULL) return NULL;
     DEBUG_LOG("%s", "spawning enemy...");
@@ -97,6 +97,8 @@ enemy_t *enemy_spawn(enemy_type_t type, const enemy_data_t *enemy_data, int x, i
         DEBUG_LOG("defense: %d", e->defense);
         e->x = x;
         e->y = y;
+        e->global_x = global_x;
+        e->global_y = global_y;
         e->trait = PASSIVE;
         e->symbol = enemy_data[i].symbol;
         e->action_points = 0;

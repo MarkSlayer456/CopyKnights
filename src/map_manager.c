@@ -19,7 +19,7 @@ void calculate_main_path(unsigned int *seed, world_t *world) {
 	unsigned int entrance_door = 0x0;
 	unsigned int starting_entrance_door = 0x8;
 	unsigned int exit_door = 0x0;
-	while(main_x < 100 && main_y < 100) {
+	while(main_x < WORLD_WIDTH && main_y < WORLD_HEIGHT) {
 		room_t *room = world->room[main_x][main_y];
 		// DEBUG_LOG("main_path: (%d, %d)", main_x, main_y);
 		room->is_main_path = true;
@@ -31,7 +31,7 @@ void calculate_main_path(unsigned int *seed, world_t *world) {
 		// TODO fix this, looks nasty, just use a for loop and random % 2 instead of 100
 		int random = rand_r_portable(seed) % 100;
 		if(random <= 49) {
-			if(main_x >= 99) {
+			if(main_x >= WORLD_WIDTH-1) {
 				main_y++;
 				entrance_door = 0x1;
 				exit_door = 0x4;
@@ -41,7 +41,7 @@ void calculate_main_path(unsigned int *seed, world_t *world) {
 				exit_door = 0x2;
 			}
 		} else if(random >= 50) {
-			if(main_y >= 99) {
+			if(main_y >= WORLD_HEIGHT-1) {
 				main_x++;
 				entrance_door = 0x8;
 				exit_door = 0x2;
@@ -288,7 +288,7 @@ room_t *load_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data, it
 		for(int j = 0; j < strlen(tok); j++) {
 			switch(tok[j]) {
 				case POTENTIAL_ENEMY_SPAWN_CHAR:
-					room->enemies[room->current_enemy_count] = enemy_spawn(enemy_generate_type(&map_seed, enemy_data, room->biome), enemy_data, j, i, room->biome);
+					room->enemies[room->current_enemy_count] = enemy_spawn(enemy_generate_type(&map_seed, enemy_data, room->biome), enemy_data, j, i, x, y, room->biome);
 					room->tiles[i][j]->floor = EMPTY;
 					room->tiles[i][j]->item_count = 0;
 					room->current_enemy_count++;
@@ -342,9 +342,17 @@ void load_room_floor_tiles(room_t *room) {
 				case POTENTIAL_ITEM_SPAWN_CHAR:
 					room->tiles[i][j]->floor = EMPTY;
 					break;
-				default:
-					room->tiles[i][j]->floor = tok[j];
+				default: {
+					tile_t *tile = room->tiles[i][j];
+					tile->floor = tok[j];
+					for(int k = 0; k < tile->deleted_trap_count; k++) {
+						if(i == tile->deleted_trap_y[k] && j == tile->deleted_trap_x[k]) {
+							tile->floor = EMPTY;
+							break;
+						}
+					}
 					break;
+				}
 			}
 		}
 		tok = strtok(NULL, "\n");

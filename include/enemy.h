@@ -8,7 +8,7 @@
 //TODO need move functions and check functions so enemies don't leave the map
 // shouldn't happen but just in case
 
-enemy_t *enemy_spawn(enemy_type_t type, const enemy_data_t *enemy_data, int x, int y, biome_t biome);
+enemy_t *enemy_spawn(enemy_type_t type, const enemy_data_t *enemy_data, int x, int y, int global_x, int global_y, biome_t biome);
 
 const char *enemy_get_name(enemy_type_t type);
 

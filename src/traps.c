@@ -4,6 +4,7 @@
 #include <strings.h>
 #include <stdlib.h>
 #include "buff.h"
+#include "player.h"
 
 
 type_map_t trap_id_map[] = {
@@ -26,64 +27,51 @@ enum trap_id get_trap_id(const char *id) {
 
 void traps_triggered_check(world_t *world, player_t *player) {
 	for(int i = 0; i < world->trap_data_count; i++) {
-		trap_data_t *trap_data = &world->trap_data[i];
+		const trap_data_t *trap_data = &world->trap_data[i];
 		if(trap_data->symbol == world->room[player->global_x][player->global_y]->tiles[player->y][player->x]->floor) {
-			switch(trap_data->id) {
-				case NULL_TRAP: {
-					buff_t buff = buff_create();
-					buff.turns_left = 10;
-					buff_set_type(&buff, BUFF_BLEED);
-					buff.damage = 1;
-					buff.target_type_id = TARGET_PLAYER;
-					buff.target.player = player;
-					world->buffs = buff_add_to_list(buff, world->buffs, &world->buff_count, &world->buff_size);
-					break;
+			buff_t buff = buff_create();
+			buff.turns_left = trap_data->effect_duration;
+			buff.damage = trap_data->damage_each_turn;
+			for(int i = 0; i < trap_data->modifier_count; i++) {
+				switch(trap_data->modifier_stats[i].stat) {
+					case STRENGTH:
+						buff.flat_strength = trap_data->modifier_stats[i].modifier;
+						break;
+					case DEXTERITY:
+						buff.flat_dexterity = trap_data->modifier_stats[i].modifier;
+						break;
+					case INTELLIGENCE:
+						buff.flat_intelligence = trap_data->modifier_stats[i].modifier;
+						break;
+					case CONSTITUTION:
+						buff.flat_constitution = trap_data->modifier_stats[i].modifier;
+						break;
+					case SPEED:
+						buff.flat_speed = trap_data->modifier_stats[i].modifier;
+						break;
+					case NULL_STAT:
+						break;
 				}
-				case TRAP_STALAGMITE: {
-					buff_t buff = buff_create();
-					buff.turns_left = 10;
-					buff_set_type(&buff, BUFF_BLEED);
-					buff.damage = 1;
-					buff.target_type_id = TARGET_PLAYER;
-					buff.target.player = player;
-					world->buffs = buff_add_to_list(buff, world->buffs, &world->buff_count, &world->buff_size);
-					break;
-				}
-				case TRAP_HOLE: {
-					buff_t buff = buff_create();
-					buff.turns_left = 10;
-					buff_set_type(&buff, BUFF_BLEED);
-					buff.damage = 1;
-					buff.flat_speed = -4;
-					buff.target_type_id = TARGET_PLAYER;
-					buff.target.player = player;
-					world->buffs = buff_add_to_list(buff, world->buffs, &world->buff_count, &world->buff_size);
-					break;
-				}
-				case TRAP_MUD: {
-					buff_t buff = buff_create();
-					buff.turns_left = 10;
-					buff_set_type(&buff, BUFF_BLEED);
-					buff.damage = 1;
-					buff.target_type_id = TARGET_PLAYER;
-					buff.target.player = player;
-					world->buffs = buff_add_to_list(buff, world->buffs, &world->buff_count, &world->buff_size);
-					break;
-				}
-				case TRAP_TWISTED_ROOT: {
-					buff_t buff = buff_create();
-					buff.turns_left = 10;
-					buff_set_type(&buff, BUFF_BLEED);
-					buff.damage = 1;
-					buff.target_type_id = TARGET_PLAYER;
-					buff.target.player = player;
-					world->buffs = buff_add_to_list(buff, world->buffs, &world->buff_count, &world->buff_size);
-					break;
-				}
+			}
+			buff_set_type(&buff, BUFF_BLEED);
+			buff.target_type_id = TARGET_PLAYER;
+			buff.target.player = player;
+			world->buffs = buff_add_to_list(buff, world->buffs, &world->buff_count, &world->buff_size);
+			player_decrease_health(player, world, trap_data->damage);
+			if(trap_data->break_on_trigger) {
+				remove_trap(world->room[player->global_x][player->global_y]->tiles[player->y][player->x], player->x, player->y);
 			}
 			break;
 		}
 	}
+}
+
+void remove_trap(tile_t *tile, int x, int y) {
+	tile->floor = EMPTY;
+	tile->deleted_trap_x[tile->deleted_trap_count] = x;
+	tile->deleted_trap_y[tile->deleted_trap_count] = y;
+	tile->deleted_trap_count++;
+
 }
 
 void load_traps_effects(world_t *world) {
@@ -161,7 +149,7 @@ void load_trap_data(world_t *world) {
 					trap_data[world->trap_data_count].damage = (int16_t)atoi(token);
 					break;
 				case 3:
-					trap_data[world->trap_data_count].damage_each_turn = get_stat(token);
+					trap_data[world->trap_data_count].damage_each_turn = (int16_t)atoi(token);
 					break;
 				case 4:
 					trap_data[world->trap_data_count].break_on_trigger = atoi(token) ? true : false;

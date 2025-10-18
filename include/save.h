@@ -17,9 +17,13 @@ void save_player(player_t *player, FILE *file);
 void save_world(world_t *world, FILE *file);
 void save_room(room_t *room, FILE *file);
 
+void save_buff(buff_t *buff, world_t *world, FILE *file);
+
+void load_buff(buff_t *buff, world_t *world, player_t *player, FILE *file);
+
 void load_player(player_t *player, FILE *file, item_data_t *item_data);
 
-void load_world(world_t *world, FILE *file);
+void load_world(world_t *world, player_t *player, FILE *file);
 
 void load_room_save(room_t *room, FILE *file, item_data_t *item_data);
 

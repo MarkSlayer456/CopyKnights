@@ -100,6 +100,7 @@
 #define ROOM_WIDTH							20
 #define ROOM_HEIGHT							20
 #define MAX_ENEMIES_PER_LEVEL				12
+#define MAX_TRAPS_PER_ROOM					8
 #define NUMBER_OF_BIOMES					6
 
 #define CAVE_NAME							"Cave"
@@ -145,7 +146,7 @@
 
 /////////////// items //////////////////
 
-#define INV_SIZE					128
+#define INV_SIZE					32
 
 #define BLANK_NAME					"Blank"
 #define TELEPORT_SCROLL_NAME		"Teleport Scroll"
@@ -334,8 +335,8 @@
 #define MESSAGE_HUD_SPACE			10
 #define HUD_LENGTH					50
 
-#define WORLD_HEIGHT				100
-#define WORLD_WIDTH					100
+#define WORLD_HEIGHT				50
+#define WORLD_WIDTH					50
 
 #define SCREEN_WIDTH				80
 #define SCREEN_HEIGHT				24
