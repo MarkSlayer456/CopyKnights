@@ -65,8 +65,6 @@ void player_take_loot_item(room_t *room, player_t *player);
 void player_get_nearby_loot(room_t *room, player_t *player);
 
 void player_clear_nearby_loot(player_t *player);
-
-
 #endif
 
 

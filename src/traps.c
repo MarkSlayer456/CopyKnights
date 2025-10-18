@@ -3,6 +3,7 @@
 #include <string.h>
 #include <strings.h>
 #include <stdlib.h>
+#include "buff.h"
 
 
 type_map_t trap_id_map[] = {
@@ -23,12 +24,66 @@ enum trap_id get_trap_id(const char *id) {
 	return NULL_TRAP;
 }
 
-void traps_triggered_check(room_t *room, player_t *player) {
-	
-}
-
-void traps_turn_pass(room_t *room, player_t *player) {
-	
+void traps_triggered_check(world_t *world, player_t *player) {
+	for(int i = 0; i < world->trap_data_count; i++) {
+		trap_data_t *trap_data = &world->trap_data[i];
+		if(trap_data->symbol == world->room[player->global_x][player->global_y]->tiles[player->y][player->x]->floor) {
+			switch(trap_data->id) {
+				case NULL_TRAP: {
+					buff_t buff = buff_create();
+					buff.turns_left = 10;
+					buff_set_type(&buff, BUFF_BLEED);
+					buff.damage = 1;
+					buff.target_type_id = TARGET_PLAYER;
+					buff.target.player = player;
+					world->buffs = buff_add_to_list(buff, world->buffs, &world->buff_count, &world->buff_size);
+					break;
+				}
+				case TRAP_STALAGMITE: {
+					buff_t buff = buff_create();
+					buff.turns_left = 10;
+					buff_set_type(&buff, BUFF_BLEED);
+					buff.damage = 1;
+					buff.target_type_id = TARGET_PLAYER;
+					buff.target.player = player;
+					world->buffs = buff_add_to_list(buff, world->buffs, &world->buff_count, &world->buff_size);
+					break;
+				}
+				case TRAP_HOLE: {
+					buff_t buff = buff_create();
+					buff.turns_left = 10;
+					buff_set_type(&buff, BUFF_BLEED);
+					buff.damage = 1;
+					buff.flat_speed = -4;
+					buff.target_type_id = TARGET_PLAYER;
+					buff.target.player = player;
+					world->buffs = buff_add_to_list(buff, world->buffs, &world->buff_count, &world->buff_size);
+					break;
+				}
+				case TRAP_MUD: {
+					buff_t buff = buff_create();
+					buff.turns_left = 10;
+					buff_set_type(&buff, BUFF_BLEED);
+					buff.damage = 1;
+					buff.target_type_id = TARGET_PLAYER;
+					buff.target.player = player;
+					world->buffs = buff_add_to_list(buff, world->buffs, &world->buff_count, &world->buff_size);
+					break;
+				}
+				case TRAP_TWISTED_ROOT: {
+					buff_t buff = buff_create();
+					buff.turns_left = 10;
+					buff_set_type(&buff, BUFF_BLEED);
+					buff.damage = 1;
+					buff.target_type_id = TARGET_PLAYER;
+					buff.target.player = player;
+					world->buffs = buff_add_to_list(buff, world->buffs, &world->buff_count, &world->buff_size);
+					break;
+				}
+			}
+			break;
+		}
+	}
 }
 
 void load_traps_effects(world_t *world) {
@@ -110,6 +165,9 @@ void load_trap_data(world_t *world) {
 					break;
 				case 4:
 					trap_data[world->trap_data_count].break_on_trigger = atoi(token) ? true : false;
+					break;
+				case 5:
+					trap_data[world->trap_data_count].symbol = token[0];
 					break;
 			}
 			token = strtok(NULL, ",");

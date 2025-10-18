@@ -54,6 +54,12 @@ void calculate_main_path(unsigned int *seed, world_t *world) {
 		int new_doors = rand_r_portable(seed) % 16;
 		room->door_mask |= exit_door;
 		room->door_mask |= new_doors;
+		if(main_x == 0) {
+			room->door_mask &= 0x7;
+		}
+		if(main_y == 0) {
+			room->door_mask &= 0xE;
+		}
 	}
 	for(int x = 0; x < WORLD_WIDTH; x++) {
 		for(int y = 0; y < WORLD_HEIGHT; y++) {
@@ -291,10 +297,6 @@ room_t *load_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data, it
 					room->tiles[i][j]->floor = tok[j];
 					room->tiles[i][j]->item_count = 0;
 					break;
-				case POTENTIAL_TRAP_SPAWN_CHAR:
-					room->tiles[i][j]->floor = tok[j];
-					room->tiles[i][j]->item_count = 0;
-					break;
 				case POTENTIAL_ITEM_SPAWN_CHAR:
 					item_spawn(item_generate_type(&map_seed, item_data, room->biome), room->biome, room->tiles[i][j], item_data);
 					room->tiles[i][j]->item_count++;
@@ -337,7 +339,6 @@ void load_room_floor_tiles(room_t *room) {
 			switch(tok[j]) {
 				case POTENTIAL_ENEMY_SPAWN_CHAR:
 				case POTENTIAL_CHEST_SPAWN_CHAR:
-				case POTENTIAL_TRAP_SPAWN_CHAR:
 				case POTENTIAL_ITEM_SPAWN_CHAR:
 					room->tiles[i][j]->floor = EMPTY;
 					break;

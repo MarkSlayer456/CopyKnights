@@ -5,21 +5,13 @@
 
 typedef struct {
 	enum trap_id id;
-	uint8_t turns_remaining;
-	union {
-		player_t *player;
-		enemy_t *enemy;
-	} target;
-} trap_t;
-
-typedef struct {
-	enum trap_id id;
 	char name[32]; // need name for messages
 	uint8_t effect_duration;
 	int8_t damage; // this isn't unsigned because it could heal
 	int8_t damage_each_turn; // same here
 	stat_modifier_t modifier_stats[MAX_ARMOR_MODIFIERS];
 	int8_t modifier_count;
+	char symbol;
 	bool break_on_trigger; // does this get removed after triggered
 } trap_data_t;
 

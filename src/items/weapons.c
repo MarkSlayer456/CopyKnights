@@ -129,7 +129,8 @@ void load_weapon_data(world_t *world) {
 					break;
 				case 3:
 					item_data[world->item_data_count].stat_type.weapon.scaling_stat1 = get_stat(token);
-					strcpy(stat_name1, token);
+					strncpy(stat_name1, token, 3);
+					stat_name1[3] = '\0';
 					break;
 				case 4:
 					item_data[world->item_data_count].stat_type.weapon.stat1_grade = get_grade(token);
@@ -137,7 +138,8 @@ void load_weapon_data(world_t *world) {
 					break;
 				case 5:
 					item_data[world->item_data_count].stat_type.weapon.scaling_stat2 = get_stat(token);
-					strcpy(stat_name2, token);
+					strncpy(stat_name2, token, 3);
+					stat_name2[3] = '\0';
 					break;
 				case 6:
 					item_data[world->item_data_count].stat_type.weapon.stat2_grade = get_grade(token);
