@@ -90,7 +90,7 @@ enemy_t *enemy_spawn(enemy_type_t type, const enemy_data_t *enemy_data, int x, i
         DEBUG_LOG("int: %d", e->intelligence);
         e->constitution = (int)enemy_data[i].base_constitution + ((e->level-1) * ENEMY_GROWTH_MODIFER);
         DEBUG_LOG("con: %d", e->constitution);
-        e->health = (int)(enemy_data[i].base_constitution + ((e->level-1) * ENEMY_GROWTH_MODIFER)) * 10;
+        e->health = (int)(e->constitution + ((e->level-1) * ENEMY_GROWTH_MODIFER)) * 10;
         e->speed = (int)enemy_data[i].base_speed + ((e->level-1) * ENEMY_GROWTH_MODIFER);
         DEBUG_LOG("speed: %d", e->speed);
         e->defense = (int)enemy_data[i].base_defense + ((e->level-1) * ENEMY_GROWTH_MODIFER);
@@ -390,48 +390,98 @@ void enemy_decide_move(enemy_t *enemy, world_t *world, player_t *player)
     // TODO move the player check to enemy_can_move functions; just makes more sense, also need loop for them
     switch(enemy->trait) {
 		case PASSIVE:
-			if(player->x < enemy->x) {
-                if(enemy_can_move_dir(enemy, world, player, LEFT) && (enemy->x-1 != player->x || enemy->y != player->y)) {
-                    enemy->x-=1;
-                    break;
-                } else if(enemy->x-1 == player->x && enemy->y == player->y) {
-                    enemy_attack(enemy, player, world);
-                    break;
-                }
-			} 
-			if(player->x > enemy->x) {
-                if(enemy_can_move_dir(enemy, world, player, RIGHT) && (enemy->x+1 != player->x || enemy->y != player->y)) {
-                    enemy->x+=1;
-                    break;
-                } else if(enemy->x+1 == player->x && enemy->y == player->y) {
-                    enemy_attack(enemy, player, world);
-                    break;
-                }
-			} 
-			if(player->y < enemy->y) {
-                if(enemy_can_move_dir(enemy, world, player, UP) && (enemy->y-1 != player->y || enemy->x != player->x)) {
-                    enemy->y-=1;
-                    break;
-                } else if(enemy->y-1 == player->y && enemy->x == player->x) {
-                    enemy_attack(enemy, player, world);
-                    break;
-                }
-			} 
-			if(player->y > enemy->y) {
-                if(enemy_can_move_dir(enemy, world, player, DOWN) && (enemy->y+1 != player->y || enemy->x != player->x)) {
-                    enemy->y+=1;
-                    break;
-                } else if(enemy->y+1 == player->y && enemy->x == player->x) {
-                    enemy_attack(enemy, player, world);
-                    break;
-                }
-			}
+			enemy_decide_move_passive(enemy, world, player);
 			break;
-		case AGRESSIVE:
+		case AGGRESSIVE:
+            enemy_decide_move_aggressive(enemy, world, player);
 			break;
-		case TACTICAL:
+		case LIGHT_CENTERED:
+            enemy_decide_move_light_centered(enemy, world, player);
 			break;
+        case DARK_CENTERED:
+            enemy_decide_move_dark_centered(enemy, world, player);
+            break;
+        case SURVIVAL:
+            enemy_decide_move_survival(enemy, world, player);
+            break;
 	}
+}
+
+void enemy_decide_move_passive(enemy_t *enemy, world_t *world, player_t *player) {
+    int max_health = (int)(enemy->constitution + ((enemy->level-1) * ENEMY_GROWTH_MODIFER)) * 10;
+    if(max_health > enemy->health) {
+        enemy_decide_move_aggressive(enemy, world, player);
+    } else {
+        float chance = (float)rand() / (float)RAND_MAX;
+        if(chance <= .20) {
+            if(enemy_can_move_dir(enemy, world, player, LEFT)) {
+                enemy->x--;
+            }
+        } else if(chance <= .40) {
+            if(enemy_can_move_dir(enemy, world, player, RIGHT)) {
+                enemy->x++;
+            }
+        } else if(chance <= .60) {
+            if(enemy_can_move_dir(enemy, world, player, DOWN)) {
+                enemy->y++;
+            }
+        } else if(chance <= .80) {
+            if(enemy_can_move_dir(enemy, world, player, UP)) {
+                enemy->y--;
+            }
+        }
+    }
+}
+
+void enemy_decide_move_aggressive(enemy_t *enemy, world_t *world, player_t *player) {
+    if(player->x < enemy->x) {
+        if(enemy_can_move_dir(enemy, world, player, LEFT)) {
+            enemy->x-=1;
+            return;
+        } else if(enemy->x-1 == player->x && enemy->y == player->y) {
+            enemy_attack(enemy, player, world);
+            return;
+        }
+    }
+    if(player->x > enemy->x) {
+        if(enemy_can_move_dir(enemy, world, player, RIGHT)) {
+            enemy->x+=1;
+            return;
+        } else if(enemy->x+1 == player->x && enemy->y == player->y) {
+            enemy_attack(enemy, player, world);
+            return;
+        }
+    }
+    if(player->y < enemy->y) {
+        if(enemy_can_move_dir(enemy, world, player, UP)) {
+            enemy->y-=1;
+            return;
+        } else if(enemy->y-1 == player->y && enemy->x == player->x) {
+            enemy_attack(enemy, player, world);
+            return;
+        }
+    }
+    if(player->y > enemy->y) {
+        if(enemy_can_move_dir(enemy, world, player, DOWN)) {
+            enemy->y+=1;
+            return;
+        } else if(enemy->y+1 == player->y && enemy->x == player->x) {
+            enemy_attack(enemy, player, world);
+            return;
+        }
+    }
+}
+
+void enemy_decide_move_dark_centered(enemy_t *enemy, world_t *world, player_t *player) {
+
+}
+
+void enemy_decide_move_light_centered(enemy_t *enemy, world_t *world, player_t *player) {
+
+}
+
+void enemy_decide_move_survival(enemy_t *enemy, world_t *world, player_t *player) {
+
 }
 
 char enemy_check_dir(enemy_t *enemy, world_t *world, player_t *player, direction_t dir) {
@@ -441,6 +491,9 @@ char enemy_check_dir(enemy_t *enemy, world_t *world, player_t *player, direction
     if(dir == RIGHT) x++;
     if(dir == DOWN) y++;
     if(dir == UP) y--;
+    if(x == player->x && y == player->y) {
+        return PLAYER;
+    }
     room_t *room = world->room[player->global_x][player->global_y];
     for(int i = 0; i < room->current_enemy_count; i++) {
         enemy_t *tmp = room->enemies[i];

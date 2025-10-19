@@ -106,9 +106,11 @@ typedef enum class_type {
 } class_type_t;
 
 typedef enum trait {
-	PASSIVE = 80000,
-	AGRESSIVE = 80001,
-	TACTICAL = 80002
+	PASSIVE,
+	AGGRESSIVE,
+	DARK_CENTERED,
+	LIGHT_CENTERED,
+	SURVIVAL
 } trait_t;
 
 typedef enum enemy_type {

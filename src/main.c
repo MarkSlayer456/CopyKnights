@@ -28,7 +28,7 @@
 	Top down dungeon crawler
 	oil is the currency here
 	your lamp is powered by oil
-	oil is your friend without you won't last long
+	oil is your friend without it you won't last long
 */
 
 WINDOW *main_menu;
@@ -37,7 +37,7 @@ WINDOW *action_bar; // OLG player's inventory/spells menu, maybe a help menu in 
 WINDOW *error; // USED FOR ERROR CHECKING ONLY
 WINDOW *inventory_hud; // player's inventory
 WINDOW *inventory_desc_hud; // player's description in the inventory
-char walk_chars[WALK_CHAR_LENGTH] = {EMPTY, '0', '"', '^', DOOR, MUD, CHEST}; // characters entites can walk on
+char walk_chars[WALK_CHAR_LENGTH] = {EMPTY, HOLE, TWISTED_ROOT, STALAGMITE, DOOR, MUD, CHEST}; // characters entites can walk on
 
 int main(int argc, char *argv[]) {
     WINDOW *win;

@@ -7,14 +7,23 @@
 
 #define MESSAGE_IS_PLAYERS_TURN					"It is your turn!"
 
-#define WALL 				'#' // a wall
-#define BOG_WALL			'%'
-#define MUD					'~'
-#define EMPTY				'.'
-#define DOOR				'/'
-#define CHEST				'$' // can walk through
-#define PLAYER				'@'
-#define ITEM_SYMBOL			'*'
+/// Symbols ///
+
+#define WALL 									'#'
+#define BOG_WALL								'%'
+#define PLAYER									'@'
+
+// can walk on //
+#define ITEM_SYMBOL								'*'
+#define STALAGMITE								'^'
+#define TWISTED_ROOT							'"'
+#define HOLE									'0'
+#define MUD										'~'
+#define DOOR									'/'
+#define EMPTY									'.'
+#define CHEST									'$'
+
+///////////////
 
 #define GAME_TITLE								"The Hollow of Marrowfall"
 #define MENU_DIVIDE_LINE						"------------------------"

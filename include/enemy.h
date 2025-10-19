@@ -34,6 +34,16 @@ void enemy_attack(enemy_t *enemy, player_t *player, world_t *world);
 
 void enemy_decide_move(enemy_t *enemy, world_t *world, player_t *player);
 
+void enemy_decide_move_passive(enemy_t *enemy, world_t *world, player_t *player);
+
+void enemy_decide_move_aggressive(enemy_t *enemy, world_t *world, player_t *player);
+
+void enemy_decide_move_dark_centered(enemy_t *enemy, world_t *world, player_t *player);
+
+void enemy_decide_move_light_centered(enemy_t *enemy, world_t *world, player_t *player);
+
+void enemy_decide_move_survival(enemy_t *enemy, world_t *world, player_t *player);
+
 char enemy_check_dir(enemy_t *enemy, world_t *world, player_t *player, direction_t dir);
 
 int enemy_can_move_dir(enemy_t *enemy, world_t *world, player_t *player, direction_t dir);
