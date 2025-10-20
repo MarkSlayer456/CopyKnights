@@ -37,6 +37,7 @@ typedef struct weapon_stats {
 	bool equipped;
 	bool two_handed;
 	bool main_hand;
+	uint8_t range;
 } weapon_stats_t;
 
 typedef struct food_stats {

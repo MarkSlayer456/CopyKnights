@@ -154,13 +154,16 @@ void load_weapon_data(world_t *world) {
 				case 9:
 					item_data[world->item_data_count].stat_type.weapon.main_hand = atoi(token);
 					break;
+				case 10:
+					item_data[world->item_data_count].stat_type.weapon.range = atoi(token);
+					break;
 			}
 			token = strtok(NULL, ",");
 			col++;
 		}
 		if(item_data[world->item_data_count].stat_type.weapon.scaling_stat2 != NULL_STAT) {
 			snprintf(item_data[world->item_data_count].desc, MAX_ITEM_DESC_LEN, 
-					"damage: %d - %d\nscaling stats: %s (%c), %s (%c)\ntwo handed: %d\nmain hand: %d", 
+					"damage: %d - %d\nscaling stats: %s (%c), %s (%c)\ntwo handed: %d\nmain hand: %d\nrange: %d",
 					item_data[world->item_data_count].stat_type.weapon.min_attack,
 					item_data[world->item_data_count].stat_type.weapon.max_attack, 
 					stat_name1,
@@ -168,16 +171,18 @@ void load_weapon_data(world_t *world) {
 					stat_name2,
 					stat2_grade,
 					item_data[world->item_data_count].stat_type.weapon.two_handed,
-					item_data[world->item_data_count].stat_type.weapon.main_hand);
+					item_data[world->item_data_count].stat_type.weapon.main_hand,
+					item_data[world->item_data_count].stat_type.weapon.range);
 		} else {
 			snprintf(item_data[world->item_data_count].desc, MAX_ITEM_DESC_LEN, 
-					"damage: %d - %d\nscaling stat: %s (%c)\ntwo handed: %d\nmain hand: %d", 
+					"damage: %d - %d\nscaling stat: %s (%c)\ntwo handed: %d\nmain hand: %d\nrange: %d",
 					item_data[world->item_data_count].stat_type.weapon.min_attack,
 					item_data[world->item_data_count].stat_type.weapon.max_attack, 
 					stat_name1,
 					stat1_grade,
 					item_data[world->item_data_count].stat_type.weapon.two_handed,
-					item_data[world->item_data_count].stat_type.weapon.main_hand);
+					item_data[world->item_data_count].stat_type.weapon.main_hand,
+					item_data[world->item_data_count].stat_type.weapon.range);
 		}
 		
 		DEBUG_LOG("Loaded Weapon Data: %d, %s, %d, %s",

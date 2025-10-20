@@ -38,6 +38,8 @@ void manage_load_menu_input(char c, load_menu_t *load_menu, world_t *world, play
 
 void manage_menu_input(char c, menu_manager_t *menu_manager, world_t *world);
 
+direction_t direction_from_key(int key);
+
 void end_game(world_t *world, player_t *player);
 
 void shutdown(world_t *world);

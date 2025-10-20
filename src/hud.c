@@ -218,8 +218,7 @@ void display_inventory_hud(world_t *world, player_t *player) {
 	}
 }
 void display_inventory_desc_hud(world_t *world, player_t *player) {
-	if(player->state == PLAYER_STATE_MOVING || player->state == PLAYER_STATE_MOVING
-		|| player->state == PLAYER_STATE_CASTING) {
+	if(player->state == PLAYER_STATE_MOVING || player->state == PLAYER_STATE_MOVING) {
 		// this should never happen
 		werase(inventory_desc_hud);
 		return;

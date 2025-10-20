@@ -47,7 +47,7 @@
 #define INVALID_ACTOR_INDEX						999999999
 
 #define DOOR_BLOCKED_MESSAGE					"This door won't seem to budge!"
-#define ATTACK_DIRECTION_MESSAGE				"choose a direction to attack!"
+#define ATTACK_DIRECTION_MESSAGE				"Which direction?"
 
 #define SAVE_MENU_PROMPT						"Name your save file (press enter to confirm or esc to cancel):"
 

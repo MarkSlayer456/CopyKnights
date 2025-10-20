@@ -28,7 +28,7 @@ char player_check_dir(player_t *player, world_t *world, direction_t dir);
 int player_can_move_dir(player_t *player, world_t *world, direction_t dir);
 
 // this will return NULL if no enemy is next to the player
-enemy_t *player_get_dir_enemy(player_t *player, world_t *world, direction_t dir);
+enemy_t *player_get_dir_enemy(player_t *player, world_t *world, direction_t dir, uint8_t range);
 
 double get_weapon_stat_scaling_factor(player_t *player, stats_t stat, double required_stat);
 

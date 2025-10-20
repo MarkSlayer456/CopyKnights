@@ -218,21 +218,34 @@ void player_increase_mana(player_t *player, int amount) {
 }
 
 
-enemy_t *player_get_dir_enemy(player_t *player, world_t *world, direction_t dir) {
+enemy_t *player_get_dir_enemy(player_t *player, world_t *world, direction_t dir, uint8_t range) {
 	int x = player->x;
 	int y = player->y;
-	if(dir == LEFT) x--;
-	if(dir == RIGHT) x++;
-	if(dir == DOWN) y++;
-	if(dir == UP) y--;
-	
-	room_t *room = world->room[player->global_x][player->global_y];
-    for(int i = 0; i < room->current_enemy_count; i++) {
-		if(room->enemies[i] == NULL) continue;
-		if(x == room->enemies[i]->x && y == room->enemies[i]->y) {
-            return room->enemies[i];
-        }  
-    }
+	for(int i = 0; i < range; i++) {
+		if(dir == LEFT) x--;
+		if(dir == RIGHT) x++;
+		if(dir == DOWN) y++;
+		if(dir == UP) y--;
+		room_t *room = world->room[player->global_x][player->global_y];
+
+		bool found = false;
+		char test = room->tiles[y][x]->floor;
+		for(int i = 0; i < WALK_CHAR_LENGTH; i++) {
+			if(test == walk_chars[i]) { // the space is open
+				found = true;
+				break;
+			}
+		}
+		if(!found) return NULL;
+
+		if(room->tiles[y][x]->floor )
+		for(int i = 0; i < room->current_enemy_count; i++) {
+			if(room->enemies[i] == NULL) continue;
+			if(x == room->enemies[i]->x && y == room->enemies[i]->y) {
+				return room->enemies[i];
+			}
+		}
+	}
     return NULL;
 }
 
@@ -265,11 +278,12 @@ double get_weapon_stat_scaling_factor(player_t *player, stats_t stat, double req
  */
 void player_attack(player_t *player, world_t *world, direction_t dir) {
 	player_exit_attack_state(player, world);
-	enemy_t *enemy = player_get_dir_enemy(player, world, dir);
-	if(!enemy) return;
-	int xp = (enemy->health + enemy->strength) * 5; // TODO this needs changed
+
 	item_t *main_hand = player->equipment.main_hand;
 	if(!main_hand) {
+		enemy_t *enemy = player_get_dir_enemy(player, world, dir, 1);
+		if(!enemy) return;
+		int xp = (enemy->health + enemy->strength) * 5; // TODO this needs changed
 		int unarmed_damage = 1;
 		char message[MAX_MESSAGE_LENGTH_WITHOUT_PREFIX];
 		snprintf(message, MAX_MESSAGE_LENGTH_WITHOUT_PREFIX, "You attacked for %d", unarmed_damage);
@@ -282,6 +296,10 @@ void player_attack(player_t *player, world_t *world, direction_t dir) {
 	int raw_damage = 0;
 	weapon_stats_t *weapon = &main_hand->stat_type.weapon;
 	double required_stat = weapon->min_attack + weapon->max_attack;
+
+	enemy_t *enemy = player_get_dir_enemy(player, world, dir, weapon->range);
+	if(!enemy) return;
+	int xp = (enemy->health + enemy->strength) * 5; // TODO this needs changed
 	
 	double scaling_factor_stat1 = get_weapon_stat_scaling_factor(player, weapon->scaling_stat1, required_stat);
 	if(scaling_factor_stat1 > 1) scaling_factor_stat1 = 1;
@@ -339,12 +357,6 @@ void player_check_level_up(player_t *player, const class_data_t *class_data) {
 		player->level++;
 		for(int i = 0; i < MAX_CLASSES; i++) {
 			if(class_data[i].type == player->player_class) {
-				// int base_strength = class_data[i].base_strength;
-				// int base_dexterity = class_data[i].base_dexterity;
-				// int base_intelligence = class_data[i].base_intelligence;
-				// int base_constitution = class_data[i].base_constitution;
-				// int base_speed = class_data[i].base_speed;
-				
 				float growth_strength = class_data[i].growth_strength;
 				float growth_dexterity = class_data[i].growth_dexterity;
 				float growth_intelligence = class_data[i].growth_intelligence;
@@ -362,7 +374,7 @@ void player_check_level_up(player_t *player, const class_data_t *class_data) {
 }
 
 void player_enter_attack_state(player_t *player, world_t *world) {
-	// display_combat_message(world, player, ATTACK_DIRECTION_MESSAGE);
+	display_combat_message(world, player, ATTACK_DIRECTION_MESSAGE);
 	player->state = PLAYER_STATE_ATTACKING;
 }
 
@@ -426,6 +438,7 @@ void player_close_loot(player_t *player) {
 
 
 void player_open_inventory(player_t *player) {
+	DEBUG_LOG("%s", "open inv");
 	player->state  = PLAYER_STATE_INVENTORY;
 }
 

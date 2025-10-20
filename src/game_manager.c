@@ -27,8 +27,7 @@ void draw(world_t *world, player_t *player) {
 	werase(inventory_hud);
 	werase(inventory_desc_hud);
 	// draw stuff...
-	if(player->state != PLAYER_STATE_MOVING && player->state != PLAYER_STATE_ATTACKING 
-		&& player->state != PLAYER_STATE_CASTING) {
+	if(player->state == PLAYER_STATE_INVENTORY || player->state == PLAYER_STATE_LOOTING) {
 		display_inventory_hud(world, player);
 		display_inventory_desc_hud(world, player);
 		wnoutrefresh(inventory_hud);
@@ -121,7 +120,6 @@ bool manage_input(char c, world_t *world, player_t *player, menu_manager_t *menu
 			case CTRL_S:
 				menu_manager->current_menu = SAVE_MENU;
 				world->is_player_turn = true;
-				// save_game(world, player, "save.bin");
 				return true;
 			case KEY_F_MINE:
 				if(lantern_increase_power(&player->lantern, &player->oil) == false) {
@@ -616,6 +614,20 @@ void display_and_manage_save_menu(WINDOW *win, char *buf, int max_len, world_t *
 		wnoutrefresh(win);
 		doupdate();
 	}
+}
+
+direction_t direction_from_key(int key) {
+	switch(key) {
+		case LEFT_ARROW:
+			return LEFT;
+		case RIGHT_ARROW:
+			return RIGHT;
+		case UP_ARROW:
+			return UP;
+		case DOWN_ARROW:
+			return DOWN;
+	}
+	return -1;
 }
 
 void end_game(world_t *world, player_t *player) {
