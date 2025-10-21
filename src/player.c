@@ -26,6 +26,11 @@ class_type_map_t class_type_map[] = {
 	{ARCHER_CLASS_NAME, ARCHER},
 	{WIZARD_CLASS_NAME, WIZARD},
 	{MERCHANT_CLASS_NAME, MERCHANT},
+	{ROGUE_CLASS_NAME, ROGUE},
+	{MONK_CLASS_NAME, MONK},
+	{PALADIN_CLASS_NAME, PALADIN},
+	{BRAWLER_CLASS_NAME, BRAWLER},
+	{VOID_EMBRACE_CLASS_NAME, VOID_EMBRACE}
 };
 
 const int class_type_map_len = sizeof(class_type_map) / sizeof(class_type_map[0]);

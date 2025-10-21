@@ -49,17 +49,23 @@ enemy_type_map_t type_map[] = {
 
 const int type_map_len = sizeof(type_map) / sizeof(type_map[0]);
 
-enemy_t *enemy_create_temp(world_t *world) 
-{
-	enemy_t *e = malloc(sizeof(enemy_t));
-	e->health = 1000000;
-	// e->attack = 0;
-	// e->defense = 0;
-	e->x = 0;
-	e->y = 0;
-	strcpy(e->name, "");
-	//TODO trait?
-	return e;
+type_map_t trait_map[] = {
+    {ENEMY_TRAIT_PASSIVE_NAME, PASSIVE},
+    {ENEMY_TRAIT_AGGRESSIVE_NAME, AGGRESSIVE},
+    {ENEMY_TRAIT_LIGHT_CENTERED_NAME, LIGHT_CENTERED},
+    {ENEMY_TRAIT_DARK_CENTERED_NAME, DARK_CENTERED},
+    {ENEMY_TRAIT_SURVIVAL_NAME, SURVIVAL},
+};
+
+const int trait_map_len = sizeof(trait_map) / sizeof(trait_map[0]);
+
+enum trait enemy_get_trait(const char *name) {
+    for(int i = 0; i < trait_map_len; i++) {
+        if(strcasecmp(name, trait_map[i].name) == 0) {
+            return trait_map[i].value;
+        }
+    }
+    return PASSIVE;
 }
 
 enemy_t *enemy_spawn(enemy_type_t type, const enemy_data_t *enemy_data, int x, int y, int global_x, int global_y, biome_t biome)
@@ -99,8 +105,9 @@ enemy_t *enemy_spawn(enemy_type_t type, const enemy_data_t *enemy_data, int x, i
         e->y = y;
         e->global_x = global_x;
         e->global_y = global_y;
-        e->trait = PASSIVE;
+        e->trait = enemy_data[i].trait;
         e->symbol = enemy_data[i].symbol;
+        e->range = enemy_data[i].range;
         e->action_points = 0;
         strcpy(e->name, enemy_get_name(type));
         i++;
@@ -249,20 +256,22 @@ void load_enemy_data(enemy_data_t *enemy_data) {
                     enemy_data[row].base_defense = atoi(token);
                     break;
                 case 7:
-                    // TODO
-                    // enemy_data[row].trait = atoi(token);
+                    enemy_data[row].trait = enemy_get_trait(token);
                     break;
                 case 8:
                     enemy_data[row].symbol = token[0];
+                    break;
+                case 9:
+                    enemy_data[row].range = atoi(token);
                     break;
                     
             }
             token = strtok(NULL, ",");
             col++;
         }
-        DEBUG_LOG("Loaded Enemy Data: %d, %d, %d, %d, %d, %d, %d, %c", enemy_data[row].type, 
+        DEBUG_LOG("Loaded Enemy Data: %d, %d, %d, %d, %d, %d, %d, %c, %d, %d", enemy_data[row].type,
                   enemy_data[row].base_strength, enemy_data[row].base_dexterity, enemy_data[row].base_intelligence,
-                  enemy_data[row].base_constitution, enemy_data[row].base_speed, enemy_data[row].base_defense, enemy_data[row].symbol);
+                  enemy_data[row].base_constitution, enemy_data[row].base_speed, enemy_data[row].base_defense, enemy_data[row].symbol, enemy_data[row].trait, enemy_data[row].range);
         col = 0;
         row++;
     }
@@ -473,6 +482,30 @@ void enemy_decide_move_aggressive(enemy_t *enemy, world_t *world, player_t *play
 }
 
 void enemy_decide_move_dark_centered(enemy_t *enemy, world_t *world, player_t *player) {
+    //TODO should consider if another enemy is already in the spot they want to move to
+    int player_top = player->y - player->lantern.power;
+    int player_bottom = player->y + player->lantern.power;
+    int player_left = player->x - player->lantern.power;
+    int player_right = player->x + player->lantern.power;
+
+    int top_dist = abs(player_top - enemy->y) + abs(player->x - enemy->x);
+    int bottom_dist = abs(player_bottom - enemy->y) + abs(player->x - enemy->x);
+    int right_dist = abs(player->y - enemy->y) + abs(player_right - enemy->x);
+    int left_dist = abs(player->y - enemy->y) + abs(player_left - enemy->x);
+
+    int shortest = compare4(top_dist, bottom_dist, right_dist, left_dist);
+    if(enemy_attempt_attack(enemy, world, player)) {
+        return;
+    }
+    if(shortest == top_dist) {
+        enemy_move_toward_location(enemy, world, player, player_top, player->x);
+    } else if(shortest == bottom_dist) {
+        enemy_move_toward_location(enemy, world, player, player_bottom, player->x);
+    } else if(shortest == right_dist) {
+        enemy_move_toward_location(enemy, world, player, player_right, player->x);
+    } else if(shortest == left_dist) {
+        enemy_move_toward_location(enemy, world, player, player_top, player->x);
+    }
 
 }
 
@@ -483,6 +516,47 @@ void enemy_decide_move_light_centered(enemy_t *enemy, world_t *world, player_t *
 void enemy_decide_move_survival(enemy_t *enemy, world_t *world, player_t *player) {
 
 }
+
+void enemy_move_toward_location(enemy_t *enemy, world_t *world, player_t *player, int y, int x) {
+    if(x < enemy->x) {
+        if(enemy_can_move_dir(enemy, world, player, LEFT)) {
+            enemy->x-=1;
+            return;
+        }
+    }
+    if(x > enemy->x) {
+        if(enemy_can_move_dir(enemy, world, player, RIGHT)) {
+            enemy->x+=1;
+            return;
+        }
+    }
+    if(y < enemy->y) {
+        if(enemy_can_move_dir(enemy, world, player, UP)) {
+            enemy->y-=1;
+            return;
+        }
+    }
+    if(y > enemy->y) {
+        if(enemy_can_move_dir(enemy, world, player, DOWN)) {
+            enemy->y+=1;
+            return;
+        }
+    }
+}
+
+int enemy_attempt_attack(enemy_t *enemy, world_t *world, player_t *player) {
+    for(int i = 1; i < enemy->range; i++) {
+        if((enemy->y-i == player->y && enemy->x == player->x) ||
+        (enemy->y+i == player->y && enemy->x == player->x) ||
+        (enemy->x-i == player->x && enemy->y == player->y) ||
+        (enemy->x+i == player->x && enemy->y == player->y)) {
+            enemy_attack(enemy, player, world);
+            return 1;
+        }
+    }
+    return 0;
+}
+
 
 char enemy_check_dir(enemy_t *enemy, world_t *world, player_t *player, direction_t dir) {
     int x = enemy->x;

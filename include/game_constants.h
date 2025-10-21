@@ -153,16 +153,22 @@
 
 #define ENEMY_GROWTH_MODIFER				1.15
 
+#define ENEMY_TRAIT_PASSIVE_NAME				"Passive"
+#define ENEMY_TRAIT_AGGRESSIVE_NAME				"Aggressive"
+#define ENEMY_TRAIT_LIGHT_CENTERED_NAME			"Light Centered"
+#define ENEMY_TRAIT_DARK_CENTERED_NAME			"Dark Centered"
+#define ENEMY_TRAIT_SURVIVAL_NAME				"Survival"
+
 /////////////// items //////////////////
 
 #define INV_SIZE					32
 
-#define BLANK_NAME					"Blank"
-#define TELEPORT_SCROLL_NAME		"Teleport Scroll"
-#define TELEPORT_SCROLL_TELEPORT_LOCATION  ((location_t){ .x = 1, .y = 1, .global_x = 0, .global_y = 0 })
-#define HEALTH_POTION_NAME			"Health Potion"
-#define	APPLE_NAME					"Apple"
-#define CHICKEN_DINNER_NAME			"Chicken Dinner"
+#define BLANK_NAME							"Blank"
+#define TELEPORT_SCROLL_NAME				"Teleport Scroll"
+#define TELEPORT_SCROLL_TELEPORT_LOCATION 	 ((location_t){ .x = 1, .y = 1, .global_x = 0, .global_y = 0 })
+#define HEALTH_POTION_NAME					"Health Potion"
+#define	APPLE_NAME							"Apple"
+#define CHICKEN_DINNER_NAME					"Chicken Dinner"
 #define ROTTEN_APPLE_NAME 					"Rotten Apple"
 #define RAT_MEAT_NAME						"Rat Meat"
 
@@ -309,6 +315,11 @@
 #define ARCHER_CLASS_NAME				"Archer"
 #define WIZARD_CLASS_NAME				"Wizard"
 #define MERCHANT_CLASS_NAME				"Merchant"
+#define ROGUE_CLASS_NAME				"Rogue"
+#define MONK_CLASS_NAME					"Monk"
+#define PALADIN_CLASS_NAME				"Paladin"
+#define BRAWLER_CLASS_NAME				"Brawler"
+#define VOID_EMBRACE_CLASS_NAME			"Void Embrace"
 
 #define BASE_STRENGTH					10
 #define BASE_DEXTERITY					10

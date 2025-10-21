@@ -143,7 +143,7 @@ int main(int argc, char *argv[]) {
 	player->inventory_manager = inv_manager;
 	player->x = 1;
 	player->y = 10;
-	player->player_class = SWORDSMAN;
+	player->player_class = BRAWLER;
 	for(int i = 0; i < MAX_CLASSES; i++) {
 		if(world->class_data[i].type == player->player_class) {
 			int base_strength = world->class_data[i].base_strength;

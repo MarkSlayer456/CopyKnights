@@ -102,6 +102,12 @@ typedef enum class_type {
 	ARCHER,
 	WIZARD,
 	MERCHANT,
+	ROGUE,
+	MONK,
+	PALADIN,
+	BRAWLER,
+	SAMURAI,
+	VOID_EMBRACE
 } class_type_t;
 
 typedef enum trait {

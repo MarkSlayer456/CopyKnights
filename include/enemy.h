@@ -8,6 +8,8 @@
 //TODO need move functions and check functions so enemies don't leave the map
 // shouldn't happen but just in case
 
+enum trait enemy_get_trait(const char *name);
+
 enemy_t *enemy_spawn(enemy_type_t type, const enemy_data_t *enemy_data, int x, int y, int global_x, int global_y, biome_t biome);
 
 const char *enemy_get_name(enemy_type_t type);
@@ -43,6 +45,10 @@ void enemy_decide_move_dark_centered(enemy_t *enemy, world_t *world, player_t *p
 void enemy_decide_move_light_centered(enemy_t *enemy, world_t *world, player_t *player);
 
 void enemy_decide_move_survival(enemy_t *enemy, world_t *world, player_t *player);
+
+void enemy_move_toward_location(enemy_t *enemy, world_t *world, player_t *player, int y, int x);
+
+int enemy_attempt_attack(enemy_t *enemy, world_t *world, player_t *player);
 
 char enemy_check_dir(enemy_t *enemy, world_t *world, player_t *player, direction_t dir);
 

@@ -111,6 +111,7 @@ typedef struct enemy {
 	int y; // room pos
 	int global_x; // map pos
 	int global_y; // map pos
+	uint8_t range;
 	enemy_type_t type;
 	char name[MAX_ENEMY_NAME_LENGTH]; // name will be the type of enemy
 	int action_points;
@@ -130,6 +131,7 @@ typedef struct enemy_data {
 	int level;
 	char symbol;
 	trait_t trait;
+	uint8_t range;
 	bool can_spawn[NUMBER_OF_BIOMES];
 	int highest_level[NUMBER_OF_BIOMES];
 	int lowest_level[NUMBER_OF_BIOMES];
