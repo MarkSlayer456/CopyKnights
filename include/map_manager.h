@@ -18,4 +18,6 @@ void load_room_floor_tiles(room_t *room);
 void load_item_from_data(item_t *item, item_data_t *item_data);
 
 void remove_item_from_tile(tile_t *tile, item_t *item);
+
+char check_tile(const room_t *room, const player_t *player, int y, int x);
 #endif

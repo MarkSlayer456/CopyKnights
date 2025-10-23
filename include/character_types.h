@@ -4,6 +4,15 @@
 
 #include "items/item_types.h"
 
+typedef struct path_node {
+	int16_t x, y;
+	int16_t g;
+	int16_t h;
+	int16_t f;
+	int16_t px, py;
+	bool checked;
+} path_node_t;
+
 typedef struct {
 	item_ids_t id;
 	float drop_chance;
@@ -118,6 +127,18 @@ typedef struct enemy {
 	// and the first letter will be the letter to represent them
 	char symbol;
 	trait_t trait;
+
+	// path finding, not saved
+	// this could probably be a struct itself
+	bool clist[ROOM_HEIGHT][ROOM_WIDTH]; // closed list
+	path_node_t all_nodes[ROOM_HEIGHT][ROOM_WIDTH];
+	path_node_t *olist; // open list
+	uint16_t olist_count;
+	uint16_t olist_size;
+	uint16_t start_x;
+	uint16_t start_y;
+	uint16_t end_x;
+	uint16_t end_y;
 } enemy_t;
 
 typedef struct enemy_data {

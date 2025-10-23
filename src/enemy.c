@@ -81,11 +81,11 @@ enemy_t *enemy_spawn(enemy_type_t type, const enemy_data_t *enemy_data, int x, i
         enemy_t *e = calloc(1, sizeof(enemy_t));
         e->type = enemy_data[i].type;
         DEBUG_LOG("Type: %s", enemy_get_name(e->type));
-        
+
         unsigned int seed = cantor_pair(x, y);
         int range = enemy_data[i].highest_level[biome] - enemy_data[i].lowest_level[biome] + 1;
         int level = (rand_r_portable(&seed) % range) +  enemy_data[i].lowest_level[biome];
-        
+
         e->level = level;
         DEBUG_LOG("Level: %d", e->level);
         e->strength = (int)enemy_data[i].base_strength + ((e->level-1) * ENEMY_GROWTH_MODIFER);
@@ -96,7 +96,7 @@ enemy_t *enemy_spawn(enemy_type_t type, const enemy_data_t *enemy_data, int x, i
         DEBUG_LOG("int: %d", e->intelligence);
         e->constitution = (int)enemy_data[i].base_constitution + ((e->level-1) * ENEMY_GROWTH_MODIFER);
         DEBUG_LOG("con: %d", e->constitution);
-        e->health = (int)(e->constitution + ((e->level-1) * ENEMY_GROWTH_MODIFER)) * 10;
+        e->health = enemy_calc_max_health(e);
         e->speed = (int)enemy_data[i].base_speed + ((e->level-1) * ENEMY_GROWTH_MODIFER);
         DEBUG_LOG("speed: %d", e->speed);
         e->defense = (int)enemy_data[i].base_defense + ((e->level-1) * ENEMY_GROWTH_MODIFER);
@@ -111,7 +111,7 @@ enemy_t *enemy_spawn(enemy_type_t type, const enemy_data_t *enemy_data, int x, i
         e->action_points = 0;
         strcpy(e->name, enemy_get_name(type));
         i++;
-        
+
         return e;
     }
     return NULL;
@@ -123,14 +123,14 @@ void load_biome_data(enemy_data_t *enemy_data) {
         perror("File open failed");
         return;
     }
-    
+
     char line[2048];
-    
+
     if(fgets(line, sizeof(line), fp) == NULL) {
         fclose(fp);
         return;
     }
-    
+
     int row = 0;
     while(fgets(line, sizeof(line), fp)) {
         line[strcspn(line, "\n")] = '\0';
@@ -138,20 +138,20 @@ void load_biome_data(enemy_data_t *enemy_data) {
         char *enemy_str = strtok(NULL, ",");
         char *min_str = strtok(NULL, ",");
         char *max_str = strtok(NULL, ",");
-        
+
         if(!biome_str || !enemy_str || !min_str || !max_str) {
             continue;
         }
-        
+
         biome_t biome = get_biome(biome_str);
         if(biome == BIOME_NULL) {
             continue;
         }
-        
+
         enemy_type_t enemy_type = enemy_get_type(enemy_str);
         int min_level = atoi(min_str);
         int max_level = atoi(max_str);
-        
+
         int i = 0;
         while(i < MAX_ENEMIES) {
             if(enemy_data[i].type != enemy_type) {
@@ -163,7 +163,7 @@ void load_biome_data(enemy_data_t *enemy_data) {
             enemy_data[i].lowest_level[biome] = min_level;
             break;
         }
-        
+
         row++;
     }
 }
@@ -217,15 +217,15 @@ void load_enemy_data(enemy_data_t *enemy_data) {
         perror("File open failed");
         return;
     }
-    
+
     char line[2048];
-    
+
     if(fgets(line, sizeof(line), fp) == NULL) {
         fprintf(stderr, "File is empty\n");
         fclose(fp);
         return;
     }
-    
+
     int row = 0;
     while(fgets(line, sizeof(line), fp)) {
         line[strcspn(line, "\n")] = '\0';
@@ -264,7 +264,7 @@ void load_enemy_data(enemy_data_t *enemy_data) {
                 case 9:
                     enemy_data[row].range = atoi(token);
                     break;
-                    
+
             }
             token = strtok(NULL, ",");
             col++;
@@ -275,9 +275,9 @@ void load_enemy_data(enemy_data_t *enemy_data) {
         col = 0;
         row++;
     }
-    
+
     load_biome_data(enemy_data);
-    
+
 }
 
 void load_enemy_drop_data(enemy_data_t *enemy_data) {
@@ -286,14 +286,14 @@ void load_enemy_drop_data(enemy_data_t *enemy_data) {
         perror("enemy_drops.csv File open failed");
         return;
     }
-    
+
     char line[2048];
-    
+
     if(fgets(line, sizeof(line), fp) == NULL) {
         fclose(fp);
         return;
     }
-    
+
     while(fgets(line, sizeof(line), fp)) {
         line[strcspn(line, "\n")] = '\0';
         char *enemy_name = strtok(line, ",");
@@ -301,28 +301,28 @@ void load_enemy_drop_data(enemy_data_t *enemy_data) {
         char *drop_chance_str = strtok(NULL, ",");
         char *min_quantity_str = strtok(NULL, ",");
         char *max_quantity_str = strtok(NULL, ",");
-        
+
         if(!enemy_name || !item_name || !drop_chance_str || !min_quantity_str || !max_quantity_str) {
             continue;
         }
-        
+
         DEBUG_LOG("drop for: %s, %s", enemy_name, item_name);
-        
+
         enemy_type_t enemy_type = enemy_get_type(enemy_name);
         item_ids_t item_id = item_get_id(item_name);
         float drop_chance = atof(drop_chance_str);
         int min_quantity = atoi(min_quantity_str);
         int max_quantity = atoi(max_quantity_str);
-        
+
         DEBUG_LOG("DROPS DATA: %d %d %f", enemy_type, item_id, drop_chance);
-        
+
         int i = 0;
         while(i < MAX_ENEMIES) {
             if(enemy_type != enemy_data[i].type) {
                 i++;
                 continue;
             }
-            
+
             int drop_count = enemy_data[i].drop_table.drop_count;
             enemy_data[i].drop_table.drops = realloc(enemy_data[i].drop_table.drops, sizeof(item_drop_t) * (drop_count+1));
             enemy_data[i].drop_table.drops[drop_count].id = item_id;
@@ -335,7 +335,7 @@ void load_enemy_drop_data(enemy_data_t *enemy_data) {
     }
 }
 
-void enemy_kill(enemy_t *enemy, world_t *world, const player_t *player) 
+void enemy_kill(enemy_t *enemy, world_t *world, const player_t *player)
 {
     room_t *room = world->room[player->global_x][player->global_y];
     enemy_handle_death_drops(enemy, world->enemy_data, world->item_data, room->tiles[enemy->y][enemy->x]);
@@ -394,7 +394,7 @@ void enemy_attack(enemy_t *enemy, player_t *player, world_t *world)
     player_decrease_health(player, world, enemy->strength);
 }
 
-void enemy_decide_move(enemy_t *enemy, world_t *world, player_t *player) 
+void enemy_decide_move(enemy_t *enemy, world_t *world, player_t *player)
 {
     // TODO move the player check to enemy_can_move functions; just makes more sense, also need loop for them
     switch(enemy->trait) {
@@ -411,7 +411,15 @@ void enemy_decide_move(enemy_t *enemy, world_t *world, player_t *player)
             enemy_decide_move_dark_centered(enemy, world, player);
             break;
         case SURVIVAL:
-            enemy_decide_move_survival(enemy, world, player);
+            // enemy_decide_move_survival(enemy, world, player);
+            enemy_create_path_lists(enemy);
+            enemy_find_path_to_target(enemy, world->room[player->global_x][player->global_y], player, 10, 10);
+            path_node_t *step = enemy_find_next_node(enemy);
+            if(!step) return;
+            enemy->x = step->x;
+            enemy->y = step->y;
+            DEBUG_LOG("enemy pos: %d, %d", enemy->x, enemy->y);
+            enemy_free_path_lists(enemy);
             break;
 	}
 }
@@ -443,42 +451,10 @@ void enemy_decide_move_passive(enemy_t *enemy, world_t *world, player_t *player)
 }
 
 void enemy_decide_move_aggressive(enemy_t *enemy, world_t *world, player_t *player) {
-    if(player->x < enemy->x) {
-        if(enemy_can_move_dir(enemy, world, player, LEFT)) {
-            enemy->x-=1;
-            return;
-        } else if(enemy->x-1 == player->x && enemy->y == player->y) {
-            enemy_attack(enemy, player, world);
-            return;
-        }
+    if(enemy_attempt_attack(enemy, world, player)) {
+        return;
     }
-    if(player->x > enemy->x) {
-        if(enemy_can_move_dir(enemy, world, player, RIGHT)) {
-            enemy->x+=1;
-            return;
-        } else if(enemy->x+1 == player->x && enemy->y == player->y) {
-            enemy_attack(enemy, player, world);
-            return;
-        }
-    }
-    if(player->y < enemy->y) {
-        if(enemy_can_move_dir(enemy, world, player, UP)) {
-            enemy->y-=1;
-            return;
-        } else if(enemy->y-1 == player->y && enemy->x == player->x) {
-            enemy_attack(enemy, player, world);
-            return;
-        }
-    }
-    if(player->y > enemy->y) {
-        if(enemy_can_move_dir(enemy, world, player, DOWN)) {
-            enemy->y+=1;
-            return;
-        } else if(enemy->y+1 == player->y && enemy->x == player->x) {
-            enemy_attack(enemy, player, world);
-            return;
-        }
-    }
+    enemy_move_toward_location(enemy, world, player, player->y, player->x);
 }
 
 void enemy_decide_move_dark_centered(enemy_t *enemy, world_t *world, player_t *player) {
@@ -502,11 +478,10 @@ void enemy_decide_move_dark_centered(enemy_t *enemy, world_t *world, player_t *p
     } else if(shortest == bottom_dist) {
         enemy_move_toward_location(enemy, world, player, player_bottom, player->x);
     } else if(shortest == right_dist) {
-        enemy_move_toward_location(enemy, world, player, player_right, player->x);
+        enemy_move_toward_location(enemy, world, player, player->y, player_right);
     } else if(shortest == left_dist) {
-        enemy_move_toward_location(enemy, world, player, player_top, player->x);
+        enemy_move_toward_location(enemy, world, player, player->y, player_left);
     }
-
 }
 
 void enemy_decide_move_light_centered(enemy_t *enemy, world_t *world, player_t *player) {
@@ -514,7 +489,25 @@ void enemy_decide_move_light_centered(enemy_t *enemy, world_t *world, player_t *
 }
 
 void enemy_decide_move_survival(enemy_t *enemy, world_t *world, player_t *player) {
-
+    int enemy_max_health = enemy_calc_max_health(enemy);
+    if(enemy->health <= enemy_max_health * ENEMY_SURVIVAL_RUN_FACTOR) {
+        int x = -1, y = -1;
+        find_suitable_tile_away_from_player(enemy, world->room[player->global_x][player->global_y], player, ENEMY_SURVIVAL_MIN_RANGE, &y, &x);
+        if(x == -1 && y == -1) {
+            if(enemy_attempt_attack(enemy, world, player)) {
+                return;
+            }
+            enemy_move_toward_location(enemy, world, player, player->y, player->x);
+            return;
+        }
+        DEBUG_LOG("values: %d, %d", x, y);
+        enemy_move_toward_location(enemy, world, player, y, x);
+    } else {
+        if(enemy_attempt_attack(enemy, world, player)) {
+            return;
+        }
+        enemy_move_toward_location(enemy, world, player, player->y, player->x);
+    }
 }
 
 void enemy_move_toward_location(enemy_t *enemy, world_t *world, player_t *player, int y, int x) {
@@ -545,7 +538,7 @@ void enemy_move_toward_location(enemy_t *enemy, world_t *world, player_t *player
 }
 
 int enemy_attempt_attack(enemy_t *enemy, world_t *world, player_t *player) {
-    for(int i = 1; i < enemy->range; i++) {
+    for(int i = 1; i <= enemy->range; i++) {
         if((enemy->y-i == player->y && enemy->x == player->x) ||
         (enemy->y+i == player->y && enemy->x == player->x) ||
         (enemy->x-i == player->x && enemy->y == player->y) ||
@@ -589,4 +582,210 @@ int enemy_can_move_dir(enemy_t *enemy, world_t *world, player_t *player, directi
         }
     }
     return 0;
+}
+
+int enemy_calc_max_health(const enemy_t *enemy) {
+    return (int)(enemy->constitution + ((enemy->level-1) * ENEMY_GROWTH_MODIFER)) * 10;
+}
+
+void find_suitable_tile_away_from_player(const enemy_t *enemy, const room_t *room, const player_t *player, int range, int *x, int *y) {
+    int left_dist = player->x-range;
+    int right_dist = player->x+range;
+    int bottom_dist = player->y+range;
+    int top_dist = player->y-range;
+
+    int shortest = compare4(left_dist, right_dist, bottom_dist, top_dist);
+
+    if(shortest == top_dist) {
+        if(check_tile(room, player, top_dist, player->x) == EMPTY) {
+            *y = top_dist;
+            *x = player->x;
+        }
+    } else if(shortest == bottom_dist) {
+        if(check_tile(room, player, bottom_dist, player->x) == EMPTY) {
+            *y = bottom_dist;
+            *x = player->x;
+        }
+    } else if(shortest == right_dist) {
+        if(check_tile(room, player, right_dist, player->x) == EMPTY) {
+            *y = player->y;
+            *x = right_dist;
+        }
+    } else if(shortest == left_dist) {
+        if(check_tile(room, player, left_dist, player->x) == EMPTY) {
+            *y = player->y;
+            *x = left_dist;
+        }
+    }
+}
+
+bool enemy_can_walk(char symbol) {
+    for(int i = 0; i < WALK_CHAR_LENGTH; i++) {
+        if(symbol == walk_chars[i]) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+void enemy_create_path_lists(enemy_t *enemy) {
+    enemy->olist = calloc(ENEMY_PATH_LIST_DEFAULT_SIZE, sizeof(path_node_t));
+    enemy->olist_size = ENEMY_PATH_LIST_DEFAULT_SIZE;
+    for (int y = 0; y < ROOM_HEIGHT; y++) {
+        for (int x = 0; x < ROOM_WIDTH; x++) {
+            enemy->all_nodes[y][x].g = 10000;
+        }
+    }
+}
+
+void enemy_add_to_olist(enemy_t *enemy, path_node_t node) {
+    if(enemy->olist_count == 0) {
+        enemy->olist[0] = node;
+        enemy->olist_count++;
+        return;
+    }
+    if(enemy->olist_count+1 >= enemy->olist_size) {
+        enemy->olist_size *= 2;
+        enemy->olist = realloc(enemy->olist, sizeof(path_node_t)*enemy->olist_size);
+        memset(enemy->olist+(enemy->olist_size/2), 0, (enemy->olist_size/2)*sizeof(path_node_t));
+    }
+    int index = enemy->olist_count;
+    for(int i = 0; i < enemy->olist_count; i++) {
+        if(enemy->olist[i].f > node.f) {
+            index = i;
+            break;
+        }
+    }
+    for(int j = enemy->olist_count; j > index; j--) {
+        enemy->olist[j] = enemy->olist[j-1];
+    }
+    enemy->olist[index] = node;
+    enemy->olist_count++;
+}
+
+void enemy_remove_from_olist(enemy_t *enemy, int index) {
+    for(int i = index; i < enemy->olist_count; i++) {
+        enemy->olist[i] = enemy->olist[i+1];
+    }
+    enemy->olist_count--;
+}
+
+path_node_t enemy_pop_from_olist(enemy_t *enemy) {
+    path_node_t node = {0};
+    if(enemy->olist_count == 0) {
+        return node;
+    }
+    node = enemy->olist[0];
+    enemy_remove_from_olist(enemy, 0);
+    return node;
+}
+
+void enemy_find_path_to_target(enemy_t *enemy, room_t *room, player_t *player, int endy, int endx) {
+    enemy->start_x = enemy->x;
+    enemy->start_y = enemy->y;
+    enemy->end_y = endy;
+    enemy->end_x = endx;
+    int dist = abs(enemy->start_y  - endy) + abs(enemy->start_x - endx);
+    path_node_t start_node = (path_node_t) {
+        .x = enemy->start_x,
+        .y = enemy->start_y,
+        .h = dist,
+        .g = 0,
+        .px = enemy->start_x,
+        .py = enemy->start_y
+    };
+    start_node.f = start_node.g + start_node.h;
+    start_node.checked = true;
+    enemy->all_nodes[start_node.y][start_node.x] = start_node;
+    enemy_add_to_olist(enemy, start_node);
+    while(enemy->olist_count > 0) {
+        path_node_t node = enemy_pop_from_olist(enemy);
+        // DEBUG_LOG("Pop: (%d,%d) g=%d h=%d f=%d\n", node.x, node.y, node.g, node.h, node.f);
+        enemy->clist[node.y][node.x] = true;
+        if(node.x == endx && node.y == endy) {
+            // DEBUG_LOG("%s", "reached end");
+            return;
+        }
+        path_node_t neighbors[4];
+        int neighbor_count = get_path_node_neighbors(node, neighbors, enemy, room, player);
+        for(int i = 0; i < neighbor_count; i++) {
+            enemy_add_to_olist(enemy, neighbors[i]);
+        }
+    }
+}
+
+path_node_t *enemy_find_next_node(enemy_t *enemy) {
+    int steps = 0;
+    const int max_steps = ROOM_WIDTH * ROOM_HEIGHT;
+    path_node_t *cur = &enemy->all_nodes[enemy->end_y][enemy->end_x];
+    path_node_t *prev = NULL;
+
+    while(cur->x != enemy->start_x || cur->y != enemy->start_y) {
+        prev = cur;
+        cur = &enemy->all_nodes[cur->py][cur->px];
+        if(steps >= max_steps) {
+            return NULL;
+        }
+        steps++;
+    }
+
+    return prev;
+}
+
+int get_path_node_neighbors(path_node_t node, path_node_t neighbors[4], enemy_t *enemy, room_t *room, player_t *player) {
+    int dx[4] = {0, 1, 0, -1};
+    int dy[4] = {1, 0, -1, 0};
+    int count = 0;
+
+    for(int i = 0; i < 4; i++) {
+        int nx = node.x + dx[i];
+        int ny = node.y + dy[i];
+
+        if(nx < 0 || ny < 0 || nx > ROOM_WIDTH-1 || ny > ROOM_HEIGHT-1) {
+            continue;
+        }
+        if(enemy->clist[ny][nx] == true) {
+            continue;
+        }
+        if(!enemy_can_walk(check_tile(room, player, ny, nx))) {
+            continue;
+        }
+        if(enemy->all_nodes[ny][nx].checked) {
+            continue;
+        }
+        int move_cost = 1;
+        int new_g = node.g + move_cost;
+        int cur_g = enemy->all_nodes[ny][nx].g;
+        if(new_g > cur_g) {
+            continue;
+        }
+        neighbors[count].checked = true;
+        //TODO trap tiles modifing speed
+        int dist = abs(nx - enemy->end_x) + abs(ny - enemy->end_y);
+        neighbors[count].x = nx;
+        neighbors[count].y = ny;
+        neighbors[count].g = node.g + move_cost;
+        neighbors[count].h = dist;
+        neighbors[count].f = neighbors[count].g + neighbors[count].h;
+        neighbors[count].px = node.x;
+        neighbors[count].py = node.y;
+        enemy->all_nodes[ny][nx] = neighbors[count];
+        // DEBUG_LOG("Neighbor (%d,%d) g=%d h=%d f=%d\n", nx, ny, neighbors[count].g, neighbors[count].h, neighbors[count].f);
+        count++;
+    }
+    return count;
+}
+
+void enemy_free_path_lists(enemy_t *enemy) {
+    free(enemy->olist);
+    memset(enemy->all_nodes, 0, sizeof(enemy->all_nodes));
+    for (int y = 0; y < ROOM_HEIGHT; y++) {
+        for (int x = 0; x < ROOM_WIDTH; x++) {
+            enemy->all_nodes[y][x].g = 10000;
+        }
+    }
+    memset(enemy->clist, 0, sizeof(enemy->clist));
+    enemy->olist_size = ENEMY_PATH_LIST_DEFAULT_SIZE;
+    enemy->olist_count = 0;
+    enemy->olist = NULL;
 }

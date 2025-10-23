@@ -56,4 +56,25 @@ int enemy_can_move_dir(enemy_t *enemy, world_t *world, player_t *player, directi
 
 enemy_t *enemy_create_temp(world_t *world);
 
+int enemy_calc_max_health(const enemy_t *enemy);
+
+void find_suitable_tile_away_from_player(const enemy_t *enemy, const room_t *room, const player_t *player, int range, int *x, int *y);
+
+bool enemy_can_walk(char symbol);
+
+void enemy_create_path_lists(enemy_t *enemy);
+
+void enemy_append_to_olist(enemy_t *enemy, path_node_t node);
+
+void enemy_remove_from_olist(enemy_t *enemy, int index);
+
+path_node_t enemy_pop_from_olist(enemy_t *enemy);
+
+path_node_t *enemy_find_next_node(enemy_t *enemy);
+
+int get_path_node_neighbors(path_node_t node, path_node_t neighbors[4], enemy_t *enemy, room_t *room, player_t *player);
+
+void enemy_find_path_to_target(enemy_t *enemy, room_t *room, player_t *player, int endy, int endx);
+
+void enemy_free_path_lists(enemy_t *enemy);
 #endif

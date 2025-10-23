@@ -410,3 +410,23 @@ void remove_item_from_tile(tile_t *tile, item_t *item) {
 		tile->items[tile->item_count] = tmp;
 	}
 }
+
+char check_tile(const room_t *room, const player_t *player, int y, int x) {
+	//TODO trap check?
+	if((x < 0 || y < 0) || (x >= ROOM_WIDTH-1 || y >= ROOM_HEIGHT-1)) {
+		return ' ';
+	}
+	if(x == player->x && y == player->y) {
+		return PLAYER;
+	}
+	for(int i = 0; i < room->current_enemy_count; i++) {
+		enemy_t *tmp = room->enemies[i];
+		if(tmp->x == x && tmp->y == y) {
+			return tmp->symbol;
+		}
+	}
+	if(x > 0 && y > 0) {
+		return room->tiles[y][x]->floor;
+	}
+	return ' ';
+}

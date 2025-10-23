@@ -124,6 +124,8 @@
 #define POTENTIAL_ITEM_SPAWN_CHAR			'*'
 #define DOOR_SPAWN_CHAR						'/'
 
+/// Enemy ///
+
 #define MAX_ENEMIES_PER_TILE				8
 #define MAX_ITEMS_PER_TILE					8
 #define ROOM_FILE_NAME_MAX_SIZE				128
@@ -158,6 +160,13 @@
 #define ENEMY_TRAIT_LIGHT_CENTERED_NAME			"Light Centered"
 #define ENEMY_TRAIT_DARK_CENTERED_NAME			"Dark Centered"
 #define ENEMY_TRAIT_SURVIVAL_NAME				"Survival"
+
+#define ENEMY_SURVIVAL_RUN_FACTOR				.2
+#define ENEMY_SURVIVAL_MIN_RANGE				4
+
+#define ENEMY_PATH_LIST_DEFAULT_SIZE			16
+
+///////////
 
 /////////////// items //////////////////
 
