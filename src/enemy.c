@@ -411,19 +411,7 @@ void enemy_decide_move(enemy_t *enemy, world_t *world, player_t *player)
             enemy_decide_move_dark_centered(enemy, world, player);
             break;
         case SURVIVAL: {
-            // enemy_decide_move_survival(enemy, world, player);
-            int destx = player->x;
-            int desty = player->y;
-            if(enemy->x == destx && enemy->y == desty) break;
-            if(!find_spot_near(enemy, world, player, &desty, &destx)) break;
-            enemy_create_path_lists(enemy);
-            enemy_find_path_to_target(enemy, world->room[player->global_x][player->global_y], player, desty, destx);
-            path_node_t *step = enemy_find_next_node(enemy);
-            if(step) {
-                enemy->x = step->x;
-                enemy->y = step->y;
-            }
-            enemy_free_path_lists(enemy);
+            enemy_decide_move_survival(enemy, world, player);
             break;
         }
 	}
@@ -459,19 +447,7 @@ void enemy_decide_move_aggressive(enemy_t *enemy, world_t *world, player_t *play
     if(enemy_attempt_attack(enemy, world, player)) {
         return;
     }
-    int destx = player->x;
-    int desty = player->y;
-    if(enemy->x == destx && enemy->y == desty) return;
-    if(!find_spot_near(enemy, world, player, &desty, &destx)) return;
-    enemy_create_path_lists(enemy);
-    enemy_find_path_to_target(enemy, world->room[player->global_x][player->global_y], player, desty, destx);
-    path_node_t *step = enemy_find_next_node(enemy);
-    if(step) {
-        enemy->x = step->x;
-        enemy->y = step->y;
-    }
-    enemy_free_path_lists(enemy);
-    // enemy_move_toward_location(enemy, world, player, player->y, player->x);
+    enemy_move_toward_location(enemy, world, player, player->y, player->x, false);
 }
 
 void enemy_decide_move_dark_centered(enemy_t *enemy, world_t *world, player_t *player) {
@@ -491,13 +467,13 @@ void enemy_decide_move_dark_centered(enemy_t *enemy, world_t *world, player_t *p
         return;
     }
     if(shortest == top_dist) {
-        enemy_move_toward_location(enemy, world, player, player_top, player->x);
+        enemy_move_toward_location(enemy, world, player, player_top, player->x, false);
     } else if(shortest == bottom_dist) {
-        enemy_move_toward_location(enemy, world, player, player_bottom, player->x);
+        enemy_move_toward_location(enemy, world, player, player_bottom, player->x, false);
     } else if(shortest == right_dist) {
-        enemy_move_toward_location(enemy, world, player, player->y, player_right);
+        enemy_move_toward_location(enemy, world, player, player->y, player_right, false);
     } else if(shortest == left_dist) {
-        enemy_move_toward_location(enemy, world, player, player->y, player_left);
+        enemy_move_toward_location(enemy, world, player, player->y, player_left, false);
     }
 }
 
@@ -509,49 +485,39 @@ void enemy_decide_move_survival(enemy_t *enemy, world_t *world, player_t *player
     int enemy_max_health = enemy_calc_max_health(enemy);
     if(enemy->health <= enemy_max_health * ENEMY_SURVIVAL_RUN_FACTOR) {
         int x = -1, y = -1;
-        find_suitable_tile_away_from_player(enemy, world->room[player->global_x][player->global_y], player, ENEMY_SURVIVAL_MIN_RANGE, &y, &x);
+        find_suitable_tile_away_from_pos(enemy, world->room[player->global_x][player->global_y], player, ENEMY_SURVIVAL_RUN_MIN_RANGE, player->y, player->x, &y, &x);
         if(x == -1 && y == -1) {
             if(enemy_attempt_attack(enemy, world, player)) {
                 return;
             }
-            enemy_move_toward_location(enemy, world, player, player->y, player->x);
+            enemy_move_toward_location(enemy, world, player, player->y, player->x, false);
             return;
         }
-        DEBUG_LOG("values: %d, %d", x, y);
-        enemy_move_toward_location(enemy, world, player, y, x);
+        enemy_move_toward_location(enemy, world, player, y, x, true);
     } else {
         if(enemy_attempt_attack(enemy, world, player)) {
             return;
         }
-        enemy_move_toward_location(enemy, world, player, player->y, player->x);
+        enemy_move_toward_location(enemy, world, player, player->y, player->x, false);
     }
 }
 
-void enemy_move_toward_location(enemy_t *enemy, world_t *world, player_t *player, int y, int x) {
-    if(x < enemy->x) {
-        if(enemy_can_move_dir(enemy, world, player, LEFT)) {
-            enemy->x-=1;
-            return;
-        }
+void enemy_move_toward_location(enemy_t *enemy, world_t *world, player_t *player, int y, int x, bool exact) {
+    int destx = x;
+    int desty = y;
+    if(enemy->x == destx && enemy->y == desty) return;
+    if(!exact) {
+        if(!find_spot_near(enemy, world, player, &desty, &destx)) return;
     }
-    if(x > enemy->x) {
-        if(enemy_can_move_dir(enemy, world, player, RIGHT)) {
-            enemy->x+=1;
-            return;
-        }
+    enemy_create_path_lists(enemy);
+    enemy_find_path_to_target(enemy, world->room[player->global_x][player->global_y], player, desty, destx);
+    path_node_t *step = enemy_find_next_node(enemy);
+    if(step) {
+        // DEBUG_LOG("Step: (%d,%d) g=%d h=%d f=%d", step->x, step->y, step->g, step->h, step->f);
+        enemy->x = step->x;
+        enemy->y = step->y;
     }
-    if(y < enemy->y) {
-        if(enemy_can_move_dir(enemy, world, player, UP)) {
-            enemy->y-=1;
-            return;
-        }
-    }
-    if(y > enemy->y) {
-        if(enemy_can_move_dir(enemy, world, player, DOWN)) {
-            enemy->y+=1;
-            return;
-        }
-    }
+    enemy_free_path_lists(enemy);
 }
 
 int enemy_attempt_attack(enemy_t *enemy, world_t *world, player_t *player) {
@@ -605,35 +571,85 @@ int enemy_calc_max_health(const enemy_t *enemy) {
     return (int)(enemy->constitution + ((enemy->level-1) * ENEMY_GROWTH_MODIFER)) * 10;
 }
 
-void find_suitable_tile_away_from_player(const enemy_t *enemy, const room_t *room, const player_t *player, int range, int *x, int *y) {
-    int left_dist = player->x-range;
-    int right_dist = player->x+range;
-    int bottom_dist = player->y+range;
-    int top_dist = player->y-range;
+void find_suitable_tile_away_from_pos(const enemy_t *enemy, const room_t *room, const player_t *player, int range, int start_y, int start_x, int *end_y, int *end_x) {
+    int left_pos = start_x-range;
+    int right_pos = start_x+range;
+    int bottom_pos = start_y+range;
+    int top_pos = start_y-range;
 
-    int shortest = compare4(left_dist, right_dist, bottom_dist, top_dist);
+    int left_dist = abs(left_pos - enemy->x);
+    int right_dist = abs(right_pos - enemy->x);
+    int top_dist = abs(top_pos - enemy->y);
+    int bottom_dist = abs(bottom_pos - enemy->y);
 
-    if(shortest == top_dist) {
-        if(check_tile(room, player, top_dist, player->x) == EMPTY) {
-            *y = top_dist;
-            *x = player->x;
+
+    const int MAX = 10000;
+    int shortest = 10000;
+
+    while(left_dist < MAX || right_dist < MAX || top_dist < MAX || bottom_dist < MAX) {
+        shortest = compare4(left_dist, right_dist, bottom_dist, top_dist);
+        if(shortest == top_dist) {
+            if(check_tile(room, player, top_pos, start_x) == EMPTY) {
+                *end_y = top_pos;
+                *end_x = start_x;
+                break;
+            } else {
+                top_dist = MAX;
+            }
+        } else if(shortest == bottom_dist) {
+            if(check_tile(room, player, bottom_pos, start_x) == EMPTY) {
+                *end_y = bottom_pos;
+                *end_x = start_x;
+                break;
+            } else {
+                bottom_dist = MAX;
+            }
+        } else if(shortest == right_dist) {
+            if(check_tile(room, player, start_y, right_pos) == EMPTY) {
+                *end_y = start_y;
+                *end_x = right_pos;
+                break;
+            } else {
+                right_dist = MAX;
+            }
+        } else if(shortest == left_dist) {
+            if(check_tile(room, player, start_y, left_pos) == EMPTY) {
+                *end_y = start_y;
+                *end_x = left_pos;
+                break;
+            } else {
+                left_dist = MAX;
+            }
         }
-    } else if(shortest == bottom_dist) {
-        if(check_tile(room, player, bottom_dist, player->x) == EMPTY) {
-            *y = bottom_dist;
-            *x = player->x;
-        }
-    } else if(shortest == right_dist) {
-        if(check_tile(room, player, right_dist, player->x) == EMPTY) {
-            *y = player->y;
-            *x = right_dist;
-        }
-    } else if(shortest == left_dist) {
-        if(check_tile(room, player, left_dist, player->x) == EMPTY) {
-            *y = player->y;
-            *x = left_dist;
-        }
+
     }
+
+    // TODO this doesn't check multiple spots if the nearesting point isn't valid it attacks the player
+    // might just be able to make a look at player location go other way function
+    // which might just work better
+
+
+    // if(shortest == top_dist) {
+    //     if(check_tile(room, player, top_pos, start_x) == EMPTY) {
+    //         *end_y = top_pos;
+    //         *end_x = start_x;
+    //     }
+    // } else if(shortest == bottom_dist) {
+    //     if(check_tile(room, player, bottom_pos, start_x) == EMPTY) {
+    //         *end_y = bottom_pos;
+    //         *end_x = start_x;
+    //     }
+    // } else if(shortest == right_dist) {
+    //     if(check_tile(room, player, start_y, right_pos) == EMPTY) {
+    //         *end_y = start_y;
+    //         *end_x = right_pos;
+    //     }
+    // } else if(shortest == left_dist) {
+    //     if(check_tile(room, player, start_y, left_pos) == EMPTY) {
+    //         *end_y = start_y;
+    //         *end_x = left_pos;
+    //     }
+    // }
 }
 
 int find_spot_near(const enemy_t *enemy, const world_t *world, const player_t *player, int *y, int *x) {
@@ -756,7 +772,7 @@ void enemy_find_path_to_target(enemy_t *enemy, room_t *room, player_t *player, i
     enemy->end_x = endx;
     int dist = abs(enemy->start_y  - endy) + abs(enemy->start_x - endx);
     if(dist == 0) return;
-    DEBUG_LOG("dist not 0 going from %d, %d -> %d, %d", enemy->start_x, enemy->start_y, enemy->end_x, enemy->end_y);
+    // DEBUG_LOG("dist not 0 going from %d, %d -> %d, %d", enemy->start_x, enemy->start_y, enemy->end_x, enemy->end_y);
     path_node_t start_node = (path_node_t) {
         .x = enemy->start_x,
         .y = enemy->start_y,
@@ -771,7 +787,7 @@ void enemy_find_path_to_target(enemy_t *enemy, room_t *room, player_t *player, i
     enemy_add_to_olist(enemy, start_node);
     while(enemy->olist_count > 0) {
         path_node_t node = enemy_pop_from_olist(enemy);
-        // DEBUG_LOG("Pop: (%d,%d) g=%d h=%d f=%d\n", node.x, node.y, node.g, node.h, node.f);
+        // DEBUG_LOG("Pop: (%d,%d) g=%d h=%d f=%d", node.x, node.y, node.g, node.h, node.f);
         enemy->clist[node.y][node.x] = true;
         if(node.x == endx && node.y == endy) {
             // DEBUG_LOG("%s", "reached end");
@@ -786,7 +802,7 @@ void enemy_find_path_to_target(enemy_t *enemy, room_t *room, player_t *player, i
 }
 
 path_node_t *enemy_find_next_node(enemy_t *enemy) {
-    DEBUG_LOG("%s", "finding nodes");
+    // DEBUG_LOG("%s", "finding nodes");
     int steps = 0;
     const int max_steps = ROOM_WIDTH * ROOM_HEIGHT;
     path_node_t *cur = &enemy->all_nodes[enemy->end_y][enemy->end_x];
@@ -795,7 +811,7 @@ path_node_t *enemy_find_next_node(enemy_t *enemy) {
     while(cur->x != enemy->start_x || cur->y != enemy->start_y) {
         prev = cur;
         cur = &enemy->all_nodes[cur->py][cur->px];
-        DEBUG_LOG("Parent Node (%d,%d) g=%d h=%d f=%d", cur->x, cur->y, cur->g, cur->h, cur->f);
+        // DEBUG_LOG("Parent Node (%d,%d) g=%d h=%d f=%d", cur->x, cur->y, cur->g, cur->h, cur->f);
         if(steps >= max_steps) {
             // DEBUG_LOG("Something is wrong: %s", "max steps reached");
             return NULL;

@@ -46,7 +46,7 @@ void enemy_decide_move_light_centered(enemy_t *enemy, world_t *world, player_t *
 
 void enemy_decide_move_survival(enemy_t *enemy, world_t *world, player_t *player);
 
-void enemy_move_toward_location(enemy_t *enemy, world_t *world, player_t *player, int y, int x);
+void enemy_move_toward_location(enemy_t *enemy, world_t *world, player_t *player, int y, int x, bool exact);
 
 int enemy_attempt_attack(enemy_t *enemy, world_t *world, player_t *player);
 
@@ -58,7 +58,7 @@ enemy_t *enemy_create_temp(world_t *world);
 
 int enemy_calc_max_health(const enemy_t *enemy);
 
-void find_suitable_tile_away_from_player(const enemy_t *enemy, const room_t *room, const player_t *player, int range, int *x, int *y);
+void find_suitable_tile_away_from_pos(const enemy_t *enemy, const room_t *room, const player_t *player, int range, int start_y, int start_x, int *end_y, int *end_x);
 
 int find_spot_near(const enemy_t *enemy, const world_t *world, const player_t *player, int *y, int *x);
 
