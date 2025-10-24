@@ -410,17 +410,22 @@ void enemy_decide_move(enemy_t *enemy, world_t *world, player_t *player)
         case DARK_CENTERED:
             enemy_decide_move_dark_centered(enemy, world, player);
             break;
-        case SURVIVAL:
+        case SURVIVAL: {
             // enemy_decide_move_survival(enemy, world, player);
+            int destx = player->x;
+            int desty = player->y;
+            if(enemy->x == destx && enemy->y == desty) break;
+            if(!find_spot_near(enemy, world, player, &desty, &destx)) break;
             enemy_create_path_lists(enemy);
-            enemy_find_path_to_target(enemy, world->room[player->global_x][player->global_y], player, 10, 10);
+            enemy_find_path_to_target(enemy, world->room[player->global_x][player->global_y], player, desty, destx);
             path_node_t *step = enemy_find_next_node(enemy);
-            if(!step) return;
-            enemy->x = step->x;
-            enemy->y = step->y;
-            DEBUG_LOG("enemy pos: %d, %d", enemy->x, enemy->y);
+            if(step) {
+                enemy->x = step->x;
+                enemy->y = step->y;
+            }
             enemy_free_path_lists(enemy);
             break;
+        }
 	}
 }
 
@@ -454,7 +459,19 @@ void enemy_decide_move_aggressive(enemy_t *enemy, world_t *world, player_t *play
     if(enemy_attempt_attack(enemy, world, player)) {
         return;
     }
-    enemy_move_toward_location(enemy, world, player, player->y, player->x);
+    int destx = player->x;
+    int desty = player->y;
+    if(enemy->x == destx && enemy->y == desty) return;
+    if(!find_spot_near(enemy, world, player, &desty, &destx)) return;
+    enemy_create_path_lists(enemy);
+    enemy_find_path_to_target(enemy, world->room[player->global_x][player->global_y], player, desty, destx);
+    path_node_t *step = enemy_find_next_node(enemy);
+    if(step) {
+        enemy->x = step->x;
+        enemy->y = step->y;
+    }
+    enemy_free_path_lists(enemy);
+    // enemy_move_toward_location(enemy, world, player, player->y, player->x);
 }
 
 void enemy_decide_move_dark_centered(enemy_t *enemy, world_t *world, player_t *player) {
@@ -619,6 +636,56 @@ void find_suitable_tile_away_from_player(const enemy_t *enemy, const room_t *roo
     }
 }
 
+int find_spot_near(const enemy_t *enemy, const world_t *world, const player_t *player, int *y, int *x) {
+    int approach_dx = (*x) - enemy->x;
+    int approach_dy = (*y) - enemy->y;
+
+    if(approach_dx > 0) approach_dx = -1;
+    else if(approach_dx < 0) approach_dx = 1;
+    if(approach_dy > 0) approach_dy = -1;
+    else if(approach_dy < 0) approach_dy = 1;
+
+    int dx[] = {
+        0,
+        approach_dx,
+        0,
+        approach_dx*2,
+        0,
+        approach_dx*3,
+    };
+
+    int dy[] = {
+        approach_dy,
+        0,
+        approach_dy*2,
+        0,
+        approach_dy*3,
+        0,
+    };
+
+    room_t *room = world->room[player->global_x][player->global_y];
+    for(int i = 0; i < sizeof(dx)/sizeof(dx[0]); i++) {
+        if(enemy_can_walk(check_tile(room, player, (*y)+dy[i], (*x)+dx[i]))) {
+            (*y) += dy[i];
+            (*x) += dx[i];
+            return 1;
+        } else if(enemy->x == (*x)+dx[i] && enemy->y == (*y)+dy[i]) {
+            return 0;
+        }
+    }
+    // if that fails scan around to find a valid tile
+    for(int nx = -SPOT_FIND_RANGE; nx <= SPOT_FIND_RANGE; nx++) {
+        for(int ny = -SPOT_FIND_RANGE; ny <= SPOT_FIND_RANGE; ny++) {
+            if(enemy_can_walk(check_tile(room, player, (*y)+ny, (*x)+nx))) {
+                (*y) += ny;
+                (*x) += nx;
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
 bool enemy_can_walk(char symbol) {
     for(int i = 0; i < WALK_CHAR_LENGTH; i++) {
         if(symbol == walk_chars[i]) {
@@ -631,9 +698,11 @@ bool enemy_can_walk(char symbol) {
 void enemy_create_path_lists(enemy_t *enemy) {
     enemy->olist = calloc(ENEMY_PATH_LIST_DEFAULT_SIZE, sizeof(path_node_t));
     enemy->olist_size = ENEMY_PATH_LIST_DEFAULT_SIZE;
+    memset(enemy->clist, 0, sizeof(enemy->clist));
     for (int y = 0; y < ROOM_HEIGHT; y++) {
         for (int x = 0; x < ROOM_WIDTH; x++) {
             enemy->all_nodes[y][x].g = 10000;
+            enemy->all_nodes[y][x].checked = false;
         }
     }
 }
@@ -686,6 +755,8 @@ void enemy_find_path_to_target(enemy_t *enemy, room_t *room, player_t *player, i
     enemy->end_y = endy;
     enemy->end_x = endx;
     int dist = abs(enemy->start_y  - endy) + abs(enemy->start_x - endx);
+    if(dist == 0) return;
+    DEBUG_LOG("dist not 0 going from %d, %d -> %d, %d", enemy->start_x, enemy->start_y, enemy->end_x, enemy->end_y);
     path_node_t start_node = (path_node_t) {
         .x = enemy->start_x,
         .y = enemy->start_y,
@@ -704,7 +775,7 @@ void enemy_find_path_to_target(enemy_t *enemy, room_t *room, player_t *player, i
         enemy->clist[node.y][node.x] = true;
         if(node.x == endx && node.y == endy) {
             // DEBUG_LOG("%s", "reached end");
-            return;
+            break;
         }
         path_node_t neighbors[4];
         int neighbor_count = get_path_node_neighbors(node, neighbors, enemy, room, player);
@@ -715,6 +786,7 @@ void enemy_find_path_to_target(enemy_t *enemy, room_t *room, player_t *player, i
 }
 
 path_node_t *enemy_find_next_node(enemy_t *enemy) {
+    DEBUG_LOG("%s", "finding nodes");
     int steps = 0;
     const int max_steps = ROOM_WIDTH * ROOM_HEIGHT;
     path_node_t *cur = &enemy->all_nodes[enemy->end_y][enemy->end_x];
@@ -723,7 +795,9 @@ path_node_t *enemy_find_next_node(enemy_t *enemy) {
     while(cur->x != enemy->start_x || cur->y != enemy->start_y) {
         prev = cur;
         cur = &enemy->all_nodes[cur->py][cur->px];
+        DEBUG_LOG("Parent Node (%d,%d) g=%d h=%d f=%d", cur->x, cur->y, cur->g, cur->h, cur->f);
         if(steps >= max_steps) {
+            // DEBUG_LOG("Something is wrong: %s", "max steps reached");
             return NULL;
         }
         steps++;
@@ -748,16 +822,27 @@ int get_path_node_neighbors(path_node_t node, path_node_t neighbors[4], enemy_t 
             continue;
         }
         if(!enemy_can_walk(check_tile(room, player, ny, nx))) {
-            continue;
-        }
-        if(enemy->all_nodes[ny][nx].checked) {
+            // DEBUG_LOG("enemy can't walk there: %d, %d", nx, ny);
             continue;
         }
         int move_cost = 1;
-        int new_g = node.g + move_cost;
-        int cur_g = enemy->all_nodes[ny][nx].g;
-        if(new_g > cur_g) {
-            continue;
+        if(enemy->all_nodes[ny][nx].checked) {
+            // DEBUG_LOG("error: %d", 2);
+            // continue;
+            int new_g = node.g + move_cost;
+            int cur_g = enemy->all_nodes[ny][nx].g;
+            if(new_g < cur_g) {
+                // DEBUG_LOG("found lower value %d < %d, replacing", new_g, cur_g);
+                //TODO trap tiles modifing speed
+                enemy->all_nodes[ny][nx].g = new_g;
+                enemy->all_nodes[ny][nx].f = enemy->all_nodes[ny][nx].g + enemy->all_nodes[ny][nx].h;
+                enemy->all_nodes[ny][nx].px = node.x;
+                enemy->all_nodes[ny][nx].py = node.y;
+                // DEBUG_LOG("Neighbor (%d,%d) g=%d h=%d f=%d\n", nx, ny, neighbors[count].g, neighbors[count].h, neighbors[count].f);
+                continue;
+            } else {
+                continue;
+            }
         }
         neighbors[count].checked = true;
         //TODO trap tiles modifing speed

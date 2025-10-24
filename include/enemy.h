@@ -60,6 +60,8 @@ int enemy_calc_max_health(const enemy_t *enemy);
 
 void find_suitable_tile_away_from_player(const enemy_t *enemy, const room_t *room, const player_t *player, int range, int *x, int *y);
 
+int find_spot_near(const enemy_t *enemy, const world_t *world, const player_t *player, int *y, int *x);
+
 bool enemy_can_walk(char symbol);
 
 void enemy_create_path_lists(enemy_t *enemy);

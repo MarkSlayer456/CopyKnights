@@ -166,6 +166,8 @@
 
 #define ENEMY_PATH_LIST_DEFAULT_SIZE			16
 
+#define SPOT_FIND_RANGE							4
+
 ///////////
 
 /////////////// items //////////////////
