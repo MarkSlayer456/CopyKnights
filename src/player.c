@@ -451,9 +451,23 @@ void player_close_inventory(player_t *player) {
 	player->state  = PLAYER_STATE_MOVING;
 }
 
+int player_inv_contains(player_t *player, item_t item) {
+	for(int i = 0; i < player->inventory_count; i++) {
+		if(player->inventory[i].id == item.id) {
+			return i;
+		}
+	}
+	return -1;
+}
+
 bool player_add_to_inv(player_t *player, item_t item) {
 	if(item.id == OIL) {
 		player->oil += item.stack;
+		return true;
+	}
+	int index = player_inv_contains(player, item);
+	if(index != -1) {
+		player->inventory[index].stack += item.stack;
 		return true;
 	}
 	if(player->inventory_count < INV_SIZE) {
@@ -461,6 +475,14 @@ bool player_add_to_inv(player_t *player, item_t item) {
 		return true;
 	}
 	return false;
+}
+
+void player_drop_item(player_t *player, world_t *world) {
+	item_t item = player->inventory[player->inventory_manager.inv_selector];
+	drop_item(world->room[player->global_x][player->global_y]->tiles[player->y][player->x], world->item_data, item.id, item.stack);
+	memset(player->inventory+player->inventory_manager.inv_selector, 0, sizeof(item_t));
+	player_organize_inv(player, player->inventory_manager.inv_selector);
+	player_get_nearby_loot(world->room[player->global_x][player->global_y], player);
 }
 
 void player_take_loot_item(room_t *room, player_t *player) {
@@ -484,13 +506,9 @@ void player_take_loot_item(room_t *room, player_t *player) {
 				DEBUG_LOG("selected_item: %p, %d ",(void *)selected_item, selected_item->id);
 				if(item == selected_item) {
 					remove_item_from_tile(room->tiles[y][x], item);
-					// DEBUG_LOG("%s", "item found!");
-					// found = true;
-					// memset(item, 0, sizeof(item_t));
-					// room->tiles[y][x]->item_count--;
-					// if(player->inventory_manager.loot_selector > 0) {
-					// 	player->inventory_manager.loot_selector--;
-					// }
+					if(player->inventory_manager.loot_selector == player->nearby_loot_count-1 && player->inventory_manager.loot_selector > 0) {
+						player->inventory_manager.loot_selector--;
+					}
 					break;
 				}
 			}

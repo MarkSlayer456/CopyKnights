@@ -447,9 +447,23 @@ item_ids_t item_generate_type(unsigned int *seed, item_data_t *item_data, biome_
     return items[random_number];
 }
 
+int tile_contains_item(tile_t *tile, item_ids_t item_id) {
+    for(int i = 0; i < tile->item_count; i++) {
+        if(tile->items[i]->id == item_id) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 void drop_item(tile_t *tile, item_data_t *item_data, item_ids_t item_id, int quantity) {
     if(tile->item_count >= MAX_ITEMS_PER_TILE) {
         // TODO move to adjacent tile or something
+        return;
+    }
+    int pos = tile_contains_item(tile, item_id);
+    if(pos != -1) {
+        tile->items[pos]->stack += quantity;
         return;
     }
     item_t *item = tile->items[tile->item_count++];

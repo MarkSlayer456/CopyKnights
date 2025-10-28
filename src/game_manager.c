@@ -161,7 +161,8 @@ bool manage_input(char c, world_t *world, player_t *player, menu_manager_t *menu
 				return false;
 			case KEY_B:
 				//TODO reset defaults
-				player_close_inventory(player);
+				// player_close_inventory(player);
+				player_drop_item(player, world);
 				break;
 			default:
 				break;

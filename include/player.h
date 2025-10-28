@@ -59,7 +59,10 @@ void player_close_inventory(player_t *player);
 
 // removes an item from the inventory list, not used to decrease item count
 void player_organize_inv(player_t *player, int loc);
+// returns the index of where item is located in inventory, or -1 if it's not in the inventory
+int player_inv_contains(player_t *player, item_t item);
 bool player_add_to_inv(player_t *player, item_t item);
+void player_drop_item(player_t *player, world_t *world);
 
 void player_take_loot_item(room_t *room, player_t *player);
 void player_get_nearby_loot(room_t *room, player_t *player);
