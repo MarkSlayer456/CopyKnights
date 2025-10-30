@@ -128,6 +128,10 @@ typedef struct enemy {
 	char symbol;
 	trait_t trait;
 
+	uint8_t knockback;
+	float knockback_chance;
+	float dodge_chance;
+
 	// path finding, not saved
 	// this could probably be a struct itself
 	bool clist[ROOM_HEIGHT][ROOM_WIDTH]; // closed list
@@ -153,6 +157,9 @@ typedef struct enemy_data {
 	char symbol;
 	trait_t trait;
 	uint8_t range;
+	uint8_t knockback;
+	float knockback_chance;
+	float dodge_chance;
 	bool can_spawn[NUMBER_OF_BIOMES];
 	int highest_level[NUMBER_OF_BIOMES];
 	int lowest_level[NUMBER_OF_BIOMES];

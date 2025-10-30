@@ -20,4 +20,10 @@ void load_item_from_data(item_t *item, item_data_t *item_data);
 void remove_item_from_tile(tile_t *tile, item_t *item);
 
 char check_tile(const room_t *room, const player_t *player, int y, int x);
+
+room_t *get_current_room(world_t *world, player_t *player);
+
+tile_t *get_tile(room_t *room, int y, int x);
+
+bool tile_is_walkable(tile_t *tile);
 #endif

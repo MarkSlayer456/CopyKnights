@@ -14,6 +14,8 @@
 #include "items/items.h"
 #include "functions.h"
 
+extern char walk_chars[WALK_CHAR_LENGTH];
+
 void calculate_main_path(unsigned int *seed, world_t *world) {
 	int main_x = 1, main_y = 0; // current main path x and y cords
 	unsigned int entrance_door = 0x0;
@@ -429,4 +431,21 @@ char check_tile(const room_t *room, const player_t *player, int y, int x) {
 		return room->tiles[y][x]->floor;
 	}
 	return ' ';
+}
+
+room_t *get_current_room(world_t *world, player_t *player) {
+	return world->room[player->global_x][player->global_y];
+}
+
+tile_t *get_tile(room_t *room, int y, int x) {
+	return room->tiles[y][x];
+}
+
+bool tile_is_walkable(tile_t *tile) {
+	for(int i = 0; i < WALK_CHAR_LENGTH; i++) {
+		if(tile->floor == walk_chars[i]) {
+			return true;
+		}
+	}
+	return false;
 }
