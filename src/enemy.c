@@ -404,22 +404,23 @@ bool enemy_decrease_health(enemy_t *enemy, world_t *world, const player_t *playe
 
 static void enemy_handle_knockback(enemy_t *enemy, player_t *player, world_t *world) {
     if(enemy->knockback_chance == 0 || enemy->knockback == 0) return;
-    int diffX = enemy->x - player->x;
-    int diffY = enemy->y - player->y;
+    int diffX = 0;
+    int diffY = 0;
 
-    if(diffX > 0) diffX = -1;
-    if(diffX < 0) diffX = 1;
-    if(diffY > 0) diffY = -1;
-    if(diffY < 0) diffY = 1;
+    if(enemy->x > player->x) diffX = -1;
+    if(enemy->x < player->x) diffX = 1;
+    if(enemy->y > player->y) diffY = -1;
+    if(enemy->y < player->y) diffY = 1;
     // TODO should probably just call the player move dir function instead of handling moving
     int knockback = enemy->knockback;
     room_t *room = get_current_room(world, player);
     int can_knockback = 0;
-    for(int i = 0; i < knockback; i++) {
+    for(int i = 1; i < knockback+1; i++) {
         tile_t *tile = get_tile(room, player->y+(diffY*i), player->x+(diffX*i));
-        if(tile_is_walkable(tile)) {
-            can_knockback++;
+        if(!tile_is_walkable(tile)) {
+            break;
         }
+        can_knockback++;
     }
     if(can_knockback > 0) {
         char buf[MAX_MESSAGE_LENGTH_WITHOUT_PREFIX];
