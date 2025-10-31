@@ -245,7 +245,7 @@ int main(int argc, char *argv[]) {
 						draw(world, player);
 					}
 					traps_triggered_check(world, player);
-					buff_apply(world->buffs, &world->buff_count);
+					buff_apply(world->buffs, &world->buff_count, world);
 				} else if(actor >= 0) {
 					enemy_t *enemy = world->room[player->global_x][player->global_y]->enemies[actor];
 					if(enemy != NULL) {

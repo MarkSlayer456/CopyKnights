@@ -10,7 +10,8 @@ void load_class_data(class_data_t *class_data);
 
 void player_wait(player_t *player, world_t *world);
 
-void player_decrease_health(player_t *player, world_t *world, int attack);
+void player_damage(player_t *player, world_t *world, int damage);
+void player_damage_ignore_armor(player_t *player, world_t *world, int damage);
 void player_increase_health(player_t *player, int amount);
 void player_increase_mana(player_t *player, int amount);
 

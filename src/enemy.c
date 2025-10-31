@@ -347,9 +347,9 @@ void load_enemy_drop_data(enemy_data_t *enemy_data) {
     }
 }
 
-void enemy_kill(enemy_t *enemy, world_t *world, const player_t *player)
+void enemy_kill(enemy_t *enemy, world_t *world)
 {
-    room_t *room = world->room[player->global_x][player->global_y];
+    room_t *room = world->room[enemy->global_x][enemy->global_y];
     enemy_handle_death_drops(enemy, world->enemy_data, world->item_data, room->tiles[enemy->y][enemy->x]);
 	for(int i = 0; i < MAX_ENEMIES_PER_LEVEL; i++) {
 		if(enemy && enemy == room->enemies[i]) {
@@ -387,15 +387,27 @@ void enemy_handle_death_drops(enemy_t *enemy, enemy_data_t *enemy_data, item_dat
 /*
  * returns true on kill returns false otherwise
  */
-bool enemy_decrease_health(enemy_t *enemy, world_t *world, const player_t *player, int amount)
-{
+bool enemy_damage(enemy_t *enemy, world_t *world, int amount) {
     if(!enemy) return false;
     enemy->health -= amount;
-	if(enemy->health <= 0) {
-		enemy_kill(enemy, world, player);
+    if(enemy->health <= 0) {
+        enemy_kill(enemy, world);
         return true;
-	}
-	return false;
+    }
+    return false;
+}
+
+/*
+ * returns true on kill returns false otherwise
+ */
+bool enemy_damage_ignore_armor(enemy_t *enemy, world_t *world, int amount) {
+    if(!enemy) return false;
+    enemy->health -= amount;
+    if(enemy->health <= 0) {
+        enemy_kill(enemy, world);
+        return true;
+    }
+    return false;
 }
 
 // static void enemy_check_dodge_chance() {
@@ -406,6 +418,11 @@ static void enemy_handle_knockback(enemy_t *enemy, player_t *player, world_t *wo
     if(enemy->knockback_chance == 0 || enemy->knockback == 0) return;
     int diffX = 0;
     int diffY = 0;
+
+    float chance = (float) rand() / (float) RAND_MAX;
+    if(enemy->knockback_chance < chance) {
+        return;
+    }
 
     if(enemy->x > player->x) diffX = -1;
     if(enemy->x < player->x) diffX = 1;
@@ -436,7 +453,7 @@ void enemy_attack(enemy_t *enemy, player_t *player, world_t *world)
     char message[MAX_MESSAGE_LENGTH_WITHOUT_PREFIX];
     snprintf(message, MAX_MESSAGE_LENGTH_WITHOUT_PREFIX, "[%c] attacked for %d", enemy->symbol, enemy->strength);
     display_combat_message(world, player, message);
-    player_decrease_health(player, world, enemy->strength);
+    player_damage(player, world, enemy->strength);
     enemy_handle_knockback(enemy, player, world);
 }
 

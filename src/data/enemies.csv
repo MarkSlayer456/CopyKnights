@@ -1,5 +1,5 @@
 type,base strength,base dexterity,base intelligence,base constitution,base speed,base defense,trait,symbol,range,knockback,knockback chance,dodge chance
-BAT,2,2,0,1,3,1,SURVIVAL,b,1,1,1,.2
+BAT,2,2,0,1,3,1,SURVIVAL,b,0,0,1,.2
 RAT,2,3,0,1,3,1,AGGRESSIVE,r,1,0,0,0
 SKELETON,4,0,0,2,5,1,AGGRESSIVE,S,2,1,.2,0
 SLIME,5,5,3,4,3,1,AGGRESSIVE,s,1,0,0,.2

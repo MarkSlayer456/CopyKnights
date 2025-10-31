@@ -8,6 +8,7 @@
 #include "player.h"
 #include "enemy.h"
 #include "items/item_types.h"
+#include "types.h"
 
 type_map_t buff_type_map[] = {
 	{BUFF_NULL_NAME, BUFF_NULL},
@@ -59,7 +60,7 @@ void buff_remove_effects(buff_t *buff_array, uint8_t index) {
 	}
 }
 
-void buff_apply(buff_t *buff_array, uint8_t *buff_count) {
+void buff_apply(buff_t *buff_array, uint8_t *buff_count, world_t *world) {
 	for(int i = 0; i < (*buff_count); i++) {
 		buff_t *buff = &buff_array[i];
 		if(buff->turns_left == 0) {
@@ -96,9 +97,9 @@ void buff_apply(buff_t *buff_array, uint8_t *buff_count) {
 		}
 		//TODO probably need to calculate and account for armor that resists these effects
 		if(buff->target_type_id == TARGET_PLAYER) {
-			buff->target.player->health -= buff->damage;
+			player_damage(buff->target.player, world, buff->damage);
 		} else if(buff->target_type_id == TARGET_ENEMY) {
-			buff->target.enemy->health -= buff->damage;
+			enemy_damage(buff->target.enemy, world, buff->damage);
 		}
 		buff->turns_left--;
 	} 

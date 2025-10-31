@@ -57,7 +57,7 @@ void traps_triggered_check(world_t *world, player_t *player) {
 			buff.target_type_id = TARGET_PLAYER;
 			buff.target.player = player;
 			world->buffs = buff_add_to_list(buff, world->buffs, &world->buff_count, &world->buff_size);
-			player_decrease_health(player, world, trap_data->damage);
+			player_damage(player, world, trap_data->damage);
 			if(trap_data->break_on_trigger) {
 				remove_trap(world->room[player->global_x][player->global_y]->tiles[player->y][player->x], player->x, player->y);
 			}

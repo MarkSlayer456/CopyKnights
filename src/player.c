@@ -198,12 +198,18 @@ void player_wait(player_t *player, world_t *world)
 	display_world_message(world, player, "You stand still!");
 }
 
-void player_decrease_health(player_t *player, world_t *world, int attack)
-{
-    player->health -= attack;
-    if(player->health <= 0) {
-        end_game(world, player);
-    }
+void player_damage(player_t *player, world_t *world, int attack) {
+	player->health -= attack;
+	if(player->health <= 0) {
+		end_game(world, player);
+	}
+}
+
+void player_damage_ignore_armor(player_t *player, world_t *world, int attack) {
+	player->health -= attack;
+	if(player->health <= 0) {
+		end_game(world, player);
+	}
 }
 
 void player_increase_health(player_t *player, int amount) {
@@ -293,7 +299,7 @@ void player_attack(player_t *player, world_t *world, direction_t dir) {
 		char message[MAX_MESSAGE_LENGTH_WITHOUT_PREFIX];
 		snprintf(message, MAX_MESSAGE_LENGTH_WITHOUT_PREFIX, "You attacked for %d", unarmed_damage);
 		display_combat_message(world, player, message);
-		if(enemy_decrease_health(enemy, world, player, unarmed_damage)) {
+		if(enemy_damage(enemy, world, unarmed_damage)) {
 			player_add_xp(player, xp, world->class_data);
 		}
 		return;
@@ -335,7 +341,7 @@ void player_attack(player_t *player, world_t *world, direction_t dir) {
 	char message[MAX_MESSAGE_LENGTH_WITHOUT_PREFIX];
 	snprintf(message, MAX_MESSAGE_LENGTH_WITHOUT_PREFIX, "You attacked for %d", damage);
 	display_combat_message(world, player, message);
-	if(enemy_decrease_health(enemy, world, player, damage)) {
+	if(enemy_damage(enemy, world, damage)) {
 		player_add_xp(player, xp, world->class_data);
 	}
 }

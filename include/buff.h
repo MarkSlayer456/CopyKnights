@@ -1,10 +1,11 @@
 #ifndef BUFFS_H_
 #define BUFFS_H_
+#include "types.h"
 #include <stdint.h>
 
 const char *buff_get_name(int16_t value);
 
-void buff_apply(buff_t *buff_array, uint8_t *buff_count);
+void buff_apply(buff_t *buff_array, uint8_t *buff_count, world_t *world);
 
 void buff_remove_from_list(uint8_t index, buff_t *buff_array, uint8_t *buff_count);
 
