@@ -207,16 +207,24 @@ room_t *load_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data, it
 	map_seed ^= (*seed) >> 15;
 	DEBUG_LOG("room_num: %d", room_num);
 	DEBUG_LOG("(x,y): (%d,%d)", x, y);
-	room->is_created = true;
-	for(int y = 0; y < ROOM_HEIGHT; y++) {
-		for(int x = 0; x < ROOM_WIDTH; x++) {
-			room->tiles[y][x] = calloc(1, sizeof(tile_t));
-			for(int i = 0; i < MAX_ITEMS_PER_TILE; i++) {
-				room->tiles[y][x]->items[i] = calloc(1, sizeof(item_t));
+	if(!room) {
+		DEBUG_LOG("%s", "room is null");
+	}
+	if(room->is_created == false) {
+		for(int tile_y = 0; tile_y < ROOM_HEIGHT; tile_y++) {
+			for(int tile_x = 0; tile_x < ROOM_WIDTH; tile_x++) {
+				room->tiles[tile_y][tile_x] = calloc(1, sizeof(tile_t));
+				for(int i = 0; i < MAX_ITEMS_PER_TILE; i++) {
+					room->tiles[tile_y][tile_x]->items[i] = calloc(1, sizeof(item_t));
+				}
 			}
 		}
 	}
+
+
+	room->is_created = true;
 	room->current_enemy_count = 0;
+
 	int depth = (int) sqrt(x*x + y*y);
 	char folder[32] = "";
 	char *file = calloc(128, sizeof(char));
@@ -290,7 +298,7 @@ room_t *load_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data, it
 		for(int j = 0; j < strlen(tok); j++) {
 			switch(tok[j]) {
 				case POTENTIAL_ENEMY_SPAWN_CHAR:
-					room->enemies[room->current_enemy_count] = enemy_spawn(enemy_generate_type(&map_seed, enemy_data, room->biome), enemy_data, j, i, x, y, room->biome);
+					enemy_spawn(room->enemies[room->current_enemy_count], enemy_generate_type(&map_seed, enemy_data, room->biome), enemy_data, j, i, x, y, room->biome);
 					room->tiles[i][j]->floor = EMPTY;
 					room->tiles[i][j]->item_count = 0;
 					room->current_enemy_count++;
@@ -320,9 +328,9 @@ room_t *load_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data, it
 
 void load_room_floor_tiles(room_t *room) {
 	char *file = calloc(128, sizeof(char));
-	
+
 	strcpy(file, room->room_file_name);
-	
+
 	int fd = open(file, O_RDONLY);
 	if(fd < 0) {
 		DEBUG_LOG("an error occured loading file %s\n", file);
@@ -331,7 +339,7 @@ void load_room_floor_tiles(room_t *room) {
 	char *buf = calloc(512, sizeof(char));
 	read(fd, buf, 512);
 	int i = 0;
-	
+
 	room->is_created = true;
 	strcpy(room->room_file_name, file);
 	char *tok = strtok(buf, "\n");

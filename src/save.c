@@ -356,6 +356,14 @@ void load_world(world_t *world, player_t *player, FILE *file) {
 
 void load_room_save(room_t *room, FILE *file, item_data_t *item_data) {
 	fread(room->room_file_name, sizeof(char), ROOM_FILE_NAME_MAX_SIZE, file);
+	for(int tile_y = 0; tile_y < ROOM_HEIGHT; tile_y++) {
+		for(int tile_x = 0; tile_x < ROOM_WIDTH; tile_x++) {
+			room->tiles[tile_y][tile_x] = calloc(1, sizeof(tile_t));
+			for(int i = 0; i < MAX_ITEMS_PER_TILE; i++) {
+				room->tiles[tile_y][tile_x]->items[i] = calloc(1, sizeof(item_t));
+			}
+		}
+	}
 	for(int x = 0; x < ROOM_WIDTH; x++) {
 		for(int y = 0; y < ROOM_HEIGHT; y++) {
 			// fwrite(&room->tiles[y][x]->floor, sizeof(char), 1, file);

@@ -4,6 +4,14 @@
 
 #include "items/item_types.h"
 
+//TODO I want to redo this
+typedef struct {
+	enum menu current_menu;
+	int cursor_pos;
+	enum menu dests[MAX_MENUS]; // where each button takes the user
+	int dests_count;
+} menu_manager_t;
+
 typedef struct path_node {
 	int16_t x, y;
 	int16_t g;
@@ -104,6 +112,7 @@ typedef struct player {
 	player_state_t state;
 	
 	inventory_manager_t inventory_manager;
+	menu_manager_t menu_manager;
 } player_t;
 
 typedef struct enemy {
@@ -167,7 +176,7 @@ typedef struct enemy_data {
 } enemy_data_t;
 
 typedef struct enemy_type_map {
-	const char *name;
+	const char name[MAX_TYPE_MAP_NAME_LENGTH];
 	enemy_type_t value;
 } enemy_type_map_t;
 

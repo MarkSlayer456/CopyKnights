@@ -127,7 +127,7 @@ bool manage_input(char c, world_t *world, player_t *player, menu_manager_t *menu
 				}
 				break;
 			case CTRL_Q:
-				shutdown(world);
+				shutdown(world, player);
 				break;
 			case KEY_I:
 				player_open_inventory(player);
@@ -150,7 +150,7 @@ bool manage_input(char c, world_t *world, player_t *player, menu_manager_t *menu
 				player_open_loot(player);
 				break;
 			case CTRL_Q:
-				shutdown(world);
+				shutdown(world, player);
 				break;
 			case ENTER_KEY:
 				use_item(player);
@@ -182,7 +182,7 @@ bool manage_input(char c, world_t *world, player_t *player, menu_manager_t *menu
 				player_open_inventory(player);
 				break;
 			case CTRL_Q:
-				shutdown(world);
+				shutdown(world, player);
 				break;
 			case ENTER_KEY:
 				player_take_loot_item(room, player);
@@ -214,7 +214,7 @@ bool manage_input(char c, world_t *world, player_t *player, menu_manager_t *menu
 				player_attack(player, world, LEFT);
 				return true;
 			case CTRL_Q:
-				shutdown(world);
+				shutdown(world, player);
 				break;
 			case ENTER_KEY:
 				player_take_loot_item(room, player);
@@ -533,7 +533,7 @@ void manage_load_menu_input(char c, load_menu_t *load_menu, world_t *world, play
 				break;
 			}
 		case CTRL_Q:
-			shutdown(world);
+			shutdown(world, player);
 			break;
 		case ENTER_KEY:
 			load_game(world, player, load_menu->filename[load_menu->cursor_pos]);
@@ -542,7 +542,7 @@ void manage_load_menu_input(char c, load_menu_t *load_menu, world_t *world, play
 	}
 }
 
-void manage_menu_input(char c, menu_manager_t *menu_manager, world_t *world) {
+void manage_menu_input(char c, menu_manager_t *menu_manager, world_t *world, player_t *player) {
 	if(c == ERR) {
 		return;
 	}
@@ -574,7 +574,7 @@ void manage_menu_input(char c, menu_manager_t *menu_manager, world_t *world) {
 			}
 			break;
 		case CTRL_Q:
-			shutdown(world);
+			shutdown(world, player);
 			break;
 		case ENTER_KEY:
 			// TODO probablly want a switch statement here
@@ -632,16 +632,98 @@ direction_t direction_from_key(int key) {
 }
 
 void end_game(world_t *world, player_t *player) {
-    shutdown(world); //TODO this obvisouly isn't what should happpen
+    return_to_main_menu(world, player);
+	// shutdown(world, player); //TODO this obvisouly isn't what should happpen
 }
 
-void shutdown(world_t *world) {
-	endwin();
-	for(int y = 0; y < ROOM_HEIGHT; y++) {
-		for(int x = 0; x < ROOM_WIDTH; x++) {
-			free(world->room[y][x]);
+void return_to_main_menu(world_t *world, player_t *player) {
+	for(int y = 0; y < WORLD_HEIGHT; y++) {
+		for(int x = 0; x < WORLD_WIDTH; x++) {
+			room_t *room = world->room[x][y];
+			if(!room) continue;
+			for(int ty = 0; ty < ROOM_HEIGHT; ty++) {
+				for(int tx = 0; tx < ROOM_WIDTH; tx++) {
+					tile_t *tile = room->tiles[ty][tx];
+					if(!tile) continue;
+					for(int i = 0; i < tile->item_count; i++) {
+						if(tile->items[i]) {
+							free(tile->items[i]);
+						}
+					}
+					free(tile);
+				}
+			}
+			for(int i = 0; i < MAX_ENEMIES_PER_LEVEL; i++) {
+				enemy_t *enemy = room->enemies[i];
+				memset(enemy, 0, sizeof(enemy_t));
+			}
+			room->current_enemy_count = 0;
+			room->is_created = false;
+			room->global_time = 0;
+			room->biome = BIOME_NULL;
+			room->is_main_path = false;
+			room->door_mask = 0x0;
+			if(!room) {
+				DEBUG_LOG("%s", "you have failed");
+			}
 		}
 	}
+
+	for(int i = 0; i < world->max_message_storage; i++) {
+		memset(world->messages[i], 0, world->messages_size);
+	}
+	memset(world->turn_order, 0, sizeof(int)*world->turn_order_size);
+	memset(world->buffs, 0, sizeof(int)*world->buff_size);
+
+	player_reset_values(player, world);
+
+	player->menu_manager.current_menu = MAIN_MENU;
+}
+
+// void setup_game(world_t *world, player_t *player) {
+//
+// }
+
+void shutdown(world_t *world, player_t *player) {
+	delwin(world->win);
+	endwin();
+	for(int y = 0; y < WORLD_HEIGHT; y++) {
+		for(int x = 0; x < WORLD_WIDTH; x++) {
+			room_t *room = world->room[x][y];
+			for(int ty = 0; ty < ROOM_HEIGHT; ty++) {
+				for(int tx = 0; tx < ROOM_WIDTH; tx++) {
+					tile_t *tile = room->tiles[ty][tx];
+					if(tile) {
+						for(int i = 0; i < MAX_ITEMS_PER_TILE; i++) {
+							if(tile->items[i]) {
+								free(tile->items[i]);
+							}
+						}
+						free(tile);
+					}
+				}
+			}
+			for(int i = 0; i < MAX_ENEMIES_PER_LEVEL; i++) {
+				enemy_t *enemy = room->enemies[i];
+				free(enemy->olist);
+				free(enemy);
+			}
+			free(room);
+		}
+	}
+	free(world->enemy_data);
+	free(world->class_data);
+	free(world->item_data);
+	free(world->trap_data);
+	for(int i = 0; i < world->messages_size; i++) {
+		free(world->messages[i]);
+	}
+	free(world->turn_order);
+	free(world->buffs);
+
+	free(player->inventory);
+
+	free(player);
 	free(world);
 	exit(0);
 }

@@ -53,8 +53,6 @@ int main(int argc, char *argv[]) {
     error = newwin(25, 25, 51, 30);
 	main_menu = newwin(SCREEN_HEIGHT, SCREEN_WIDTH, 0, 0);
     
-	menu_manager_t menu_manager = {.current_menu = MAIN_MENU, .cursor_pos = 0};
-	
 	load_menu_t load_menu;
 	load_menu.win = newwin(SCREEN_HEIGHT, SCREEN_WIDTH, 0, 0);
 	load_menu.filename_count = 0;
@@ -130,74 +128,15 @@ int main(int argc, char *argv[]) {
 	load_trap_data(world);
 	
 	player_t *player = calloc(1, sizeof(player_t));
-	
-	inventory_manager_t inv_manager = {
-		.spells_selector = 0,
-		.inv_selector = 0,
-		.inv_offset = 0,
-		.loot_selector = 0,
-		.loot_offset = 0,
-		.cat = ITEM
-	};
-	
-	player->inventory_manager = inv_manager;
-	player->x = 1;
-	player->y = 10;
-	player->player_class = BRAWLER;
-	for(int i = 0; i < MAX_CLASSES; i++) {
-		if(world->class_data[i].type == player->player_class) {
-			int base_strength = world->class_data[i].base_strength;
-			int base_dexterity = world->class_data[i].base_dexterity;
-			int base_intelligence = world->class_data[i].base_intelligence;
-			int base_constitution = world->class_data[i].base_constitution;
-			int base_speed = world->class_data[i].base_speed;
-			
-			player->strength = base_strength;
-			player->dexterity = base_dexterity;
-			player->intelligence = base_intelligence;
-			player->constitution = base_constitution;
-			player->speed = base_speed;
-			break;
-		}
-	}
-	player->health = player->constitution * 10;
-	player->max_health = player->constitution * 10;
-	player->global_x = 0;
-	player->global_y = 0;
-	player->action_points = 0;
-	player->level = 1;
-	player->xp = 0;
-	player->oil = STARTING_OIL;
-	player->equipment = (equipment_t) {0};
-	player->state = PLAYER_STATE_MOVING;
-	
-	player->inventory = malloc(INV_SIZE * sizeof(item_t));
-	player->inventory_count = 0;
-	for(int i = 0; i < MAX_ITEMS_NEARBY_PLAYER; i++) {
-		player->nearby_loot[i] = malloc(1 * sizeof(item_t));
-	}
-	player->nearby_loot_count = 0;
-	
-	item_t blank = {BLANK_NAME, "does nothing", BLANK, 0};
-	
-	for(int i = 0; i < INV_SIZE; i++) {
-		player->inventory[i] = blank;
-	}
-	
-	player->lantern.power = 5;
-	player->lantern.is_on = true;
-	player->lantern.turns_since_last_dim = 0;
+
+	player_setup(player, world);
 
 	world->turn_order = calloc(MAX_ENEMIES_PER_LEVEL+1, sizeof(int));
 	world->turn_order_size = 0;
 	for(int y = 0; y < WORLD_HEIGHT; y++) {
 		for(int x = 0; x < WORLD_WIDTH; x++) {
 			world->room[x][y] = calloc(1, sizeof(room_t));
-			for(int tile_y = 0; tile_y < ROOM_HEIGHT; tile_y++) {
-				for(int tile_x = 0; tile_x < ROOM_WIDTH; tile_x++) {
-					world->room[x][y]->tiles[tile_y][tile_x] = calloc(1, sizeof(tile_t));
-				}
-			}
+
 			for(int i = 0; i < MAX_ENEMIES_PER_LEVEL; i++) {
 				world->room[x][y]->enemies[i] = calloc(1, sizeof(enemy_t));
 			}
@@ -210,12 +149,12 @@ int main(int argc, char *argv[]) {
 	}
 	
 	room_t *first = setup_first_room(&world->seed, 0, 0, world->enemy_data, world->item_data, world);
-	first->enemies[0] = enemy_spawn(BAT, world->enemy_data, 1, 1, 0, 0, first->biome);
-	
+	enemy_spawn(first->enemies[0], BAT, world->enemy_data, 1, 1, 0, 0, first->biome);
+
 	first->current_enemy_count++;
-	
+
 	world->room[0][0] = first;
-	
+
 	world->room[0][0]->door_mask = 0x6;
 	calculate_door_masks(world);
 	calculate_main_path(&world->seed, world);
@@ -224,8 +163,17 @@ int main(int argc, char *argv[]) {
     world->turn_order_size = 0;
 	
 	for(;;) {
-		switch(menu_manager.current_menu) {
+		switch(player->menu_manager.current_menu) {
 			case GAME:
+				if(world->room[0][0]->is_created == false) {
+					//TODO reset world function
+					load_room(&world->seed, 0, 0, world->enemy_data, world->item_data, world);
+					enemy_spawn(first->enemies[0], BAT, world->enemy_data, 1, 1, 0, 0, first->biome);
+					first->current_enemy_count++;
+					calculate_door_masks(world);
+					calculate_main_path(&world->seed, world);
+					world->turn_order_size = 0;
+				}
 				calculate_light(world, player);
 				generate_turn_order_display(world, player);
 				draw(world, player);
@@ -241,7 +189,7 @@ int main(int argc, char *argv[]) {
 					char c;
 					while(run == false) {
 						c = getch();
-						run = manage_input(c, world, player, &menu_manager);
+						run = manage_input(c, world, player, &player->menu_manager);
 						draw(world, player);
 					}
 					traps_triggered_check(world, player);
@@ -254,26 +202,26 @@ int main(int argc, char *argv[]) {
 				}
 				break;
 			case MAIN_MENU: { // this bracket must be here and it infuriates me
-				draw_main_menu(main_menu, &menu_manager);
+				draw_main_menu(main_menu, &player->menu_manager);
 				char c = getch();
-				manage_menu_input(c, &menu_manager, world);
+				manage_menu_input(c, &player->menu_manager, world, player);
 				break;
 			}
 			case LOAD_MENU: {
 				draw_load_menu(&load_menu);
 				char c = getch();
-				manage_load_menu_input(c, &load_menu, world, player, &menu_manager);
+				manage_load_menu_input(c, &load_menu, world, player, &player->menu_manager);
 				break;
 			}
 			case SAVE_MENU: {
 				char buf[SAVE_FILE_MAX_LEN];
-				display_and_manage_save_menu(main_menu, buf, SAVE_FILE_MAX_LEN, world, player, &menu_manager);
+				display_and_manage_save_menu(main_menu, buf, SAVE_FILE_MAX_LEN, world, player, &player->menu_manager);
 				break;
 			}
 			case LOG_BOOK_MENU:
 				break;
 			case NULL_MENU:
-				menu_manager.current_menu = MAIN_MENU;
+				player->menu_manager.current_menu = MAIN_MENU;
 				DEBUG_LOG("%s", "WARNING: NULL_MENU WAS SET, RESETTING TO MAIN_MENU");
 				break;
 		}

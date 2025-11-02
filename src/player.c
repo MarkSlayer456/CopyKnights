@@ -111,6 +111,7 @@ void load_class_data(class_data_t *class_data) {
 		col = 0;
 		row++;
 	}
+	fclose(fp);
 }
 
 char player_get_current_pos(player_t *player, world_t *world)
@@ -585,4 +586,126 @@ void player_organize_inv(player_t *player, int loc)
 	while(player->inventory[player->inventory_manager.inv_selector].id == BLANK && player->inventory_manager.inv_selector > 0) {
 		player_cycle_inv_selector_up(player);
 	}
+}
+
+void player_setup(player_t *player, world_t *world) {
+	inventory_manager_t inv_manager = {
+		.spells_selector = 0,
+		.inv_selector = 0,
+		.inv_offset = 0,
+		.loot_selector = 0,
+		.loot_offset = 0,
+		.cat = ITEM
+	};
+	player->inventory_manager = inv_manager;
+	player->x = 1;
+	player->y = 10;
+	player->player_class = BRAWLER;
+	for(int i = 0; i < MAX_CLASSES; i++) {
+		if(world->class_data[i].type == player->player_class) {
+			int base_strength = world->class_data[i].base_strength;
+			int base_dexterity = world->class_data[i].base_dexterity;
+			int base_intelligence = world->class_data[i].base_intelligence;
+			int base_constitution = world->class_data[i].base_constitution;
+			int base_speed = world->class_data[i].base_speed;
+
+			player->strength = base_strength;
+			player->dexterity = base_dexterity;
+			player->intelligence = base_intelligence;
+			player->constitution = base_constitution;
+			player->speed = base_speed;
+			break;
+		}
+	}
+
+	player->health = player->constitution * 10;
+	player->max_health = player->constitution * 10;
+	player->global_x = 0;
+	player->global_y = 0;
+	player->action_points = 0;
+	player->level = 1;
+	player->xp = 0;
+	player->oil = STARTING_OIL;
+	player->equipment = (equipment_t) {0};
+	player->state = PLAYER_STATE_MOVING;
+
+	player->inventory = malloc(INV_SIZE * sizeof(item_t));
+	player->inventory_count = 0;
+	for(int i = 0; i < MAX_ITEMS_NEARBY_PLAYER; i++) {
+		player->nearby_loot[i] = malloc(1 * sizeof(item_t));
+	}
+	player->nearby_loot_count = 0;
+
+	item_t blank = {BLANK_NAME, "does nothing", BLANK, 0};
+
+	for(int i = 0; i < INV_SIZE; i++) {
+		player->inventory[i] = blank;
+	}
+
+	player->lantern.power = 5;
+	player->lantern.is_on = true;
+	player->lantern.turns_since_last_dim = 0;
+	player->menu_manager = (menu_manager_t){.current_menu = MAIN_MENU, .cursor_pos = 0};
+}
+
+void player_reset_values(player_t *player, world_t *world) {
+	inventory_manager_t inv_manager = {
+		.spells_selector = 0,
+		.inv_selector = 0,
+		.inv_offset = 0,
+		.loot_selector = 0,
+		.loot_offset = 0,
+		.cat = ITEM
+	};
+
+	player->inventory_manager = inv_manager;
+	player->x = 1;
+	player->y = 10;
+	player->player_class = BRAWLER;
+	for(int i = 0; i < MAX_CLASSES; i++) {
+		if(world->class_data[i].type == player->player_class) {
+			int base_strength = world->class_data[i].base_strength;
+			int base_dexterity = world->class_data[i].base_dexterity;
+			int base_intelligence = world->class_data[i].base_intelligence;
+			int base_constitution = world->class_data[i].base_constitution;
+			int base_speed = world->class_data[i].base_speed;
+
+			player->strength = base_strength;
+			player->dexterity = base_dexterity;
+			player->intelligence = base_intelligence;
+			player->constitution = base_constitution;
+			player->speed = base_speed;
+			break;
+		}
+	}
+
+	player->health = player->constitution * 10;
+	player->max_health = player->constitution * 10;
+	player->global_x = 0;
+	player->global_y = 0;
+	player->action_points = 0;
+	player->level = 1;
+	player->xp = 0;
+	player->oil = STARTING_OIL;
+	player->equipment = (equipment_t) {0};
+	player->state = PLAYER_STATE_MOVING;
+
+	player->inventory_count = 0;
+	player->nearby_loot_count = 0;
+
+	item_t blank = {BLANK_NAME, "does nothing", BLANK, 0};
+
+	for(int i = 0; i < INV_SIZE; i++) {
+		player->inventory[i] = blank;
+	}
+	memset(player->inventory, 0, sizeof(item_t)*player->inventory_count);
+	for(int i = 0; i < MAX_ITEMS_NEARBY_PLAYER; i++) {
+		memset(player->nearby_loot[i], 0, sizeof(item_t));
+	}
+
+	player->lantern.power = 5;
+	player->lantern.is_on = true;
+	player->lantern.turns_since_last_dim = 0;
+	// menu manager doesn't need to be cleared, it's always in use
+
 }

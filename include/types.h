@@ -30,9 +30,9 @@ typedef struct world {
 	int item_data_count;
 	int trap_data_count;
 	trap_data_t *trap_data;
-	int messages_size;
+	int messages_size; // TODO rename
 	char **messages;
-	int max_message_storage;
+	int max_message_storage; // TODO rename
 	int turn_order_size;
 	int *turn_order; // -1 for player, index for enemies
 	int room_template_count;
@@ -42,14 +42,6 @@ typedef struct world {
 	uint8_t buff_count;
 	buff_t *buffs;
 } world_t;
-
-//TODO I want to redo this
-typedef struct {
-	enum menu current_menu;
-	int cursor_pos;
-	enum menu dests[MAX_MENUS]; // where each button takes the user
-	int dests_count;
-} menu_manager_t;
 
 typedef struct {
 	WINDOW *win;

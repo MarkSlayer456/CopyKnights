@@ -7,7 +7,7 @@
 #include "game_constants.h"
 
 typedef struct type_map {
-	const char *name;
+	const char name[MAX_TYPE_MAP_NAME_LENGTH];
 	int16_t value;
 } type_map_t;
 

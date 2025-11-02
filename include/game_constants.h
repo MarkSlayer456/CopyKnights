@@ -7,6 +7,8 @@
 
 #define MESSAGE_IS_PLAYERS_TURN					"It is your turn!"
 
+#define MAX_TYPE_MAP_NAME_LENGTH				128
+
 /// Symbols ///
 
 #define WALL 									'#'

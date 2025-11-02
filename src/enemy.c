@@ -68,9 +68,10 @@ enum trait enemy_get_trait(const char *name) {
     return PASSIVE;
 }
 
-enemy_t *enemy_spawn(enemy_type_t type, const enemy_data_t *enemy_data, int x, int y, int global_x, int global_y, biome_t biome)
+void enemy_spawn(enemy_t *e, enemy_type_t type, const enemy_data_t *enemy_data, int x, int y, int global_x, int global_y, biome_t biome)
 {
-    if(enemy_data == NULL) return NULL;
+    if(!e) return;
+    if(enemy_data == NULL) return;
     DEBUG_LOG("%s", "spawning enemy...");
     int i = 0;
     while(i < MAX_ENEMIES_PER_LEVEL) {
@@ -78,7 +79,6 @@ enemy_t *enemy_spawn(enemy_type_t type, const enemy_data_t *enemy_data, int x, i
             i++;
             continue;
         }
-        enemy_t *e = calloc(1, sizeof(enemy_t));
         e->type = enemy_data[i].type;
         DEBUG_LOG("Type: %s", enemy_get_name(e->type));
 
@@ -114,10 +114,7 @@ enemy_t *enemy_spawn(enemy_type_t type, const enemy_data_t *enemy_data, int x, i
         e->action_points = 0;
         strcpy(e->name, enemy_get_name(type));
         i++;
-
-        return e;
     }
-    return NULL;
 }
 
 void load_biome_data(enemy_data_t *enemy_data) {
@@ -169,6 +166,7 @@ void load_biome_data(enemy_data_t *enemy_data) {
 
         row++;
     }
+    fclose(fp);
 }
 
 biome_t get_biome(const char *name) {
@@ -287,7 +285,7 @@ void load_enemy_data(enemy_data_t *enemy_data) {
         col = 0;
         row++;
     }
-
+    fclose(fp);
     load_biome_data(enemy_data);
 
 }
@@ -345,6 +343,7 @@ void load_enemy_drop_data(enemy_data_t *enemy_data) {
             break;
         }
     }
+   fclose(fp);
 }
 
 void enemy_kill(enemy_t *enemy, world_t *world)
@@ -686,33 +685,6 @@ void find_suitable_tile_away_from_pos(const enemy_t *enemy, const room_t *room, 
         }
 
     }
-
-    // TODO this doesn't check multiple spots if the nearesting point isn't valid it attacks the player
-    // might just be able to make a look at player location go other way function
-    // which might just work better
-
-
-    // if(shortest == top_dist) {
-    //     if(check_tile(room, player, top_pos, start_x) == EMPTY) {
-    //         *end_y = top_pos;
-    //         *end_x = start_x;
-    //     }
-    // } else if(shortest == bottom_dist) {
-    //     if(check_tile(room, player, bottom_pos, start_x) == EMPTY) {
-    //         *end_y = bottom_pos;
-    //         *end_x = start_x;
-    //     }
-    // } else if(shortest == right_dist) {
-    //     if(check_tile(room, player, start_y, right_pos) == EMPTY) {
-    //         *end_y = start_y;
-    //         *end_x = right_pos;
-    //     }
-    // } else if(shortest == left_dist) {
-    //     if(check_tile(room, player, start_y, left_pos) == EMPTY) {
-    //         *end_y = start_y;
-    //         *end_x = left_pos;
-    //     }
-    // }
 }
 
 int find_spot_near(const enemy_t *enemy, const world_t *world, const player_t *player, int *y, int *x) {
