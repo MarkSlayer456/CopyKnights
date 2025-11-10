@@ -132,12 +132,12 @@ void player_move_dir(player_t *player, world_t *world, direction_t dir) {
 		if(dir == UP) player->global_y--;
 		if(player->global_y < 0) {
 			player->y += 1;
-			display_world_message(world, player, DOOR_BLOCKED_MESSAGE);
+			display_world_message(world, DOOR_BLOCKED_MESSAGE);
 			return;
 		}
 		if(player->global_x < 0) {
 			player->x += 1;
-			display_world_message(world, player, DOOR_BLOCKED_MESSAGE);
+			display_world_message(world, DOOR_BLOCKED_MESSAGE);
 			return;
 		}
 		
@@ -157,7 +157,7 @@ void player_enter_new_room(player_t *player, world_t *world) {
 	float chance = (float)rand() / (float)RAND_MAX;
 	if(chance <= ENTRANCE_MESSAGE_CHANCE) {
 		int message = rand() % cave_entrance_messages_count;
-		display_combat_message(world, player, cave_entrance_messages[message]);
+		display_combat_message(world, cave_entrance_messages[message]);
 	}
 	world->room[player->global_x][player->global_y] = generate_room(&world->seed, player->global_x, player->global_y, world->enemy_data, world->item_data, world);
 }
@@ -196,7 +196,7 @@ int player_can_move_dir(player_t *player, world_t *world, direction_t dir) {
 
 void player_wait(player_t *player, world_t *world)
 {
-	display_world_message(world, player, "You stand still!");
+	display_world_message(world, "You stand still!");
 }
 
 void player_damage(player_t *player, world_t *world, int attack) {
@@ -299,7 +299,7 @@ void player_attack(player_t *player, world_t *world, direction_t dir) {
 		int unarmed_damage = 1;
 		char message[MAX_MESSAGE_LENGTH_WITHOUT_PREFIX];
 		snprintf(message, MAX_MESSAGE_LENGTH_WITHOUT_PREFIX, "You attacked for %d", unarmed_damage);
-		display_combat_message(world, player, message);
+		display_combat_message(world, message);
 		if(enemy_damage(enemy, world, unarmed_damage)) {
 			player_add_xp(player, xp, world->class_data);
 		}
@@ -334,14 +334,14 @@ void player_attack(player_t *player, world_t *world, direction_t dir) {
 	DEBUG_LOG("raw damage: %d", raw_damage);
 	if(player_did_crit(player_get_total_crit_chance(weapon))) {
 		raw_damage *= 2;
-		display_combat_message(world, player, "You land a crit");
+		display_combat_message(world, "You land a crit");
 	}
 	int damage = raw_damage * (DEFENSE_SCALING_CONSTANT)/(DEFENSE_SCALING_CONSTANT+enemy->defense);
 	damage = MAX(1, damage);
 	DEBUG_LOG("actual damage: %d", damage);
 	char message[MAX_MESSAGE_LENGTH_WITHOUT_PREFIX];
 	snprintf(message, MAX_MESSAGE_LENGTH_WITHOUT_PREFIX, "You attacked for %d", damage);
-	display_combat_message(world, player, message);
+	display_combat_message(world, message);
 	if(enemy_damage(enemy, world, damage)) {
 		player_add_xp(player, xp, world->class_data);
 	}
@@ -386,7 +386,7 @@ void player_check_level_up(player_t *player, const class_data_t *class_data) {
 }
 
 void player_enter_attack_state(player_t *player, world_t *world) {
-	display_combat_message(world, player, ATTACK_DIRECTION_MESSAGE);
+	display_combat_message(world, ATTACK_DIRECTION_MESSAGE);
 	player->state = PLAYER_STATE_ATTACKING;
 }
 

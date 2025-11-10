@@ -68,6 +68,51 @@ enum trait enemy_get_trait(const char *name) {
     return PASSIVE;
 }
 
+static bool enemy_check_dodge_chance(enemy_t *enemy, world_t *world) {
+    float chance = (float) rand() / (float) RAND_MAX;
+    if(enemy->dodge_chance >= chance) {
+        char buf[MAX_MESSAGE_LENGTH_WITHOUT_PREFIX];
+        snprintf(buf, MAX_MESSAGE_LENGTH_WITHOUT_PREFIX, "[%c] dodged the attack", enemy->symbol);
+        display_combat_message(world, buf);
+        return true;
+    }
+    return false;
+}
+
+static void enemy_handle_knockback(enemy_t *enemy, player_t *player, world_t *world) {
+    if(enemy->knockback_chance == 0 || enemy->knockback == 0) return;
+    int diffX = 0;
+    int diffY = 0;
+
+    float chance = (float) rand() / (float) RAND_MAX;
+    if(enemy->knockback_chance < chance) {
+        return;
+    }
+
+    if(enemy->x > player->x) diffX = -1;
+    if(enemy->x < player->x) diffX = 1;
+    if(enemy->y > player->y) diffY = -1;
+    if(enemy->y < player->y) diffY = 1;
+    // TODO should probably just call the player move dir function instead of handling moving
+    int knockback = enemy->knockback;
+    room_t *room = get_current_room(world, player);
+    int can_knockback = 0;
+    for(int i = 1; i < knockback+1; i++) {
+        tile_t *tile = get_tile(room, player->y+(diffY*i), player->x+(diffX*i));
+        if(!tile_is_walkable(tile)) {
+            break;
+        }
+        can_knockback++;
+    }
+    if(can_knockback > 0) {
+        char buf[MAX_MESSAGE_LENGTH_WITHOUT_PREFIX];
+        snprintf(buf, MAX_MESSAGE_LENGTH_WITHOUT_PREFIX, "You were knocked back %d tile(s) by [%c]", (can_knockback%MAX_KNOCKBACK), enemy->symbol);
+        display_combat_message(world, buf);
+        player->x += (diffX*can_knockback);
+        player->y += (diffY*can_knockback);
+    }
+}
+
 void enemy_spawn(enemy_t *e, enemy_type_t type, const enemy_data_t *enemy_data, int x, int y, int global_x, int global_y, biome_t biome)
 {
     if(!e) return;
@@ -388,6 +433,7 @@ void enemy_handle_death_drops(enemy_t *enemy, enemy_data_t *enemy_data, item_dat
  */
 bool enemy_damage(enemy_t *enemy, world_t *world, int amount) {
     if(!enemy) return false;
+    if(enemy_check_dodge_chance(enemy, world)) return false;
     enemy->health -= amount;
     if(enemy->health <= 0) {
         enemy_kill(enemy, world);
@@ -401,6 +447,7 @@ bool enemy_damage(enemy_t *enemy, world_t *world, int amount) {
  */
 bool enemy_damage_ignore_armor(enemy_t *enemy, world_t *world, int amount) {
     if(!enemy) return false;
+    if(enemy_check_dodge_chance(enemy, world)) return false;
     enemy->health -= amount;
     if(enemy->health <= 0) {
         enemy_kill(enemy, world);
@@ -409,49 +456,13 @@ bool enemy_damage_ignore_armor(enemy_t *enemy, world_t *world, int amount) {
     return false;
 }
 
-// static void enemy_check_dodge_chance() {
-//
-// }
 
-static void enemy_handle_knockback(enemy_t *enemy, player_t *player, world_t *world) {
-    if(enemy->knockback_chance == 0 || enemy->knockback == 0) return;
-    int diffX = 0;
-    int diffY = 0;
-
-    float chance = (float) rand() / (float) RAND_MAX;
-    if(enemy->knockback_chance < chance) {
-        return;
-    }
-
-    if(enemy->x > player->x) diffX = -1;
-    if(enemy->x < player->x) diffX = 1;
-    if(enemy->y > player->y) diffY = -1;
-    if(enemy->y < player->y) diffY = 1;
-    // TODO should probably just call the player move dir function instead of handling moving
-    int knockback = enemy->knockback;
-    room_t *room = get_current_room(world, player);
-    int can_knockback = 0;
-    for(int i = 1; i < knockback+1; i++) {
-        tile_t *tile = get_tile(room, player->y+(diffY*i), player->x+(diffX*i));
-        if(!tile_is_walkable(tile)) {
-            break;
-        }
-        can_knockback++;
-    }
-    if(can_knockback > 0) {
-        char buf[MAX_MESSAGE_LENGTH_WITHOUT_PREFIX];
-        snprintf(buf, MAX_MESSAGE_LENGTH_WITHOUT_PREFIX, "You were knocked back %d tile(s) by %c", can_knockback, enemy->symbol);
-        display_combat_message(world, player, buf);
-        player->x += (diffX*can_knockback);
-        player->y += (diffY*can_knockback);
-    }
-}
 
 void enemy_attack(enemy_t *enemy, player_t *player, world_t *world)
 {
     char message[MAX_MESSAGE_LENGTH_WITHOUT_PREFIX];
     snprintf(message, MAX_MESSAGE_LENGTH_WITHOUT_PREFIX, "[%c] attacked for %d", enemy->symbol, enemy->strength);
-    display_combat_message(world, player, message);
+    display_combat_message(world, message);
     player_damage(player, world, enemy->strength);
     enemy_handle_knockback(enemy, player, world);
 }

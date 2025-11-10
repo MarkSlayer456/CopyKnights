@@ -123,7 +123,7 @@ bool manage_input(char c, world_t *world, player_t *player, menu_manager_t *menu
 				return true;
 			case KEY_F_MINE:
 				if(lantern_increase_power(&player->lantern, &player->oil) == false) {
-					display_world_message(world, player, LANTERN_CAN_AFFORD_REFUEL);
+					display_world_message(world, LANTERN_CAN_AFFORD_REFUEL);
 				}
 				break;
 			case CTRL_Q:
@@ -228,7 +228,7 @@ bool manage_input(char c, world_t *world, player_t *player, menu_manager_t *menu
 	return false;
 }
 
-void display_combat_message(world_t *world, player_t *player, const char *str) {
+void display_combat_message(world_t *world, const char *str) {
 	if(MAX_MESSAGE_LENGTH_WITHOUT_PREFIX < strlen(str)) return;
 	int current_size = world->messages_size;
 	if(current_size >= world->max_message_storage) {
@@ -247,7 +247,7 @@ void display_combat_message(world_t *world, player_t *player, const char *str) {
 	//TODO max_message_storage
 }
 
-void display_world_message(world_t *world, player_t *player, const char *str) {
+void display_world_message(world_t *world, const char *str) {
 	if(MAX_MESSAGE_LENGTH_WITHOUT_PREFIX < strlen(str)) return;
 	int current_size = world->messages_size;
 	if(current_size >= world->max_message_storage) {
@@ -655,7 +655,9 @@ void return_to_main_menu(world_t *world, player_t *player) {
 			}
 			for(int i = 0; i < MAX_ENEMIES_PER_LEVEL; i++) {
 				enemy_t *enemy = room->enemies[i];
-				memset(enemy, 0, sizeof(enemy_t));
+				if(enemy) {
+					memset(enemy, 0, sizeof(enemy_t));
+				}
 			}
 			room->current_enemy_count = 0;
 			room->is_created = false;

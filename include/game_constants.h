@@ -103,7 +103,7 @@
 #define VOID_HOLLOW_DEPTH					60
 
 #define CAVE_ROOM_COUNT						20
-#define BOG_ROOM_COUNT						2
+#define BOG_ROOM_COUNT						16
 #define CATACOMBS_ROOM_COUNT				1
 #define ANCIENT_CITY_ROOM_COUNT				1
 #define ARCANE_LABYRINTH_ROOM_COUNT			1
@@ -169,6 +169,8 @@
 #define ENEMY_PATH_LIST_DEFAULT_SIZE			16
 
 #define SPOT_FIND_RANGE							4
+
+#define MAX_KNOCKBACK							10
 
 ///////////
 
