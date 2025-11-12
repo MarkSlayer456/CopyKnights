@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include "buff.h"
 #include "player.h"
+#include "enemy.h"
 
 
 type_map_t trap_id_map[] = {
@@ -25,7 +26,7 @@ enum trap_id get_trap_id(const char *id) {
 	return NULL_TRAP;
 }
 
-void traps_triggered_check(world_t *world, player_t *player) {
+void traps_triggered_check_player(world_t *world, player_t *player) {
 	for(int i = 0; i < world->trap_data_count; i++) {
 		const trap_data_t *trap_data = &world->trap_data[i];
 		if(trap_data->symbol == world->room[player->global_x][player->global_y]->tiles[player->y][player->x]->floor) {
@@ -53,7 +54,7 @@ void traps_triggered_check(world_t *world, player_t *player) {
 						break;
 				}
 			}
-			buff_set_type(&buff, BUFF_BLEED);
+			buff_set_type(&buff, trap_data->buff_type);
 			buff.target_type_id = TARGET_PLAYER;
 			buff.target.player = player;
 			world->buffs = buff_add_to_list(buff, world->buffs, &world->buff_count, &world->buff_size);
@@ -62,6 +63,51 @@ void traps_triggered_check(world_t *world, player_t *player) {
 				remove_trap(world->room[player->global_x][player->global_y]->tiles[player->y][player->x], player->x, player->y);
 			}
 			break;
+		}
+	}
+}
+
+void traps_triggered_check_enemies(world_t *world, room_t *room) {
+	for(int i = 0; i < world->trap_data_count; i++) {
+		const trap_data_t *trap_data = &world->trap_data[i];
+		for(int j = 0; j < room->current_enemy_count; j++) {
+			enemy_t *enemy = room->enemies[j];
+			if(trap_data->symbol == room->tiles[enemy->y][enemy->x]->floor) {
+				buff_t buff = buff_create();
+				buff.turns_left = trap_data->effect_duration;
+				buff.damage = trap_data->damage_each_turn;
+				for(int i = 0; i < trap_data->modifier_count; i++) {
+					switch(trap_data->modifier_stats[i].stat) {
+						case STRENGTH:
+							buff.flat_strength = trap_data->modifier_stats[i].modifier;
+							break;
+						case DEXTERITY:
+							buff.flat_dexterity = trap_data->modifier_stats[i].modifier;
+							break;
+						case INTELLIGENCE:
+							buff.flat_intelligence = trap_data->modifier_stats[i].modifier;
+							break;
+						case CONSTITUTION:
+							buff.flat_constitution = trap_data->modifier_stats[i].modifier;
+							break;
+						case SPEED:
+							buff.flat_speed = trap_data->modifier_stats[i].modifier;
+							break;
+						case NULL_STAT:
+							break;
+					}
+				}
+				buff_set_type(&buff, trap_data->buff_type);
+				buff.target_type_id = TARGET_ENEMY;
+				buff.target.enemy = enemy;
+				world->buffs = buff_add_to_list(buff, world->buffs, &world->buff_count, &world->buff_size);
+				enemy_damage(enemy, world, trap_data->damage);
+				if(trap_data->break_on_trigger) {
+					remove_trap(room->tiles[enemy->y][enemy->x], enemy->x, enemy->y);
+				}
+
+				break;
+			}
 		}
 	}
 }
@@ -156,6 +202,9 @@ void load_trap_data(world_t *world) {
 					break;
 				case 5:
 					trap_data[world->trap_data_count].symbol = token[0];
+					break;
+				case 6:
+					trap_data[world->trap_data_count].buff_type = buff_get_type(token);
 					break;
 			}
 			token = strtok(NULL, ",");

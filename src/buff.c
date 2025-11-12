@@ -31,6 +31,15 @@ const char *buff_get_name(int16_t value) {
 	return BUFF_NULL_NAME;
 }
 
+enum buff_type buff_get_type(const char *name) {
+	for(int i = 0; i < buff_type_map_len; i++) {
+		if(strcasecmp(name, buff_type_map[i].name) == 0) {
+			return buff_type_map[i].value;
+		}
+	}
+	return BUFF_NULL;
+}
+
 void buff_remove_effects(buff_t *buff_array, uint8_t index) {
 	buff_t buff = buff_array[index];
 	if(buff.target_type_id == TARGET_PLAYER) {

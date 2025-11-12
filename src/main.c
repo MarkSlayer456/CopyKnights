@@ -192,7 +192,7 @@ int main(int argc, char *argv[]) {
 						run = manage_input(c, world, player, &player->menu_manager);
 						draw(world, player);
 					}
-					traps_triggered_check(world, player);
+					traps_triggered_check_player(world, player);
 					buff_apply(world->buffs, &world->buff_count, world);
 				} else if(actor >= 0) {
 					enemy_t *enemy = world->room[player->global_x][player->global_y]->enemies[actor];
@@ -200,6 +200,7 @@ int main(int argc, char *argv[]) {
 						enemy_decide_move(enemy, world, player);
 					}
 				}
+				traps_triggered_check_enemies(world, world->room[player->global_x][player->global_y]);
 				break;
 			case MAIN_MENU: { // this bracket must be here and it infuriates me
 				draw_main_menu(main_menu, &player->menu_manager);

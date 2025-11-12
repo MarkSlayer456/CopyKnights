@@ -73,6 +73,12 @@
 #define KEY_S       							115
 #define KEY_F_MINE									102
 
+#define KEY_W									119
+#define KEY_S									115
+#define KEY_D									100
+#define KEY_E									101
+#define KEY_SPACE								94
+
 #define CTRL_Q									17
 #define CTRL_S									19
 

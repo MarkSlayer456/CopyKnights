@@ -99,22 +99,22 @@ bool manage_input(char c, world_t *world, player_t *player, menu_manager_t *menu
 	}
 	if(player->state == PLAYER_STATE_MOVING) {
 		switch(x) {
-			case LEFT_ARROW:
+			case KEY_A:
 				player_move_dir(player, world, LEFT);
 				break;
-			case RIGHT_ARROW:
+			case KEY_D:
 				player_move_dir(player, world, RIGHT);
 				break;
-			case UP_ARROW:
+			case KEY_W:
 				player_move_dir(player, world, UP);
 				break;
-			case DOWN_ARROW:
+			case KEY_S:
 				player_move_dir(player, world, DOWN);
 				break;
-			case KEY_A:
+			case KEY_SPACE:
 				player_wait(player, world);
 				break;
-			case KEY_S:
+			case KEY_E:
 				player_enter_attack_state(player, world);
 				return false;
 			case CTRL_S:
@@ -140,13 +140,13 @@ bool manage_input(char c, world_t *world, player_t *player, menu_manager_t *menu
 		return true;
 	} else if(player->state == PLAYER_STATE_INVENTORY) {
 		switch(x) {
-			case UP_ARROW:
+			case KEY_W:
 				player_cycle_inv_selector_up(player);
 				break;
-			case DOWN_ARROW:
+			case KEY_S:
 				player_cycle_inv_selector_down(player);
 				break;
-			case RIGHT_ARROW:
+			case KEY_D:
 				player_open_loot(player);
 				break;
 			case CTRL_Q:
@@ -172,13 +172,13 @@ bool manage_input(char c, world_t *world, player_t *player, menu_manager_t *menu
 		return false;
 	} else if(player->state == PLAYER_STATE_LOOTING) { 
 		switch(x) {
-			case UP_ARROW:
+			case KEY_W:
 				player_cycle_loot_selector_up(player);
 				break;
-			case DOWN_ARROW:
+			case KEY_S:
 				player_cycle_loot_selector_down(player);
 				break;
-			case LEFT_ARROW:
+			case KEY_A:
 				player_open_inventory(player);
 				break;
 			case CTRL_Q:
@@ -201,16 +201,16 @@ bool manage_input(char c, world_t *world, player_t *player, menu_manager_t *menu
 		return false;
 	} else if(player->state == PLAYER_STATE_ATTACKING) {
 		switch(x) {
-			case UP_ARROW:
+			case KEY_W:
 				player_attack(player, world, UP);
 				return true;
-			case DOWN_ARROW:
+			case KEY_S:
 				player_attack(player, world, DOWN);
 				return true;
-			case RIGHT_ARROW:
+			case KEY_D:
 				player_attack(player, world, RIGHT);
 				return true;
-			case LEFT_ARROW:
+			case KEY_A:
 				player_attack(player, world, LEFT);
 				return true;
 			case CTRL_Q:
@@ -707,7 +707,6 @@ void shutdown(world_t *world, player_t *player) {
 			}
 			for(int i = 0; i < MAX_ENEMIES_PER_LEVEL; i++) {
 				enemy_t *enemy = room->enemies[i];
-				free(enemy->olist);
 				free(enemy);
 			}
 			free(room);

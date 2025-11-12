@@ -12,6 +12,7 @@ typedef struct {
 	stat_modifier_t modifier_stats[MAX_ARMOR_MODIFIERS];
 	int8_t modifier_count;
 	char symbol;
+	enum buff_type buff_type;
 	bool break_on_trigger; // does this get removed after triggered
 } trap_data_t;
 

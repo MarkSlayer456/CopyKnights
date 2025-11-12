@@ -150,6 +150,7 @@ void save_world(world_t *world, FILE *file) {
 	fwrite(world->turn_order, sizeof(int), world->turn_order_size, file);
 	fwrite(&world->room_template_count, sizeof(int), 1, file);
 	fwrite(&world->room_templates, sizeof(room_template_t), world->room_template_count, file);
+	fwrite(&world->is_player_turn, sizeof(bool), 1, file);
 	fwrite(&world->buff_size, sizeof(uint8_t), 1, file);
 	fwrite(&world->buff_count, sizeof(uint8_t), 1, file);
 	for(int i = 0; i < world->buff_count; i++) {
@@ -347,6 +348,7 @@ void load_world(world_t *world, player_t *player, FILE *file) {
 	fread(world->turn_order, sizeof(int), world->turn_order_size, file);
 	fread(&world->room_template_count, sizeof(int), 1, file);
 	fread(&world->room_templates, sizeof(room_template_t), world->room_template_count, file);
+	fread(&world->is_player_turn, sizeof(bool), 1, file);
 	fread(&world->buff_size, sizeof(uint8_t), 1, file);
 	fread(&world->buff_count, sizeof(uint8_t), 1, file);
 	for(int i = 0; i < world->buff_count; i++) {
