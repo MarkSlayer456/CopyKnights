@@ -396,6 +396,9 @@ void load_item_from_data(item_t *item, item_data_t *item_data) {
 				case VALUE_TYPE_SCROLL:
 					item->stat_type.scroll = item_data[i].stat_type.scroll;
 					break;
+				case VALUE_TYPE_SPELL:
+					item->stat_type.spell = item_data[i].stat_type.spell;
+					break;
 			}
 		}
 	}

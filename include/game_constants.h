@@ -224,6 +224,10 @@
 #define BOGSTICK_VEST_NAME					"Bogstick Vest"
 #define VOIDLACE_CLOAK_NAME					"Voidlace Cloak"
 
+// spells
+#define FIREBALL_SPELL_BOOK_NAME						"Fireball Spell Book"
+
+
 // armor types
 #define ARMOR_TYPE_LIGHT_NAME				"light"
 #define ARMOR_TYPE_MEDIUM_NAME				"medium"

@@ -73,6 +73,7 @@ typedef enum {
 	// not in a menu
 	PLAYER_STATE_MOVING,
 	PLAYER_STATE_ATTACKING,
+	PLAYER_STATE_VIEWING, // in view mode
 	// in a menu
 	PLAYER_STATE_INVENTORY,
 	PLAYER_STATE_LOOTING,

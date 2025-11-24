@@ -82,6 +82,9 @@ typedef struct equipment {
 	item_t *main_hand;
 	bool main_hand_two_handed; // is this weapon 2 handed
 	item_t *off_hand;
+	item_t *spell1;
+	item_t *spell2;
+	item_t *spell3;
 } equipment_t;
 
 typedef struct player {

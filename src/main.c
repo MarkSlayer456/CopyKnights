@@ -18,6 +18,7 @@
 #include "lantern.h"
 #include "items/armor.h"
 #include "items/weapons.h"
+#include "items/spells.h"
 #include "items/foods.h"
 #include "items/misc.h"
 #include "save.h"
@@ -123,6 +124,7 @@ int main(int argc, char *argv[]) {
 	load_class_data(world->class_data);
 	load_armor_data(world);
 	load_weapon_data(world);
+	load_spell_data(world);
 	load_foods_data(world);
 	load_misc_data(world);
 	load_trap_data(world);
@@ -156,6 +158,7 @@ int main(int argc, char *argv[]) {
 	world->room[0][0] = first;
 
 	world->room[0][0]->door_mask = 0x6;
+	drop_item(world->room[0][0]->tiles[10][1], world->item_data, FIREBALL_SPELL_BOOK, 1);
 	calculate_door_masks(world);
 	calculate_main_path(&world->seed, world);
 	
@@ -173,6 +176,7 @@ int main(int argc, char *argv[]) {
 					calculate_door_masks(world);
 					calculate_main_path(&world->seed, world);
 					world->turn_order_size = 0;
+					drop_item(world->room[0][0]->tiles[10][1], world->item_data, FIREBALL_SPELL_BOOK, 1);
 				}
 				calculate_light(world, player);
 				generate_turn_order_display(world, player);

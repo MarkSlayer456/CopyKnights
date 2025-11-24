@@ -56,6 +56,7 @@ void buff_remove_effects(buff_t *buff_array, uint8_t index) {
 		player->speed /= (1 + buff.percent_speed);
 	} else if(buff.target_type_id == TARGET_ENEMY) {
 		enemy_t *enemy = buff.target.enemy;
+		if(enemy == NULL) return;
 		enemy->strength -= buff.flat_strength;
 		enemy->dexterity -= buff.flat_dexterity;
 		enemy->intelligence -= buff.flat_intelligence;
@@ -91,6 +92,7 @@ void buff_apply(buff_t *buff_array, uint8_t *buff_count, world_t *world) {
 				player->speed *= (1 + buff->percent_speed); 
 			} else if(buff->target_type_id == TARGET_ENEMY) {
 				enemy_t *enemy = buff->target.enemy;
+				if(enemy == NULL) return;
 				enemy->strength += buff->flat_strength; 
 				enemy->dexterity += buff->flat_dexterity; 
 				enemy->intelligence += buff->flat_intelligence; 
@@ -107,7 +109,7 @@ void buff_apply(buff_t *buff_array, uint8_t *buff_count, world_t *world) {
 		//TODO probably need to calculate and account for armor that resists these effects
 		if(buff->target_type_id == TARGET_PLAYER) {
 			player_damage(buff->target.player, world, buff->damage);
-		} else if(buff->target_type_id == TARGET_ENEMY) {
+		} else if(buff->target_type_id == TARGET_ENEMY && buff->target.enemy) {
 			enemy_damage(buff->target.enemy, world, buff->damage);
 		}
 		buff->turns_left--;

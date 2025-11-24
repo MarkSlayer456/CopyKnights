@@ -158,6 +158,8 @@ type_map_t item_type_map[] = {
     {TERRACTIE_STAFF_NAME, TERRACTIE_STAFF},
     {GRAVEMARROW_STAFF_NAME, GRAVEMARROW_STAFF},
     {VOIDMARROW_STAFF_NAME, VOIDMARROW_STAFF},
+
+    {FIREBALL_SPELL_BOOK_NAME, FIREBALL_SPELL_BOOK},
 };
 
 const int item_type_map_len = sizeof(item_type_map) / sizeof(item_type_map[0]);
@@ -429,12 +431,16 @@ void item_spawn(item_ids_t id, biome_t biome, tile_t *tile, item_data_t *item_da
                 case VALUE_TYPE_SCROLL:
                     item->stat_type.scroll = item_data[i].stat_type.scroll;
                     break;
+                case VALUE_TYPE_SPELL:
+                    item->stat_type.spell = item_data[i].stat_type.spell;
+                    break;
             }
         }
     }
 }
 
 item_ids_t item_generate_type(unsigned int *seed, item_data_t *item_data, biome_t biome) {
+    // TODO needs to check for rarity
     item_ids_t items[MAX_ITEMS];
     int items_size = 0;
     for(int i = 0; i < MAX_ITEMS; i++) {
@@ -490,6 +496,9 @@ void drop_item(tile_t *tile, item_data_t *item_data, item_ids_t item_id, int qua
                     break;
                 case VALUE_TYPE_SCROLL:
                     item->stat_type.scroll = item_data[i].stat_type.scroll;
+                    break;
+                case VALUE_TYPE_SPELL:
+                    item->stat_type.spell = item_data[i].stat_type.spell;
                     break;
             }
             break; 

@@ -13,6 +13,7 @@ typedef enum value_type {
 	VALUE_TYPE_NONE,
 	VALUE_TYPE_ARMOR,
 	VALUE_TYPE_WEAPON,
+	VALUE_TYPE_SPELL,
 	VALUE_TYPE_FOOD,
 	VALUE_TYPE_SCROLL
 } value_type_t;
@@ -142,6 +143,9 @@ typedef enum item_ids {
 	TERRACTIE_STAFF,
 	GRAVEMARROW_STAFF,
 	VOIDMARROW_STAFF,
+
+	// spells
+	FIREBALL_SPELL_BOOK,
 } item_ids_t;
 
 #endif

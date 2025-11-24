@@ -214,9 +214,9 @@ void display_inventory_hud(world_t *world, player_t *player) {
 			wmove(inventory_hud, pos++, 1);
 			waddstr(inventory_hud, item_name);
 		}
-		// TODO display player's inventory
 	}
 }
+
 void display_inventory_desc_hud(world_t *world, player_t *player) {
 	if(player->state == PLAYER_STATE_MOVING || player->state == PLAYER_STATE_MOVING) {
 		// this should never happen

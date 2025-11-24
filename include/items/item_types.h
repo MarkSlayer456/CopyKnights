@@ -16,6 +16,20 @@ typedef struct stat_modifier {
 	stats_t stat;
 } stat_modifier_t;
 
+typedef struct {
+	int16_t min_damage;
+	int16_t max_damage;
+	int8_t mana_cost;
+	int8_t range;
+	double crit_chance;
+	double status_chance;
+	bool equipped;
+	bool applies_buff;
+	enum buff_type buff_type;
+	stat_modifier_t modifier_stats[MAX_ARMOR_MODIFIERS];
+	int8_t modifier_count;
+} spell_stats_t;
+
 typedef struct armor_stats {
 	armor_type_t type;
 	int16_t defense;
@@ -64,6 +78,7 @@ typedef struct item {
 		weapon_stats_t weapon;
 		food_stats_t food;
 		scroll_stats_t scroll;
+		spell_stats_t spell;
 	} stat_type;
 } item_t;
 
@@ -79,6 +94,7 @@ typedef struct item_data {
 		weapon_stats_t weapon;
 		food_stats_t food;
 		scroll_stats_t scroll;
+		spell_stats_t spell;
 	} stat_type;
 } item_data_t;
 
