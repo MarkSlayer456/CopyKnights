@@ -17,6 +17,9 @@ int use_item(player_t *player);
 
 int handle_armor_change(player_t *player, item_t *new_armor);
 int handle_weapon_change(player_t *player, item_t *new_weapon);
+int handle_spell_one_change(player_t *player, item_t *new_spell1);
+int handle_spell_two_change(player_t *player, item_t *new_spell2);
+int handle_spell_three_change(player_t *player, item_t *new_spell3);
 
 void add_player_equipment_stats(player_t *player, stats_t stat, int modifier);
 void sub_player_equipment_stats(player_t *player, stats_t stat, int modifier);

@@ -235,6 +235,8 @@ int use_item(player_t *player)
             player_increase_mana(player, player->inventory[player->inventory_manager.inv_selector].stat_type.food.mana_heal_amount);
             remove_item(player);
             success = 1;
+        } else if(player->inventory[player->inventory_manager.inv_selector].value_type == VALUE_TYPE_SPELL) {
+            success = handle_spell_one_change(player, &player->inventory[player->inventory_manager.inv_selector]);
         } else {
             switch(player->inventory[player->inventory_manager.inv_selector].id) {
                 case BLANK:
@@ -342,6 +344,64 @@ int handle_weapon_change(player_t *player, item_t *new_weapon) {
             add_player_equipment_stats(player, player->equipment.off_hand->stat_type.weapon.modifier_stats[i].stat, player->equipment.off_hand->stat_type.weapon.modifier_stats[i].modifier);
         }
     }
+    return 1;
+}
+
+int handle_spell_one_change(player_t *player, item_t *new_spell1) {
+    if(player->equipment.spell1 == new_spell1) {
+        player->equipment.spell1->stat_type.spell.equipped = false;
+        player->equipment.spell1 = NULL;
+        return 1;
+    }
+
+    if(player->equipment.spell1 == NULL) {
+        player->equipment.spell1 = new_spell1;
+        player->equipment.spell1->stat_type.spell.equipped = true;
+        return 1;
+    }
+
+    if(player->equipment.spell1 != new_spell1) {
+        player->equipment.spell1->stat_type.spell.equipped = false;
+        player->equipment.spell1 = NULL;
+
+        player->equipment.spell1 = new_spell1;
+        player->equipment.spell1->stat_type.spell.equipped = true;
+        return 1;
+    }
+    return 1;
+}
+
+int handle_spell_two_change(player_t *player, item_t *new_spell2) {
+    if(player->equipment.spell2 == new_spell2) {
+        player->equipment.spell2->stat_type.spell.equipped = false;
+        player->equipment.spell2 = NULL;
+        return 1;
+    }
+
+    if(player->equipment.spell2 != new_spell2) {
+        player->equipment.spell2->stat_type.spell.equipped = false;
+        player->equipment.spell2 = NULL;
+    }
+
+    player->equipment.spell2 = new_spell2;
+    player->equipment.spell2->stat_type.spell.equipped = true;
+    return 1;
+}
+
+int handle_spell_three_change(player_t *player, item_t *new_spell3) {
+    if(player->equipment.spell3 == new_spell3) {
+        player->equipment.spell3->stat_type.spell.equipped = false;
+        player->equipment.spell3 = NULL;
+        return 1;
+    }
+
+    if(player->equipment.spell3 != new_spell3) {
+        player->equipment.spell3->stat_type.spell.equipped = false;
+        player->equipment.spell3 = NULL;
+    }
+
+    player->equipment.spell3 = new_spell3;
+    player->equipment.spell3->stat_type.spell.equipped = true;
     return 1;
 }
 

@@ -620,6 +620,8 @@ void player_setup(player_t *player, world_t *world) {
 
 	player->health = player->constitution * 10;
 	player->max_health = player->constitution * 10;
+	player->mana = player->intelligence * 10;
+	player->max_mana = player->intelligence * 10;
 	player->global_x = 0;
 	player->global_y = 0;
 	player->action_points = 0;

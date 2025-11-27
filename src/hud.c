@@ -21,21 +21,15 @@ void hud_update_player_health(const player_t *player, const buff_t *buff_array, 
 	waddch(hud, ' ');
 	//TODO rename all strings in this function
 	char buf[64];
-	snprintf(buf, sizeof(buf), "%d", player->health);
+	snprintf(buf, sizeof(buf), "%d / %d | Mana: %d / %d | Level: %d | XP: %d / %d", player->health, player->max_health, player->mana, player->max_mana, player->level, player->xp, xp_to_level_up(player->level));
 	waddstr(hud, buf);
+	DEBUG_LOG("buf length: %ld", strlen(buf));
 	
-	waddch(hud, ' ');
-	waddch(hud, '/');
-	waddch(hud, ' ');
-	
-	snprintf(buf, sizeof(buf), "%d", player->max_health);
-	waddstr(hud, buf);
-	
-	getyx(hud, y, x);
-	wmove(hud, y+1, 0);
-	snprintf(buf, sizeof(buf), "Level: %d | XP: %d / %d", player->level, player->xp, xp_to_level_up(player->level));
-	waddstr(hud, buf);
-	
+// 	getyx(hud, y, x);
+// 	wmove(hud, y+1, 0);
+// 	snprintf(buf, sizeof(buf), "Level: %d | XP: %d / %d", player->level, player->xp, xp_to_level_up(player->level));
+// 	waddstr(hud, buf);
+//
 	// this will break if any stats are over 3 digits
 	getyx(hud, y, x);
 	wmove(hud, y+1, 0);
@@ -191,7 +185,7 @@ void display_inventory_hud(world_t *world, player_t *player) {
 		for(int i = player->inventory_manager.inv_offset; i < visible_item_count+player->inventory_manager.inv_offset; i++) {
 			if(player->inventory[i].stack == 0) continue;
 			if(i == player->inventory_manager.inv_selector) {
-				if(player->equipment.armor == &player->inventory[i] || player->equipment.main_hand == &player->inventory[i] || player->equipment.off_hand == &player->inventory[i]) {
+				if(player->equipment.spell3 == &player->inventory[i] || player->equipment.spell2 == &player->inventory[i] || player->equipment.spell1 == &player->inventory[i] || player->equipment.armor == &player->inventory[i] || player->equipment.main_hand == &player->inventory[i] || player->equipment.off_hand == &player->inventory[i]) {
 					if(player->state == PLAYER_STATE_INVENTORY) {
 						snprintf(item_name, MAX_ITEM_NAME_LENGTH+add_size, ">>%s (E) x%d", player->inventory[i].name, player->inventory[i].stack);
 					} else {
