@@ -347,6 +347,33 @@ void player_attack(player_t *player, world_t *world, direction_t dir) {
 	}
 }
 
+void player_cycle_attack_weapon(player_t *player) {
+	if((!player->equipment.main_hand && !player->equipment.spell1 && !player->equipment.spell2 && !player->equipment.spell3) || !player->equipment.attack_weapon) {
+		return;
+	}
+	if(player->equipment.main_hand == player->equipment.attack_weapon) {
+		player->equipment.attack_weapon = player->equipment.spell1;
+		if(!player->equipment.attack_weapon) {
+			player_cycle_attack_weapon(player);
+		}
+	} else if(player->equipment.spell1 == player->equipment.attack_weapon) {
+		player->equipment.attack_weapon = player->equipment.spell2;
+		if(!player->equipment.spell1) {
+			player_cycle_attack_weapon(player);
+		}
+	} else if(player->equipment.spell2 == player->equipment.attack_weapon) {
+		player->equipment.attack_weapon = player->equipment.spell3;
+		if(!player->equipment.spell2) {
+			player_cycle_attack_weapon(player);
+		}
+	} else if(player->equipment.spell3 == player->equipment.attack_weapon) {
+		player->equipment.attack_weapon = player->equipment.main_hand;
+		if(!player->equipment.spell3) {
+			player_cycle_attack_weapon(player);
+		}
+	}
+}
+
 bool player_did_crit(double total_crit_chance) {
 	double roll = (double)rand() / RAND_MAX;
 	return roll < total_crit_chance;
@@ -701,9 +728,9 @@ void player_reset_values(player_t *player, world_t *world) {
 		player->inventory[i] = blank;
 	}
 	memset(player->inventory, 0, sizeof(item_t)*player->inventory_count);
-	for(int i = 0; i < MAX_ITEMS_NEARBY_PLAYER; i++) {
-		memset(player->nearby_loot[i], 0, sizeof(item_t));
-	}
+	// for(int i = 0; i < MAX_ITEMS_NEARBY_PLAYER; i++) {
+	// 	memset(player->nearby_loot[i], 0, sizeof(item_t));
+	// }
 
 	player->lantern.power = 5;
 	player->lantern.is_on = true;

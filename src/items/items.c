@@ -303,7 +303,8 @@ int handle_weapon_change(player_t *player, item_t *new_weapon) {
                 if(player->equipment.off_hand != NULL) {
                     player->equipment.off_hand->stat_type.weapon.equipped = false;
                 }
-                player->equipment.main_hand = new_weapon; 
+                player->equipment.main_hand = new_weapon;
+                player->equipment.attack_weapon = player->equipment.main_hand;
                 player->equipment.off_hand = new_weapon;
                 player->equipment.main_hand->stat_type.weapon.equipped = true;
                 player->equipment.off_hand->stat_type.weapon.equipped = true;
@@ -322,6 +323,7 @@ int handle_weapon_change(player_t *player, item_t *new_weapon) {
                     player->equipment.main_hand->stat_type.weapon.equipped = false;
                 }
                 player->equipment.main_hand = new_weapon;
+                player->equipment.attack_weapon = player->equipment.main_hand;
                 player->equipment.main_hand->stat_type.weapon.equipped = true;
             }
         }
@@ -357,6 +359,7 @@ int handle_spell_one_change(player_t *player, item_t *new_spell1) {
     if(player->equipment.spell1 == NULL) {
         player->equipment.spell1 = new_spell1;
         player->equipment.spell1->stat_type.spell.equipped = true;
+        player->equipment.attack_weapon = player->equipment.spell1;
         return 1;
     }
 
@@ -366,6 +369,7 @@ int handle_spell_one_change(player_t *player, item_t *new_spell1) {
 
         player->equipment.spell1 = new_spell1;
         player->equipment.spell1->stat_type.spell.equipped = true;
+        player->equipment.attack_weapon = player->equipment.spell1;
         return 1;
     }
     return 1;
@@ -378,13 +382,22 @@ int handle_spell_two_change(player_t *player, item_t *new_spell2) {
         return 1;
     }
 
+    if(player->equipment.spell2 == NULL) {
+        player->equipment.spell2 = new_spell2;
+        player->equipment.spell2->stat_type.spell.equipped = true;
+        player->equipment.attack_weapon = player->equipment.spell2;
+        return 1;
+    }
+
     if(player->equipment.spell2 != new_spell2) {
         player->equipment.spell2->stat_type.spell.equipped = false;
         player->equipment.spell2 = NULL;
-    }
 
-    player->equipment.spell2 = new_spell2;
-    player->equipment.spell2->stat_type.spell.equipped = true;
+        player->equipment.spell2 = new_spell2;
+        player->equipment.spell2->stat_type.spell.equipped = true;
+        player->equipment.attack_weapon = player->equipment.spell2;
+        return 1;
+    }
     return 1;
 }
 
@@ -395,13 +408,22 @@ int handle_spell_three_change(player_t *player, item_t *new_spell3) {
         return 1;
     }
 
+    if(player->equipment.spell3 == NULL) {
+        player->equipment.spell3 = new_spell3;
+        player->equipment.spell3->stat_type.spell.equipped = true;
+        player->equipment.attack_weapon = player->equipment.spell3;
+        return 1;
+    }
+
     if(player->equipment.spell3 != new_spell3) {
         player->equipment.spell3->stat_type.spell.equipped = false;
         player->equipment.spell3 = NULL;
-    }
 
-    player->equipment.spell3 = new_spell3;
-    player->equipment.spell3->stat_type.spell.equipped = true;
+        player->equipment.spell3 = new_spell3;
+        player->equipment.spell3->stat_type.spell.equipped = true;
+        player->equipment.attack_weapon = player->equipment.spell3;
+        return 1;
+    }
     return 1;
 }
 

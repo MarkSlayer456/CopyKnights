@@ -110,6 +110,7 @@ void save_player(player_t *player, FILE *file) {
 	fwrite(&player->player_class, sizeof(class_type_t), 1, file);
 	fwrite(&player->lantern, sizeof(lantern_t), 1, file);
 	
+	fwrite(&player->equipment.attack_weapon, sizeof(item_ids_t), 1, file);
 	fwrite(&player->equipment.armor_id, sizeof(item_ids_t), 1, file);
 	fwrite(&player->equipment.main_hand_id, sizeof(item_ids_t), 1, file);
 	fwrite(&player->equipment.off_hand_id, sizeof(item_ids_t), 1, file);
@@ -305,6 +306,7 @@ void load_player(player_t *player, FILE *file, item_data_t *item_data) {
 	fread(&player->player_class, sizeof(class_type_t), 1, file);
 	fread(&player->lantern, sizeof(lantern_t), 1, file);
 	
+	fread(&player->equipment.attack_weapon, sizeof(item_ids_t), 1, file);
 	fread(&player->equipment.armor_id, sizeof(item_ids_t), 1, file);
 	fread(&player->equipment.main_hand_id, sizeof(item_ids_t), 1, file);
 	fread(&player->equipment.off_hand_id, sizeof(item_ids_t), 1, file);

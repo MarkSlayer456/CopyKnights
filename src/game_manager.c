@@ -117,6 +117,9 @@ bool manage_input(char c, world_t *world, player_t *player, menu_manager_t *menu
 			case KEY_E:
 				player_enter_attack_state(player, world);
 				return false;
+			case KEY_Q:
+				player_cycle_attack_weapon(player);
+				break;
 			case CTRL_S:
 				menu_manager->current_menu = SAVE_MENU;
 				world->is_player_turn = true;
@@ -239,6 +242,8 @@ void display_combat_message(world_t *world, const char *str) {
 					tmp[i] = calloc(MAX_MESSAGE_LENGTH, sizeof(char));
 			}
 			world->messages = tmp;
+		} else {
+			world->max_message_storage/=2;
 		}
 	}
 	// strncpy(world->messages[current_size], str, MAX_MESSAGE_LENGTH-1);
@@ -258,6 +263,8 @@ void display_world_message(world_t *world, const char *str) {
 				tmp[i] = calloc(MAX_MESSAGE_LENGTH, sizeof(char));
 			}
 			world->messages = tmp;
+		} else {
+			world->max_message_storage/=2;
 		}
 	}
 	// strncpy(world->messages[current_size], str, MAX_MESSAGE_LENGTH-1);

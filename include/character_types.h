@@ -78,6 +78,7 @@ typedef struct lantern {
 
 typedef struct equipment {
 	item_ids_t armor_id, main_hand_id, off_hand_id, spell1_id, spell2_id, spell3_id;
+	item_t *attack_weapon; // this is the weapon currently used by the player when pressing attack
 	item_t *armor;
 	item_t *main_hand;
 	bool main_hand_two_handed; // is this weapon 2 handed

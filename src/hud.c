@@ -23,7 +23,6 @@ void hud_update_player_health(const player_t *player, const buff_t *buff_array, 
 	char buf[64];
 	snprintf(buf, sizeof(buf), "%d / %d | Mana: %d / %d | Level: %d | XP: %d / %d", player->health, player->max_health, player->mana, player->max_mana, player->level, player->xp, xp_to_level_up(player->level));
 	waddstr(hud, buf);
-	DEBUG_LOG("buf length: %ld", strlen(buf));
 	
 // 	getyx(hud, y, x);
 // 	wmove(hud, y+1, 0);
@@ -38,7 +37,11 @@ void hud_update_player_health(const player_t *player, const buff_t *buff_array, 
 
 	getyx(hud, y, x);
 	wmove(hud, y+1, 0);
-	snprintf(buf, sizeof(buf), "Oil: %d", player->oil);
+	if(player->equipment.attack_weapon) {
+		snprintf(buf, sizeof(buf), "Attack Weapon: %s | Oil: %d", player->equipment.attack_weapon->name, player->oil);
+	} else {
+		snprintf(buf, sizeof(buf), "Attack Weapon: Unarmed | Oil: %d", player->oil);
+	}
 	waddstr(hud, buf);
 
 	memset(buf, 0, sizeof(buf));
@@ -187,9 +190,25 @@ void display_inventory_hud(world_t *world, player_t *player) {
 			if(i == player->inventory_manager.inv_selector) {
 				if(player->equipment.spell3 == &player->inventory[i] || player->equipment.spell2 == &player->inventory[i] || player->equipment.spell1 == &player->inventory[i] || player->equipment.armor == &player->inventory[i] || player->equipment.main_hand == &player->inventory[i] || player->equipment.off_hand == &player->inventory[i]) {
 					if(player->state == PLAYER_STATE_INVENTORY) {
-						snprintf(item_name, MAX_ITEM_NAME_LENGTH+add_size, ">>%s (E) x%d", player->inventory[i].name, player->inventory[i].stack);
+						if(player->equipment.spell1 == &player->inventory[i]) {
+							snprintf(item_name, MAX_ITEM_NAME_LENGTH+add_size, ">>%s (E) [SP 1] x%d", player->inventory[i].name, player->inventory[i].stack);
+						} else if(player->equipment.spell2 == &player->inventory[i]) {
+							snprintf(item_name, MAX_ITEM_NAME_LENGTH+add_size, ">>%s (E) [SP 2] x%d", player->inventory[i].name, player->inventory[i].stack);
+						} else if(player->equipment.spell3 == &player->inventory[i]) {
+							snprintf(item_name, MAX_ITEM_NAME_LENGTH+add_size, ">>%s (E) [SP 3] x%d", player->inventory[i].name, player->inventory[i].stack);
+						} else {
+							snprintf(item_name, MAX_ITEM_NAME_LENGTH+add_size, ">>%s (E) x%d", player->inventory[i].name, player->inventory[i].stack);
+						}
 					} else {
-						snprintf(item_name, MAX_ITEM_NAME_LENGTH+add_size, ">%s (E) x%d", player->inventory[i].name, player->inventory[i].stack);
+						if(player->equipment.spell1 == &player->inventory[i]) {
+							snprintf(item_name, MAX_ITEM_NAME_LENGTH+add_size, ">%s (E SP 1) x%d", player->inventory[i].name, player->inventory[i].stack);
+						} else if(player->equipment.spell2 == &player->inventory[i]) {
+							snprintf(item_name, MAX_ITEM_NAME_LENGTH+add_size, ">%s (E SP 2) x%d", player->inventory[i].name, player->inventory[i].stack);
+						} else if(player->equipment.spell3 == &player->inventory[i]) {
+							snprintf(item_name, MAX_ITEM_NAME_LENGTH+add_size, ">%s (E SP 3) x%d", player->inventory[i].name, player->inventory[i].stack);
+						} else {
+							snprintf(item_name, MAX_ITEM_NAME_LENGTH+add_size, ">%s (E) x%d", player->inventory[i].name, player->inventory[i].stack);
+						}
 					}
 				} else {
 					if(player->state == PLAYER_STATE_INVENTORY) {
@@ -199,8 +218,16 @@ void display_inventory_hud(world_t *world, player_t *player) {
 					}
 				}
 			} else {
-				if(player->equipment.armor == &player->inventory[i] || player->equipment.main_hand == &player->inventory[i] || player->equipment.off_hand == &player->inventory[i]) {
-					snprintf(item_name, MAX_ITEM_NAME_LENGTH+add_size, "%s (E) x%d", player->inventory[i].name, player->inventory[i].stack);
+				if(player->equipment.spell3 == &player->inventory[i] || player->equipment.spell2 == &player->inventory[i] || player->equipment.spell1 == &player->inventory[i] || player->equipment.armor == &player->inventory[i] || player->equipment.main_hand == &player->inventory[i] || player->equipment.off_hand == &player->inventory[i]) {
+					if(player->equipment.spell1 == &player->inventory[i]) {
+						snprintf(item_name, MAX_ITEM_NAME_LENGTH+add_size, "%s (E) [SP 1] x%d", player->inventory[i].name, player->inventory[i].stack);
+					} else if(player->equipment.spell2 == &player->inventory[i]) {
+						snprintf(item_name, MAX_ITEM_NAME_LENGTH+add_size, "%s (E) [SP 2] x%d", player->inventory[i].name, player->inventory[i].stack);
+					} else if(player->equipment.spell3 == &player->inventory[i]) {
+						snprintf(item_name, MAX_ITEM_NAME_LENGTH+add_size, "%s (E) [SP 3] x%d", player->inventory[i].name, player->inventory[i].stack);
+					} else {
+						snprintf(item_name, MAX_ITEM_NAME_LENGTH+add_size, "%s (E) x%d", player->inventory[i].name, player->inventory[i].stack);
+					}
 				} else {
 					snprintf(item_name, MAX_ITEM_NAME_LENGTH+add_size, "%s x%d", player->inventory[i].name, player->inventory[i].stack);
 				}

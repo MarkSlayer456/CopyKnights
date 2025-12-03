@@ -34,6 +34,7 @@ enemy_t *player_get_dir_enemy(player_t *player, world_t *world, direction_t dir,
 double get_weapon_stat_scaling_factor(player_t *player, stats_t stat, double required_stat);
 
 void player_attack(player_t *player, world_t *world, direction_t dir);
+void player_cycle_attack_weapon(player_t *player);
 
 bool player_did_crit(double total_crit_chance);
 

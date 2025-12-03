@@ -78,6 +78,10 @@
 #define KEY_D									100
 #define KEY_E									101
 #define KEY_SPACE								94
+#define KEY_Q									113
+#define KEY_1									49
+#define KEY_2									50
+#define KEY_3									51
 
 #define CTRL_Q									17
 #define CTRL_S									19
@@ -96,7 +100,7 @@
 #define MAX_ITEM_NAME_LENGTH					32
 #define MAX_ITEM_DESC_LEN						256
 #define MAX_ITEM_STACK							99
-#define DEFAULT_MAX_MESSAGE_STORAGE				128
+#define DEFAULT_MAX_MESSAGE_STORAGE				4
 #define MAX_MESSAGE_LENGTH						59
 #define MAX_MESSAGE_LENGTH_WITHOUT_PREFIX		47
 
