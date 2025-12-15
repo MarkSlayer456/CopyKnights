@@ -23,6 +23,7 @@ typedef struct {
 	int8_t range;
 	double crit_chance;
 	double status_chance;
+	enum grade stat_grade;
 	bool equipped;
 	bool applies_buff;
 	enum buff_type buff_type;

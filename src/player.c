@@ -292,11 +292,11 @@ void player_attack(player_t *player, world_t *world, direction_t dir) {
 	player_exit_attack_state(player, world);
 
 	item_t *main_hand = player->equipment.main_hand;
-	if(!main_hand) {
+	if(player->equipment.attack_weapon == NULL) {
+		int unarmed_damage = 1;
 		enemy_t *enemy = player_get_dir_enemy(player, world, dir, 1);
 		if(!enemy) return;
 		int xp = (enemy->health + enemy->strength) * 5; // TODO this needs changed
-		int unarmed_damage = 1;
 		char message[MAX_MESSAGE_LENGTH_WITHOUT_PREFIX];
 		snprintf(message, MAX_MESSAGE_LENGTH_WITHOUT_PREFIX, "You attacked for %d", unarmed_damage);
 		display_combat_message(world, message);
@@ -305,72 +305,89 @@ void player_attack(player_t *player, world_t *world, direction_t dir) {
 		}
 		return;
 	}
-	int raw_damage = 0;
-	weapon_stats_t *weapon = &main_hand->stat_type.weapon;
-	double required_stat = weapon->min_attack + weapon->max_attack;
 
-	enemy_t *enemy = player_get_dir_enemy(player, world, dir, weapon->range);
-	if(!enemy) return;
-	int xp = (enemy->health + enemy->strength) * 5; // TODO this needs changed
-	
-	double scaling_factor_stat1 = get_weapon_stat_scaling_factor(player, weapon->scaling_stat1, required_stat);
-	if(scaling_factor_stat1 > 1) scaling_factor_stat1 = 1;
-	
-	if(weapon->scaling_stat2 != NULL_STAT) {
-		double scaling_factor_stat2 = get_weapon_stat_scaling_factor(player, weapon->scaling_stat2, required_stat);
-		if(scaling_factor_stat2 > 1) scaling_factor_stat2 = 1;
-		double stat1_weight = scaling_factor_stat1 * get_percent_from_grade(weapon->stat1_grade);
-		double stat2_weight = scaling_factor_stat2 * get_percent_from_grade(weapon->stat2_grade);
-		double rand_weight = (((double)rand() / RAND_MAX) * (1-(get_percent_from_grade(weapon->stat1_grade)+get_percent_from_grade(weapon->stat2_grade))));
-		raw_damage = ceil(weapon->max_attack * (stat1_weight + stat2_weight + rand_weight));
-	} else {
-		double stat_weight = scaling_factor_stat1 * get_percent_from_grade(weapon->stat1_grade);
-		double rand_weight = (((double)rand() / RAND_MAX) * (1-get_percent_from_grade(weapon->stat1_grade)));
-		raw_damage = ceil(weapon->max_attack * (stat_weight + rand_weight));
+	if(player->equipment.attack_weapon->value_type == VALUE_TYPE_SPELL) {
+		DEBUG_LOG("%s", "reached value type spell in player_attack");
+		int raw_damage = 0;
+		spell_stats_t *spell = &player->equipment.attack_weapon->stat_type.spell;
+		enemy_t *enemy = player_get_dir_enemy(player, world, dir, spell->range);
+		if(!enemy) return;
+		int xp = (enemy->health + enemy->strength) * 5; // TODO this needs changed
+		double required_stat = spell->min_damage + spell->max_damage;
+		double scaling_factor = get_weapon_stat_scaling_factor(player, INTELLIGENCE, required_stat);
+		double stat_weight = scaling_factor * get_percent_from_grade(spell->stat_grade);
+		double rand_weight = (((double)rand() / RAND_MAX) * (1-(get_percent_from_grade(spell->stat_grade))));
+		raw_damage = ceil(spell->max_damage * (stat_weight + rand_weight));
+		int damage = raw_damage * (DEFENSE_SCALING_CONSTANT)/(DEFENSE_SCALING_CONSTANT+enemy->defense);
+		damage = MAX(1, damage);
+		char message[MAX_MESSAGE_LENGTH_WITHOUT_PREFIX];
+		snprintf(message, MAX_MESSAGE_LENGTH_WITHOUT_PREFIX, "You attacked for %d", damage);
+		display_combat_message(world, message);
+		if(enemy_damage(enemy, world, damage)) {
+			player_add_xp(player, xp, world->class_data);
+		}
+		return;
 	}
-	
-	raw_damage = MAX(weapon->min_attack, raw_damage);
-	if(raw_damage > weapon->max_attack) raw_damage = weapon->max_attack;
-	DEBUG_LOG("raw damage: %d", raw_damage);
-	if(player_did_crit(player_get_total_crit_chance(weapon))) {
-		raw_damage *= 2;
-		display_combat_message(world, "You land a crit");
-	}
-	int damage = raw_damage * (DEFENSE_SCALING_CONSTANT)/(DEFENSE_SCALING_CONSTANT+enemy->defense);
-	damage = MAX(1, damage);
-	DEBUG_LOG("actual damage: %d", damage);
-	char message[MAX_MESSAGE_LENGTH_WITHOUT_PREFIX];
-	snprintf(message, MAX_MESSAGE_LENGTH_WITHOUT_PREFIX, "You attacked for %d", damage);
-	display_combat_message(world, message);
-	if(enemy_damage(enemy, world, damage)) {
-		player_add_xp(player, xp, world->class_data);
+
+	if(player->equipment.attack_weapon->value_type == VALUE_TYPE_WEAPON) {
+		enemy_t *enemy = player_get_dir_enemy(player, world, dir, main_hand->stat_type.weapon.range);
+		if(!enemy) return;
+		int xp = (enemy->health + enemy->strength) * 5; // TODO this needs changed
+
+		int raw_damage = 0;
+		weapon_stats_t *weapon = &main_hand->stat_type.weapon;
+		double required_stat = weapon->min_attack + weapon->max_attack;
+
+		double scaling_factor_stat1 = get_weapon_stat_scaling_factor(player, weapon->scaling_stat1, required_stat);
+		if(scaling_factor_stat1 > 1) scaling_factor_stat1 = 1;
+
+		if(weapon->scaling_stat2 != NULL_STAT) {
+			double scaling_factor_stat2 = get_weapon_stat_scaling_factor(player, weapon->scaling_stat2, required_stat);
+			if(scaling_factor_stat2 > 1) scaling_factor_stat2 = 1;
+			double stat1_weight = scaling_factor_stat1 * get_percent_from_grade(weapon->stat1_grade);
+			double stat2_weight = scaling_factor_stat2 * get_percent_from_grade(weapon->stat2_grade);
+			double rand_weight = (((double)rand() / RAND_MAX) * (1-(get_percent_from_grade(weapon->stat1_grade)+get_percent_from_grade(weapon->stat2_grade))));
+			raw_damage = ceil(weapon->max_attack * (stat1_weight + stat2_weight + rand_weight));
+		} else {
+			double stat_weight = scaling_factor_stat1 * get_percent_from_grade(weapon->stat1_grade);
+			double rand_weight = (((double)rand() / RAND_MAX) * (1-get_percent_from_grade(weapon->stat1_grade)));
+			raw_damage = ceil(weapon->max_attack * (stat_weight + rand_weight));
+		}
+
+		raw_damage = MAX(weapon->min_attack, raw_damage);
+		if(raw_damage > weapon->max_attack) raw_damage = weapon->max_attack;
+		DEBUG_LOG("raw damage: %d", raw_damage);
+		if(player_did_crit(player_get_total_crit_chance(weapon))) {
+			raw_damage *= 2;
+			display_combat_message(world, "You land a crit");
+		}
+		int damage = raw_damage * (DEFENSE_SCALING_CONSTANT)/(DEFENSE_SCALING_CONSTANT+enemy->defense);
+		damage = MAX(1, damage);
+		DEBUG_LOG("actual damage: %d", damage);
+		char message[MAX_MESSAGE_LENGTH_WITHOUT_PREFIX];
+		snprintf(message, MAX_MESSAGE_LENGTH_WITHOUT_PREFIX, "You attacked for %d", damage);
+		display_combat_message(world, message);
+		if(enemy_damage(enemy, world, damage)) {
+			player_add_xp(player, xp, world->class_data);
+		}
 	}
 }
 
 void player_cycle_attack_weapon(player_t *player) {
-	if((!player->equipment.main_hand && !player->equipment.spell1 && !player->equipment.spell2 && !player->equipment.spell3) || !player->equipment.attack_weapon) {
+	if((!player->equipment.main_hand && !player->equipment.spell1 && !player->equipment.spell2 && !player->equipment.spell3)) {
 		return;
 	}
 	if(player->equipment.main_hand == player->equipment.attack_weapon) {
 		player->equipment.attack_weapon = player->equipment.spell1;
-		if(!player->equipment.attack_weapon) {
-			player_cycle_attack_weapon(player);
-		}
 	} else if(player->equipment.spell1 == player->equipment.attack_weapon) {
 		player->equipment.attack_weapon = player->equipment.spell2;
-		if(!player->equipment.spell1) {
-			player_cycle_attack_weapon(player);
-		}
 	} else if(player->equipment.spell2 == player->equipment.attack_weapon) {
 		player->equipment.attack_weapon = player->equipment.spell3;
-		if(!player->equipment.spell2) {
-			player_cycle_attack_weapon(player);
-		}
 	} else if(player->equipment.spell3 == player->equipment.attack_weapon) {
 		player->equipment.attack_weapon = player->equipment.main_hand;
-		if(!player->equipment.spell3) {
-			player_cycle_attack_weapon(player);
-		}
+	}
+	if(!player->equipment.attack_weapon) {
+		player->equipment.attack_weapon = player->equipment.main_hand;
 	}
 }
 
@@ -627,7 +644,7 @@ void player_setup(player_t *player, world_t *world) {
 	player->inventory_manager = inv_manager;
 	player->x = 1;
 	player->y = 10;
-	player->player_class = BRAWLER;
+	player->player_class = WIZARD;
 	for(int i = 0; i < MAX_CLASSES; i++) {
 		if(world->class_data[i].type == player->player_class) {
 			int base_strength = world->class_data[i].base_strength;

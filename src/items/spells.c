@@ -74,6 +74,7 @@ void load_spell_data(world_t *world) {
 		char *range = strtok(NULL, ",");
 		char *crit_chance = strtok(NULL, ",");
 		char *status_chance = strtok(NULL, ",");
+		char *stat_grade = strtok(NULL, ",");
 		char *buff_type = strtok(NULL, ",");
 
 		if(!spell_name || !min_damage || !max_damage || !range || !crit_chance
@@ -91,6 +92,7 @@ void load_spell_data(world_t *world) {
 		item_data[world->item_data_count].stat_type.spell.range = (int8_t)atoi(range);
 		item_data[world->item_data_count].stat_type.spell.crit_chance = atof(crit_chance);
 		item_data[world->item_data_count].stat_type.spell.status_chance = atof(status_chance);
+		item_data[world->item_data_count].stat_type.spell.stat_grade = get_grade(stat_grade);
 		item_data[world->item_data_count].stat_type.spell.buff_type = buff_get_type(buff_type);
 
 

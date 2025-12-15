@@ -1,2 +1,2 @@
-name,min damage,max damage,cost,range,critical chance,status chance,buff type
-fireball spell book,3,10,10,5,0,.25,BRN
+name,min damage,max damage,cost,range,critical chance,status chance,stat grade,buff type
+fireball spell book,3,10,10,5,0,.25,A,BRN
