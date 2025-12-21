@@ -99,7 +99,7 @@ static void enemy_handle_knockback(enemy_t *enemy, player_t *player, world_t *wo
     int can_knockback = 0;
     for(int i = 1; i < knockback+1; i++) {
         tile_t *tile = get_tile(room, player->y+(diffY*i), player->x+(diffX*i));
-        if(!tile_is_walkable(tile)) {
+        if(!tile_is_walkable(tile) || tile->floor == DOOR) {
             break;
         }
         can_knockback++;
@@ -594,11 +594,47 @@ void enemy_move_toward_location(enemy_t *enemy, world_t *world, player_t *player
 }
 
 int enemy_attempt_attack(enemy_t *enemy, world_t *world, player_t *player) {
+    room_t *room = world->room[enemy->global_x][enemy->global_y];
     for(int i = 1; i <= enemy->range; i++) {
-        if((enemy->y-i == player->y && enemy->x == player->x) ||
-        (enemy->y+i == player->y && enemy->x == player->x) ||
-        (enemy->x-i == player->x && enemy->y == player->y) ||
-        (enemy->x+i == player->x && enemy->y == player->y)) {
+        tile_t *tile_up = get_tile(room, enemy->y-i, enemy->x);
+        tile_t *tile_down = get_tile(room, enemy->y+i, enemy->x);
+        tile_t *tile_left = get_tile(room, enemy->y, enemy->x+i);
+        tile_t *tile_right = get_tile(room, enemy->y, enemy->x-i);
+
+        bool player_up = (enemy->y-i == player->y && enemy->x == player->x);
+        bool player_down = (enemy->y+i == player->y && enemy->x == player->x);
+        bool player_left = (enemy->x-i == player->x && enemy->y == player->y);
+        bool player_right =(enemy->x+i == player->x && enemy->y == player->y);
+
+        bool walkable = false;
+        for(int i = 0; i < WALK_CHAR_LENGTH; i++) {
+            if(player_up) {
+                if(tile_up->floor == walk_chars[i]) {
+                    walkable = true;
+                    break;
+                }
+            } else if(player_down) {
+                if(tile_down->floor == walk_chars[i]) {
+                    walkable = true;
+                    break;
+                }
+            } else if(player_left) {
+                if(tile_left->floor == walk_chars[i]) {
+                    walkable = true;
+                    break;
+                }
+            } else if(player_right) {
+                if(tile_right->floor == walk_chars[i]) {
+                    walkable = true;
+                    break;
+                }
+            }
+        }
+        if(!walkable) {
+            return 0;
+        }
+
+        if(player_up || player_down || player_left || player_right) {
             enemy_attack(enemy, player, world);
             return 1;
         }

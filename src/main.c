@@ -24,6 +24,7 @@
 #include "save.h"
 #include "traps.h"
 #include "buff.h"
+#include "pot.h"
 
 /*
 	Top down dungeon crawler
@@ -128,6 +129,7 @@ int main(int argc, char *argv[]) {
 	load_foods_data(world);
 	load_misc_data(world);
 	load_trap_data(world);
+	load_pot_data(world);
 	
 	player_t *player = calloc(1, sizeof(player_t));
 

@@ -13,6 +13,7 @@
 #include "types.h"
 #include "items/items.h"
 #include "functions.h"
+#include "pot.h"
 
 extern char walk_chars[WALK_CHAR_LENGTH];
 
@@ -309,6 +310,11 @@ room_t *load_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data, it
 					break;
 				case POTENTIAL_ITEM_SPAWN_CHAR:
 					item_spawn(item_generate_type(&map_seed, item_data, room->biome), room->biome, room->tiles[i][j], item_data);
+					room->tiles[i][j]->item_count++;
+					room->tiles[i][j]->floor = EMPTY;
+					break;
+				case POT_SPAWN_CHAR:
+					pot_spawn(room, j, i);
 					room->tiles[i][j]->item_count++;
 					room->tiles[i][j]->floor = EMPTY;
 					break;

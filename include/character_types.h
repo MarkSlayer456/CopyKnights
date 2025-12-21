@@ -21,18 +21,6 @@ typedef struct path_node {
 	bool checked;
 } path_node_t;
 
-typedef struct {
-	item_ids_t id;
-	float drop_chance;
-	int min_quantity;
-	int max_quantity;
-} item_drop_t;
-
-typedef struct {
-	item_drop_t *drops;
-	int drop_count;
-} drop_table_t;
-
 typedef struct location {
 	int x;
 	int y;

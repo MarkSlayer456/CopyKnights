@@ -41,6 +41,7 @@ typedef struct world {
 	uint8_t buff_size;
 	uint8_t buff_count;
 	buff_t *buffs;
+	drop_table_t pot_drop_table;
 } world_t;
 
 typedef struct {

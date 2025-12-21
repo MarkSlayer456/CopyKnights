@@ -55,6 +55,13 @@ void draw(world_t *world, player_t *player) {
 						break;
 					}
 				}
+				for(int u = 0; u < room->current_pot_count; u++) {
+					if(room->pots[u].broken) continue;
+					if(room->pots[u].x == j && room->pots[u].y == i) {
+						waddch(world->win, POT);
+						break;
+					}
+				}
 				
 				if(player->x == j && player->y == i) {
 					waddch(world->win, PLAYER);

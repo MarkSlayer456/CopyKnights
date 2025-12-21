@@ -24,6 +24,7 @@
 #define DOOR									'/'
 #define EMPTY									'.'
 #define CHEST									'$'
+#define POT										'&'
 
 ///////////////
 
@@ -122,6 +123,7 @@
 #define ROOM_HEIGHT							20
 #define MAX_ENEMIES_PER_LEVEL				12
 #define MAX_TRAPS_PER_ROOM					8
+#define MAX_POTS_PER_ROOM					32
 #define NUMBER_OF_BIOMES					6
 
 #define CAVE_NAME							"Cave"
@@ -135,6 +137,7 @@
 #define POTENTIAL_CHEST_SPAWN_CHAR			'$'
 #define POTENTIAL_ITEM_SPAWN_CHAR			'*'
 #define DOOR_SPAWN_CHAR						'/'
+#define POT_SPAWN_CHAR						'&'
 
 /// Enemy ///
 
@@ -348,6 +351,7 @@
 #define MONK_CLASS_NAME					"Monk"
 #define PALADIN_CLASS_NAME				"Paladin"
 #define BRAWLER_CLASS_NAME				"Brawler"
+#define SAMURAI_CLASS_NAME				"Samurai"
 #define VOID_EMBRACE_CLASS_NAME			"Void Embrace"
 
 #define BASE_STRENGTH					10

@@ -1,7 +1,15 @@
 #ifndef MAP_TYPES_H_
 #define MAP_TYPES_H_
 
+#include "items/item_types.h"
+
 #include <stdint.h>
+
+typedef struct {
+	int8_t x;
+	int8_t y;
+	bool broken;
+} pot_t;
 
 typedef struct {
 	enum trap_id id;
@@ -36,7 +44,9 @@ typedef struct room {
 	char room_file_name[ROOM_FILE_NAME_MAX_SIZE];
 	tile_t *tiles[ROOM_WIDTH][ROOM_HEIGHT];
 	int8_t current_enemy_count;
-	enemy_t *enemies[MAX_ENEMIES_PER_LEVEL]; 
+	enemy_t *enemies[MAX_ENEMIES_PER_LEVEL];
+	int8_t current_pot_count;
+	pot_t pots[MAX_POTS_PER_ROOM];
 	bool is_created;
 	int global_time;
 	biome_t biome;

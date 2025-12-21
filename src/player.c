@@ -12,6 +12,7 @@
 #include <strings.h>
 #include "types.h"
 #include "entrances.h"
+#include "pot.h"
 
 #define MIN(a,b)       (a < b) ? a : b
 #define MAX(a,b)       (a > b) ? a : b
@@ -30,6 +31,7 @@ class_type_map_t class_type_map[] = {
 	{MONK_CLASS_NAME, MONK},
 	{PALADIN_CLASS_NAME, PALADIN},
 	{BRAWLER_CLASS_NAME, BRAWLER},
+	{SAMURAI_CLASS_NAME, SAMURAI},
 	{VOID_EMBRACE_CLASS_NAME, VOID_EMBRACE}
 };
 
@@ -261,6 +263,37 @@ enemy_t *player_get_dir_enemy(player_t *player, world_t *world, direction_t dir,
     return NULL;
 }
 
+pot_t *player_get_dir_pot(player_t *player, world_t *world, direction_t dir, uint8_t range) {
+	int x = player->x;
+	int y = player->y;
+	for(int i = 0; i < range; i++) {
+		if(dir == LEFT) x--;
+		if(dir == RIGHT) x++;
+		if(dir == DOWN) y++;
+		if(dir == UP) y--;
+		room_t *room = world->room[player->global_x][player->global_y];
+
+		bool found = false;
+		char test = room->tiles[y][x]->floor;
+		for(int i = 0; i < WALK_CHAR_LENGTH; i++) {
+			if(test == walk_chars[i]) { // the space is open
+				found = true;
+				break;
+			}
+		}
+		if(!found) return NULL;
+
+		if(room->tiles[y][x]->floor )
+			for(int i = 0; i < room->current_pot_count; i++) {
+				if(room->pots[i].broken) continue;
+				if(x == room->pots[i].x && y == room->pots[i].y) {
+					return &room->pots[i];
+				}
+			}
+	}
+	return NULL;
+}
+
 double get_weapon_stat_scaling_factor(player_t *player, stats_t stat, double required_stat) {
 	double scaling_factor = 0.0f;
 	switch(stat) {
@@ -292,6 +325,11 @@ void player_attack(player_t *player, world_t *world, direction_t dir) {
 	player_exit_attack_state(player, world);
 
 	item_t *main_hand = player->equipment.main_hand;
+	pot_t *pot = player_get_dir_pot(player, world, dir, 1);
+	if(pot) {
+		pot_break(world, pot);
+		return;
+	}
 	if(player->equipment.attack_weapon == NULL) {
 		int unarmed_damage = 1;
 		enemy_t *enemy = player_get_dir_enemy(player, world, dir, 1);
@@ -607,6 +645,9 @@ void player_organize_inv(player_t *player, int loc)
 {
 	for(int i = loc; i < INV_SIZE-1; i++) {
 		player->inventory[i] = player->inventory[i + 1];
+		if(player->equipment.attack_weapon == &player->inventory[i]) {
+			player->equipment.attack_weapon--;
+		}
 		if(player->inventory[i].value_type == VALUE_TYPE_ARMOR) {
 			if(player->inventory[i].stat_type.armor.equipped == true) {
 				player->equipment.armor = &player->inventory[i];
@@ -644,7 +685,7 @@ void player_setup(player_t *player, world_t *world) {
 	player->inventory_manager = inv_manager;
 	player->x = 1;
 	player->y = 10;
-	player->player_class = WIZARD;
+	player->player_class = SAMURAI;
 	for(int i = 0; i < MAX_CLASSES; i++) {
 		if(world->class_data[i].type == player->player_class) {
 			int base_strength = world->class_data[i].base_strength;

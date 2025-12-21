@@ -6,6 +6,8 @@
 #include "enums.h"
 #include "game_constants.h"
 
+
+
 typedef struct type_map {
 	const char name[MAX_TYPE_MAP_NAME_LENGTH];
 	int16_t value;
@@ -98,5 +100,17 @@ typedef struct item_data {
 		spell_stats_t spell;
 	} stat_type;
 } item_data_t;
+
+typedef struct {
+	item_ids_t id;
+	float drop_chance;
+	int min_quantity;
+	int max_quantity;
+} item_drop_t;
+
+typedef struct {
+	item_drop_t *drops;
+	int drop_count;
+} drop_table_t;
 
 #endif
