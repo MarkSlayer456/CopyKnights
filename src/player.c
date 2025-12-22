@@ -324,13 +324,14 @@ double get_weapon_stat_scaling_factor(player_t *player, stats_t stat, double req
 void player_attack(player_t *player, world_t *world, direction_t dir) {
 	player_exit_attack_state(player, world);
 
-	item_t *main_hand = player->equipment.main_hand;
+	equipment_t equip = player->equipment;
+	item_t main_hand = player->inventory[equip.main_hand];
 	pot_t *pot = player_get_dir_pot(player, world, dir, 1);
 	if(pot) {
 		pot_break(world, pot);
 		return;
 	}
-	if(player->equipment.attack_weapon == NULL) {
+	if(player->inventory[equip.attack_weapon].id == BLANK) {
 		int unarmed_damage = 1;
 		enemy_t *enemy = player_get_dir_enemy(player, world, dir, 1);
 		if(!enemy) return;
@@ -344,10 +345,10 @@ void player_attack(player_t *player, world_t *world, direction_t dir) {
 		return;
 	}
 
-	if(player->equipment.attack_weapon->value_type == VALUE_TYPE_SPELL) {
+	if(player->inventory[equip.attack_weapon].value_type == VALUE_TYPE_SPELL) {
 		DEBUG_LOG("%s", "reached value type spell in player_attack");
 		int raw_damage = 0;
-		spell_stats_t *spell = &player->equipment.attack_weapon->stat_type.spell;
+		spell_stats_t *spell = &player->inventory[equip.attack_weapon].stat_type.spell;
 		enemy_t *enemy = player_get_dir_enemy(player, world, dir, spell->range);
 		if(!enemy) return;
 		int xp = (enemy->health + enemy->strength) * 5; // TODO this needs changed
@@ -367,13 +368,13 @@ void player_attack(player_t *player, world_t *world, direction_t dir) {
 		return;
 	}
 
-	if(player->equipment.attack_weapon->value_type == VALUE_TYPE_WEAPON) {
-		enemy_t *enemy = player_get_dir_enemy(player, world, dir, main_hand->stat_type.weapon.range);
+	if(player->inventory[equip.attack_weapon].value_type == VALUE_TYPE_WEAPON) {
+		enemy_t *enemy = player_get_dir_enemy(player, world, dir, main_hand.stat_type.weapon.range);
 		if(!enemy) return;
 		int xp = (enemy->health + enemy->strength) * 5; // TODO this needs changed
 
 		int raw_damage = 0;
-		weapon_stats_t *weapon = &main_hand->stat_type.weapon;
+		weapon_stats_t *weapon = &main_hand.stat_type.weapon;
 		double required_stat = weapon->min_attack + weapon->max_attack;
 
 		double scaling_factor_stat1 = get_weapon_stat_scaling_factor(player, weapon->scaling_stat1, required_stat);
@@ -412,20 +413,35 @@ void player_attack(player_t *player, world_t *world, direction_t dir) {
 }
 
 void player_cycle_attack_weapon(player_t *player) {
-	if((!player->equipment.main_hand && !player->equipment.spell1 && !player->equipment.spell2 && !player->equipment.spell3)) {
-		return;
+	if(player->equipment.attack_weapon == -1) {
+		player->equipment.attack_weapon = player->equipment.main_hand;
+		if(player->equipment.attack_weapon != -1) {
+			return;
+		}
 	}
 	if(player->equipment.main_hand == player->equipment.attack_weapon) {
 		player->equipment.attack_weapon = player->equipment.spell1;
-	} else if(player->equipment.spell1 == player->equipment.attack_weapon) {
-		player->equipment.attack_weapon = player->equipment.spell2;
-	} else if(player->equipment.spell2 == player->equipment.attack_weapon) {
-		player->equipment.attack_weapon = player->equipment.spell3;
-	} else if(player->equipment.spell3 == player->equipment.attack_weapon) {
-		player->equipment.attack_weapon = player->equipment.main_hand;
+		if(player->equipment.attack_weapon != -1) {
+			return;
+		}
 	}
-	if(!player->equipment.attack_weapon) {
-		player->equipment.attack_weapon = player->equipment.main_hand;
+	if(player->equipment.spell1 == player->equipment.attack_weapon) {
+		player->equipment.attack_weapon = player->equipment.spell2;
+		if(player->equipment.attack_weapon != -1) {
+			return;
+		}
+	}
+	if(player->equipment.spell2 == player->equipment.attack_weapon) {
+		player->equipment.attack_weapon = player->equipment.spell3;
+		if(player->equipment.attack_weapon != -1) {
+			return;
+		}
+	}
+	if(player->equipment.spell3 == player->equipment.attack_weapon) {
+		player->equipment.attack_weapon = -1;
+		if(player->equipment.attack_weapon != -1) {
+			return;
+		}
 	}
 }
 
@@ -643,34 +659,38 @@ void player_clear_nearby_loot(player_t *player) {
 // removes an item from the inventory list and reorganizes, not used to decrease item count
 void player_organize_inv(player_t *player, int loc)
 {
+	player_decrement_equipment_indexes(player, loc);
+
 	for(int i = loc; i < INV_SIZE-1; i++) {
 		player->inventory[i] = player->inventory[i + 1];
-		if(player->equipment.attack_weapon == &player->inventory[i]) {
-			player->equipment.attack_weapon--;
-		}
-		if(player->inventory[i].value_type == VALUE_TYPE_ARMOR) {
-			if(player->inventory[i].stat_type.armor.equipped == true) {
-				player->equipment.armor = &player->inventory[i];
-			}
-		} else if(player->inventory[i].value_type == VALUE_TYPE_WEAPON) {
-			if(player->inventory[i].stat_type.weapon.equipped == true) {
-				if(player->inventory[i].stat_type.weapon.main_hand == true) {
-						player->equipment.main_hand = &player->inventory[i];
-						if(player->inventory[i].stat_type.weapon.two_handed == true) {
-							player->equipment.off_hand = &player->inventory[i];
-						}
-				} else {
-					player->equipment.off_hand = &player->inventory[i + 1];
-				}
-			}
-		}
 	}
+
 	item_t blank = {BLANK_NAME, "does nothing", BLANK, 0};
 	player->inventory[INV_SIZE-1] = blank;
 	player->inventory_count--;
 	while(player->inventory[player->inventory_manager.inv_selector].id == BLANK && player->inventory_manager.inv_selector > 0) {
 		player_cycle_inv_selector_up(player);
 	}
+}
+
+void player_decrement_equipment_indexes(player_t *player, int loc) {
+	equipment_t *equip = &player->equipment;
+
+	if(loc == equip->attack_weapon) equip->attack_weapon = -1;
+	if(loc == equip->armor) equip->armor = -1;
+	if(loc == equip->main_hand) equip->main_hand = -1;
+	if(loc == equip->off_hand) equip->off_hand = -1;
+	if(loc == equip->spell1) equip->spell1 = -1;
+	if(loc == equip->spell2) equip->spell2 = -1;
+	if(loc == equip->spell3) equip->spell3 = -1;
+
+	if(loc < equip->attack_weapon) equip->attack_weapon--;
+	if(loc < equip->armor) equip->armor--;
+	if(loc < equip->main_hand) equip->main_hand--;
+	if(loc < equip->off_hand) equip->off_hand--;
+	if(loc < equip->spell1) equip->spell1--;
+	if(loc < equip->spell2) equip->spell2--;
+	if(loc < equip->spell3) equip->spell3--;
 }
 
 void player_setup(player_t *player, world_t *world) {
@@ -714,6 +734,14 @@ void player_setup(player_t *player, world_t *world) {
 	player->xp = 0;
 	player->oil = STARTING_OIL;
 	player->equipment = (equipment_t) {0};
+	player->equipment.attack_weapon = -1;
+	player->equipment.main_hand = -1;
+	player->equipment.off_hand = -1;
+	player->equipment.armor = -1;
+	player->equipment.spell1 = -1;
+	player->equipment.spell2 = -1;
+	player->equipment.spell3 = -1;
+
 	player->state = PLAYER_STATE_MOVING;
 
 	player->inventory = malloc(INV_SIZE * sizeof(item_t));
@@ -775,6 +803,13 @@ void player_reset_values(player_t *player, world_t *world) {
 	player->xp = 0;
 	player->oil = STARTING_OIL;
 	player->equipment = (equipment_t) {0};
+	player->equipment.attack_weapon = -1;
+	player->equipment.main_hand = -1;
+	player->equipment.off_hand = -1;
+	player->equipment.armor = -1;
+	player->equipment.spell1 = -1;
+	player->equipment.spell2 = -1;
+	player->equipment.spell3 = -1;
 	player->state = PLAYER_STATE_MOVING;
 
 	player->inventory_count = 0;

@@ -126,7 +126,7 @@ bool manage_input(char c, world_t *world, player_t *player, menu_manager_t *menu
 				return false;
 			case KEY_Q:
 				player_cycle_attack_weapon(player);
-				break;
+				return false;
 			case CTRL_S:
 				menu_manager->current_menu = SAVE_MENU;
 				world->is_player_turn = true;

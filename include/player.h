@@ -69,6 +69,8 @@ int player_inv_contains(player_t *player, item_t item);
 bool player_add_to_inv(player_t *player, item_t item);
 void player_drop_item(player_t *player, world_t *world);
 
+void player_decrement_equipment_indexes(player_t *player, int loc);
+
 void player_take_loot_item(room_t *room, player_t *player);
 void player_get_nearby_loot(room_t *room, player_t *player);
 

@@ -226,9 +226,9 @@ int use_item(player_t *player)
     DEBUG_LOG("current id: %d", player->inventory_manager.inv_selector);
 	if(player->inventory[player->inventory_manager.inv_selector].stack > 0) {
         if(player->inventory[player->inventory_manager.inv_selector].value_type == VALUE_TYPE_ARMOR) {
-            success = handle_armor_change(player, &player->inventory[player->inventory_manager.inv_selector]);
+            success = handle_armor_change(player, player->inventory_manager.inv_selector);
         } else if(player->inventory[player->inventory_manager.inv_selector].value_type == VALUE_TYPE_WEAPON) {
-            success = handle_weapon_change(player, &player->inventory[player->inventory_manager.inv_selector]);
+            success = handle_weapon_change(player, player->inventory_manager.inv_selector);
         } else if(player->inventory[player->inventory_manager.inv_selector].value_type == VALUE_TYPE_FOOD) {
             //TODO effects with durations
             player_increase_health(player, player->inventory[player->inventory_manager.inv_selector].stat_type.food.heal_amount);
@@ -236,7 +236,7 @@ int use_item(player_t *player)
             remove_item(player);
             success = 1;
         } else if(player->inventory[player->inventory_manager.inv_selector].value_type == VALUE_TYPE_SPELL) {
-            success = handle_spell_one_change(player, &player->inventory[player->inventory_manager.inv_selector]);
+            success = handle_spell_one_change(player, player->inventory_manager.inv_selector);
         } else {
             switch(player->inventory[player->inventory_manager.inv_selector].id) {
                 case BLANK:
@@ -256,172 +256,179 @@ int use_item(player_t *player)
 	return success;
 }
 
-int handle_armor_change(player_t *player, item_t *new_armor) {
-    if(player->equipment.armor == new_armor) {
+int handle_armor_change(player_t *player, int new_armor) {
+    int *old_armor = &player->equipment.armor;
+    if(*old_armor == new_armor) {
         for(int i = 0; i < MAX_ARMOR_MODIFIERS; i++) {
-            sub_player_equipment_stats(player, player->equipment.armor->stat_type.armor.modifier_stats[i].stat, player->equipment.armor->stat_type.armor.modifier_stats[i].modifier);
+            sub_player_equipment_stats(player, player->inventory[*old_armor].stat_type.armor.modifier_stats[i].stat, player->inventory[*old_armor].stat_type.armor.modifier_stats[i].modifier);
         }
-        player->equipment.armor->stat_type.armor.equipped = false;
-        player->equipment.armor = NULL;
+        player->inventory[*old_armor].stat_type.armor.equipped = false;
+        player->equipment.armor = -1;
     } else {
-        if(player->equipment.armor != NULL) {
+        if(*old_armor >= 0) {
             for(int i = 0; i < MAX_ARMOR_MODIFIERS; i++) {
-                sub_player_equipment_stats(player, player->equipment.armor->stat_type.armor.modifier_stats[i].stat, player->equipment.armor->stat_type.armor.modifier_stats[i].modifier);
+                sub_player_equipment_stats(player, player->inventory[*old_armor].stat_type.armor.modifier_stats[i].stat, player->inventory[*old_armor].stat_type.armor.modifier_stats[i].modifier);
             }
         }
         player->equipment.armor = new_armor;
-        player->equipment.armor->stat_type.armor.equipped = true;
+        player->inventory[player->equipment.armor].stat_type.armor.equipped = true;
         for(int i = 0; i < MAX_ARMOR_MODIFIERS; i++) {
-            add_player_equipment_stats(player, player->equipment.armor->stat_type.armor.modifier_stats[i].stat, player->equipment.armor->stat_type.armor.modifier_stats[i].modifier);
+            add_player_equipment_stats(player, player->inventory[*old_armor].stat_type.armor.modifier_stats[i].stat, player->inventory[*old_armor].stat_type.armor.modifier_stats[i].modifier);
         }
     }
     return 1;
 }
 
-int handle_weapon_change(player_t *player, item_t *new_weapon) {
+int handle_weapon_change(player_t *player, int new_weapon) {
+    int *main_hand = &player->equipment.main_hand;
+    int *off_hand = &player->equipment.off_hand;
+    int *attack_weapon = &player->equipment.attack_weapon;
     if(player->inventory[player->inventory_manager.inv_selector].stat_type.weapon.main_hand == true) {
-        if(player->equipment.main_hand == new_weapon) {
-            if(player->equipment.main_hand->stat_type.weapon.two_handed == true) {
-                player->equipment.off_hand->stat_type.weapon.equipped = false;
-                player->equipment.off_hand = NULL;
+        if(*main_hand == new_weapon) {
+            if(player->inventory[*main_hand].stat_type.weapon.two_handed == true) {
+                player->inventory[*off_hand].stat_type.weapon.equipped = false;
+                *off_hand = -1;
             }
             for(int i = 0; i < MAX_ARMOR_MODIFIERS; i++) {
-                sub_player_equipment_stats(player, player->equipment.main_hand->stat_type.weapon.modifier_stats[i].stat, player->equipment.main_hand->stat_type.weapon.modifier_stats[i].modifier);
+                sub_player_equipment_stats(player, player->inventory[*main_hand].stat_type.weapon.modifier_stats[i].stat, player->inventory[*main_hand].stat_type.weapon.modifier_stats[i].modifier);
             }
-            player->equipment.main_hand->stat_type.weapon.equipped = false;
-            player->equipment.main_hand = NULL;
+            player->inventory[*main_hand].stat_type.weapon.equipped = false;
+            *main_hand = -1;
         } else {
             if(player->inventory[player->inventory_manager.inv_selector].stat_type.weapon.two_handed == true) {
-                if(player->equipment.main_hand != NULL) {
+                if(*main_hand >= 0) {
                     for(int i = 0; i < MAX_ARMOR_MODIFIERS; i++) {
-                        sub_player_equipment_stats(player, player->equipment.main_hand->stat_type.weapon.modifier_stats[i].stat, player->equipment.main_hand->stat_type.weapon.modifier_stats[i].modifier);
+                        sub_player_equipment_stats(player, player->inventory[*main_hand].stat_type.weapon.modifier_stats[i].stat, player->inventory[*main_hand].stat_type.weapon.modifier_stats[i].modifier);
                     }
                 }
-                if(player->equipment.main_hand != NULL) {
-                    player->equipment.main_hand->stat_type.weapon.equipped = false;
+                if(*main_hand >= 0) {
+                    player->inventory[*main_hand].stat_type.weapon.equipped = false;
                 }
-                if(player->equipment.off_hand != NULL) {
-                    player->equipment.off_hand->stat_type.weapon.equipped = false;
+                if(*off_hand >= 0) {
+                    player->inventory[*off_hand].stat_type.weapon.equipped = false;
                 }
-                player->equipment.main_hand = new_weapon;
-                player->equipment.attack_weapon = player->equipment.main_hand;
-                player->equipment.off_hand = new_weapon;
-                player->equipment.main_hand->stat_type.weapon.equipped = true;
-                player->equipment.off_hand->stat_type.weapon.equipped = true;
+                *main_hand = new_weapon;
+                *attack_weapon = *main_hand;
+                *off_hand = new_weapon;
+                player->inventory[*main_hand].stat_type.weapon.equipped = true;
+                player->inventory[*off_hand].stat_type.weapon.equipped = true;
                 for(int i = 0; i < MAX_ARMOR_MODIFIERS; i++) {
-                    add_player_equipment_stats(player, player->equipment.main_hand->stat_type.weapon.modifier_stats[i].stat, player->equipment.main_hand->stat_type.weapon.modifier_stats[i].modifier);
+                    add_player_equipment_stats(player, player->inventory[*main_hand].stat_type.weapon.modifier_stats[i].stat, player->inventory[*main_hand].stat_type.weapon.modifier_stats[i].modifier);
                 }
             } else {
-                if(player->equipment.main_hand != NULL) {
-                    if(player->equipment.main_hand->stat_type.weapon.two_handed == true) {
-                        player->equipment.off_hand->stat_type.weapon.equipped = false;
-                        player->equipment.off_hand = NULL;
+                if(*main_hand >= 0) {
+                    if(player->inventory[*main_hand].stat_type.weapon.two_handed == true) {
+                        player->inventory[*off_hand].stat_type.weapon.equipped = false;
+                        *off_hand = -1;
                     }
                     for(int i = 0; i < MAX_ARMOR_MODIFIERS; i++) {
-                        sub_player_equipment_stats(player, player->equipment.main_hand->stat_type.weapon.modifier_stats[i].stat, player->equipment.main_hand->stat_type.weapon.modifier_stats[i].modifier);
+                        sub_player_equipment_stats(player, player->inventory[*main_hand].stat_type.weapon.modifier_stats[i].stat, player->inventory[*main_hand].stat_type.weapon.modifier_stats[i].modifier);
                     }
-                    player->equipment.main_hand->stat_type.weapon.equipped = false;
+                    player->inventory[*main_hand].stat_type.weapon.equipped = false;
                 }
-                player->equipment.main_hand = new_weapon;
-                player->equipment.attack_weapon = player->equipment.main_hand;
-                player->equipment.main_hand->stat_type.weapon.equipped = true;
+                *main_hand = new_weapon;
+                *attack_weapon = *main_hand;
+                player->inventory[*main_hand].stat_type.weapon.equipped = true;
             }
         }
-    } else if(player->equipment.off_hand == new_weapon) {
+    } else if(*off_hand == new_weapon) {
         for(int i = 0; i < MAX_ARMOR_MODIFIERS; i++) {
-            sub_player_equipment_stats(player, player->equipment.off_hand->stat_type.weapon.modifier_stats[i].stat, player->equipment.off_hand->stat_type.weapon.modifier_stats[i].modifier);
+            sub_player_equipment_stats(player, player->inventory[*off_hand].stat_type.weapon.modifier_stats[i].stat, player->inventory[*off_hand].stat_type.weapon.modifier_stats[i].modifier);
         }
-        player->equipment.off_hand->stat_type.weapon.equipped = false;
-        player->equipment.off_hand = NULL;
+        player->inventory[*off_hand].stat_type.weapon.equipped = false;
+        *off_hand = -1;
     } else {
-        if(player->equipment.off_hand != NULL) {
+        if(*off_hand >= 0) {
             for(int i = 0; i < MAX_ARMOR_MODIFIERS; i++) {
-                sub_player_equipment_stats(player, player->equipment.off_hand->stat_type.weapon.modifier_stats[i].stat, player->equipment.off_hand->stat_type.weapon.modifier_stats[i].modifier);
+                sub_player_equipment_stats(player,player->inventory[*off_hand].stat_type.weapon.modifier_stats[i].stat, player->inventory[*off_hand].stat_type.weapon.modifier_stats[i].modifier);
             }
-            player->equipment.off_hand->stat_type.weapon.equipped = false;
+            player->inventory[*off_hand].stat_type.weapon.equipped = false;
         }
-        player->equipment.off_hand = new_weapon;
-        player->equipment.off_hand->stat_type.weapon.equipped = true;
+        *off_hand = new_weapon;
+        player->inventory[*off_hand].stat_type.weapon.equipped = true;
         for(int i = 0; i < MAX_ARMOR_MODIFIERS; i++) {
-            add_player_equipment_stats(player, player->equipment.off_hand->stat_type.weapon.modifier_stats[i].stat, player->equipment.off_hand->stat_type.weapon.modifier_stats[i].modifier);
+            add_player_equipment_stats(player, player->inventory[*off_hand].stat_type.weapon.modifier_stats[i].stat, player->inventory[*off_hand].stat_type.weapon.modifier_stats[i].modifier);
         }
     }
     return 1;
 }
 
-int handle_spell_one_change(player_t *player, item_t *new_spell1) {
-    if(player->equipment.spell1 == new_spell1) {
-        player->equipment.spell1->stat_type.spell.equipped = false;
-        player->equipment.spell1 = NULL;
+int handle_spell_one_change(player_t *player, int new_spell1) {
+    int *spell1 = &player->equipment.spell1;
+    if(*spell1 == new_spell1) {
+        player->inventory[*spell1].stat_type.spell.equipped = false;
+        *spell1 = -1;
         return 1;
     }
 
-    if(player->equipment.spell1 == NULL) {
-        player->equipment.spell1 = new_spell1;
-        player->equipment.spell1->stat_type.spell.equipped = true;
-        player->equipment.attack_weapon = player->equipment.spell1;
+    if(*spell1 >= 0) {
+        *spell1 = new_spell1;
+        player->inventory[*spell1].stat_type.spell.equipped = true;
+        player->equipment.attack_weapon = *spell1;
         return 1;
     }
 
     if(player->equipment.spell1 != new_spell1) {
-        player->equipment.spell1->stat_type.spell.equipped = false;
-        player->equipment.spell1 = NULL;
+        player->inventory[*spell1].stat_type.spell.equipped = false;
+        *spell1 = -1;
 
-        player->equipment.spell1 = new_spell1;
-        player->equipment.spell1->stat_type.spell.equipped = true;
-        player->equipment.attack_weapon = player->equipment.spell1;
+        *spell1 = new_spell1;
+        player->inventory[*spell1].stat_type.spell.equipped = true;
+        player->equipment.attack_weapon = *spell1;
         return 1;
     }
     return 1;
 }
 
-int handle_spell_two_change(player_t *player, item_t *new_spell2) {
-    if(player->equipment.spell2 == new_spell2) {
-        player->equipment.spell2->stat_type.spell.equipped = false;
-        player->equipment.spell2 = NULL;
+int handle_spell_two_change(player_t *player, int new_spell2) {
+    int *spell2 = &player->equipment.spell2;
+    if(*spell2 == new_spell2) {
+        player->inventory[*spell2].stat_type.spell.equipped = false;
+        *spell2 = -1;
         return 1;
     }
 
-    if(player->equipment.spell2 == NULL) {
-        player->equipment.spell2 = new_spell2;
-        player->equipment.spell2->stat_type.spell.equipped = true;
-        player->equipment.attack_weapon = player->equipment.spell2;
+    if(*spell2 >= 0) {
+        *spell2 = new_spell2;
+        player->inventory[*spell2].stat_type.spell.equipped = true;
+        player->equipment.attack_weapon = *spell2;
         return 1;
     }
 
     if(player->equipment.spell2 != new_spell2) {
-        player->equipment.spell2->stat_type.spell.equipped = false;
-        player->equipment.spell2 = NULL;
+        player->inventory[*spell2].stat_type.spell.equipped = false;
+        *spell2 = -1;
 
-        player->equipment.spell2 = new_spell2;
-        player->equipment.spell2->stat_type.spell.equipped = true;
-        player->equipment.attack_weapon = player->equipment.spell2;
+        *spell2 = new_spell2;
+        player->inventory[*spell2].stat_type.spell.equipped = true;
+        player->equipment.attack_weapon = *spell2;
         return 1;
     }
     return 1;
 }
 
-int handle_spell_three_change(player_t *player, item_t *new_spell3) {
-    if(player->equipment.spell3 == new_spell3) {
-        player->equipment.spell3->stat_type.spell.equipped = false;
-        player->equipment.spell3 = NULL;
+int handle_spell_three_change(player_t *player, int new_spell3) {
+    int *spell3 = &player->equipment.spell3;
+    if(*spell3 == new_spell3) {
+        player->inventory[*spell3].stat_type.spell.equipped = false;
+        *spell3 = -1;
         return 1;
     }
 
-    if(player->equipment.spell3 == NULL) {
-        player->equipment.spell3 = new_spell3;
-        player->equipment.spell3->stat_type.spell.equipped = true;
-        player->equipment.attack_weapon = player->equipment.spell3;
+    if(*spell3 >= 0) {
+        *spell3 = new_spell3;
+        player->inventory[*spell3].stat_type.spell.equipped = true;
+        player->equipment.attack_weapon = *spell3;
         return 1;
     }
 
     if(player->equipment.spell3 != new_spell3) {
-        player->equipment.spell3->stat_type.spell.equipped = false;
-        player->equipment.spell3 = NULL;
+        player->inventory[*spell3].stat_type.spell.equipped = false;
+        *spell3 = -1;
 
-        player->equipment.spell3 = new_spell3;
-        player->equipment.spell3->stat_type.spell.equipped = true;
-        player->equipment.attack_weapon = player->equipment.spell3;
+        *spell3 = new_spell3;
+        player->inventory[*spell3].stat_type.spell.equipped = true;
+        player->equipment.attack_weapon = *spell3;
         return 1;
     }
     return 1;

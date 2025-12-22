@@ -281,16 +281,16 @@ void load_player(player_t *player, FILE *file, item_data_t *item_data) {
 			DEBUG_LOG("main_hand: %d, Equipped: %d", player->inventory[i].stat_type.weapon.main_hand, player->inventory[i].stat_type.weapon.equipped);
 			if(player->inventory[i].stat_type.weapon.equipped) {
 				if(player->inventory[i].stat_type.weapon.main_hand) {
-					player->equipment.main_hand = &player->inventory[i];
+					player->equipment.main_hand = i;
 				} else {
-					player->equipment.off_hand = &player->inventory[i];
+					player->equipment.off_hand = i;
 				}
 			}
 			
 		} else if(player->inventory[i].value_type == VALUE_TYPE_ARMOR) {
 			fread(&player->inventory[i].stat_type.armor.equipped, sizeof(bool), 1, file);
 			if(player->inventory[i].stat_type.armor.equipped) {
-				player->equipment.armor = &player->inventory[i];
+				player->equipment.armor = i;
 			}
 		}
 	}

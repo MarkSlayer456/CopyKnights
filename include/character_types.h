@@ -66,14 +66,14 @@ typedef struct lantern {
 
 typedef struct equipment {
 	item_ids_t armor_id, main_hand_id, off_hand_id, spell1_id, spell2_id, spell3_id;
-	item_t *attack_weapon; // this is the weapon currently used by the player when pressing attack
-	item_t *armor;
-	item_t *main_hand;
+	int attack_weapon; // this is the weapon currently used by the player when pressing attack
+	int armor;
+	int main_hand;
 	bool main_hand_two_handed; // is this weapon 2 handed
-	item_t *off_hand;
-	item_t *spell1;
-	item_t *spell2;
-	item_t *spell3;
+	int off_hand;
+	int spell1;
+	int spell2;
+	int spell3;
 } equipment_t;
 
 typedef struct player {
