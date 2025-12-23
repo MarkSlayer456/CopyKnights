@@ -240,6 +240,7 @@ enemy_t *player_get_dir_enemy(player_t *player, world_t *world, direction_t dir,
 		if(dir == RIGHT) x++;
 		if(dir == DOWN) y++;
 		if(dir == UP) y--;
+		if(x < 0 || y < 0) return NULL;
 		room_t *room = world->room[player->global_x][player->global_y];
 
 		bool found = false;
@@ -271,6 +272,7 @@ pot_t *player_get_dir_pot(player_t *player, world_t *world, direction_t dir, uin
 		if(dir == RIGHT) x++;
 		if(dir == DOWN) y++;
 		if(dir == UP) y--;
+		if(x < 0 || y < 0) return NULL;
 		room_t *room = world->room[player->global_x][player->global_y];
 
 		bool found = false;
@@ -325,13 +327,13 @@ void player_attack(player_t *player, world_t *world, direction_t dir) {
 	player_exit_attack_state(player, world);
 
 	equipment_t equip = player->equipment;
-	item_t main_hand = player->inventory[equip.main_hand];
+
 	pot_t *pot = player_get_dir_pot(player, world, dir, 1);
 	if(pot) {
-		pot_break(world, pot);
+		pot_break(world, get_current_room(world, player), pot);
 		return;
 	}
-	if(player->inventory[equip.attack_weapon].id == BLANK) {
+	if(equip.attack_weapon < 0) {
 		int unarmed_damage = 1;
 		enemy_t *enemy = player_get_dir_enemy(player, world, dir, 1);
 		if(!enemy) return;
@@ -344,6 +346,7 @@ void player_attack(player_t *player, world_t *world, direction_t dir) {
 		}
 		return;
 	}
+
 
 	if(player->inventory[equip.attack_weapon].value_type == VALUE_TYPE_SPELL) {
 		DEBUG_LOG("%s", "reached value type spell in player_attack");
@@ -369,6 +372,8 @@ void player_attack(player_t *player, world_t *world, direction_t dir) {
 	}
 
 	if(player->inventory[equip.attack_weapon].value_type == VALUE_TYPE_WEAPON) {
+		if(equip.main_hand < 0) return;
+		item_t main_hand = player->inventory[equip.main_hand];
 		enemy_t *enemy = player_get_dir_enemy(player, world, dir, main_hand.stat_type.weapon.range);
 		if(!enemy) return;
 		int xp = (enemy->health + enemy->strength) * 5; // TODO this needs changed
@@ -828,6 +833,8 @@ void player_reset_values(player_t *player, world_t *world) {
 	player->lantern.power = 5;
 	player->lantern.is_on = true;
 	player->lantern.turns_since_last_dim = 0;
+
+	player->menu_manager.current_menu = MAIN_MENU;
 	// menu manager doesn't need to be cleared, it's always in use
 
 }

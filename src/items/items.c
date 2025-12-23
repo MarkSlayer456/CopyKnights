@@ -358,20 +358,14 @@ int handle_spell_one_change(player_t *player, int new_spell1) {
     if(*spell1 == new_spell1) {
         player->inventory[*spell1].stat_type.spell.equipped = false;
         *spell1 = -1;
+        player_cycle_attack_weapon(player);
         return 1;
     }
 
-    if(*spell1 >= 0) {
-        *spell1 = new_spell1;
-        player->inventory[*spell1].stat_type.spell.equipped = true;
-        player->equipment.attack_weapon = *spell1;
-        return 1;
-    }
-
-    if(player->equipment.spell1 != new_spell1) {
-        player->inventory[*spell1].stat_type.spell.equipped = false;
-        *spell1 = -1;
-
+    if(*spell1 != new_spell1) {
+        if(*spell1 >= 0) {
+            player->inventory[*spell1].stat_type.spell.equipped = false;
+        }
         *spell1 = new_spell1;
         player->inventory[*spell1].stat_type.spell.equipped = true;
         player->equipment.attack_weapon = *spell1;
@@ -385,20 +379,14 @@ int handle_spell_two_change(player_t *player, int new_spell2) {
     if(*spell2 == new_spell2) {
         player->inventory[*spell2].stat_type.spell.equipped = false;
         *spell2 = -1;
+        player_cycle_attack_weapon(player);
         return 1;
     }
 
-    if(*spell2 >= 0) {
-        *spell2 = new_spell2;
-        player->inventory[*spell2].stat_type.spell.equipped = true;
-        player->equipment.attack_weapon = *spell2;
-        return 1;
-    }
-
-    if(player->equipment.spell2 != new_spell2) {
-        player->inventory[*spell2].stat_type.spell.equipped = false;
-        *spell2 = -1;
-
+    if(*spell2 != new_spell2) {
+        if(*spell2 >= 0) {
+            player->inventory[*spell2].stat_type.spell.equipped = false;
+        }
         *spell2 = new_spell2;
         player->inventory[*spell2].stat_type.spell.equipped = true;
         player->equipment.attack_weapon = *spell2;
@@ -412,20 +400,14 @@ int handle_spell_three_change(player_t *player, int new_spell3) {
     if(*spell3 == new_spell3) {
         player->inventory[*spell3].stat_type.spell.equipped = false;
         *spell3 = -1;
+        player_cycle_attack_weapon(player);
         return 1;
     }
 
-    if(*spell3 >= 0) {
-        *spell3 = new_spell3;
-        player->inventory[*spell3].stat_type.spell.equipped = true;
-        player->equipment.attack_weapon = *spell3;
-        return 1;
-    }
-
-    if(player->equipment.spell3 != new_spell3) {
-        player->inventory[*spell3].stat_type.spell.equipped = false;
-        *spell3 = -1;
-
+    if(*spell3 != new_spell3) {
+        if(*spell3 >= 0) {
+            player->inventory[*spell3].stat_type.spell.equipped = false;
+        }
         *spell3 = new_spell3;
         player->inventory[*spell3].stat_type.spell.equipped = true;
         player->equipment.attack_weapon = *spell3;
@@ -494,7 +476,7 @@ void remove_item(player_t *player)
 		player_organize_inv(player, player->inventory_manager.inv_selector);
 	}
 }
-void item_spawn(item_ids_t id, biome_t biome, tile_t *tile, item_data_t *item_data) {
+void item_spawn(item_ids_t id, room_t *room, tile_t *tile, item_data_t *item_data) {
     item_t *item = tile->items[tile->item_count];
     for(int i = 0; i < MAX_ITEMS; i++) {
         if(!item) continue;
@@ -524,6 +506,8 @@ void item_spawn(item_ids_t id, biome_t biome, tile_t *tile, item_data_t *item_da
                     item->stat_type.spell = item_data[i].stat_type.spell;
                     break;
             }
+            tile->item_count++;
+            break;
         }
     }
 }

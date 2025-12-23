@@ -31,7 +31,7 @@ int use_chicken_dinner(player_t *player);
 
 void remove_item(player_t *player);
 
-void item_spawn(item_ids_t id, biome_t biome, tile_t *tile, item_data_t *item_data);
+void item_spawn(item_ids_t id, room_t *room, tile_t *tile, item_data_t *item_data);
 item_ids_t item_generate_type(unsigned int *seed, item_data_t *item_data, biome_t biome);
 
 int tile_contains_item(tile_t *tile, item_ids_t item_id);

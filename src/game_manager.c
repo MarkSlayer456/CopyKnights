@@ -692,8 +692,6 @@ void return_to_main_menu(world_t *world, player_t *player) {
 	memset(world->buffs, 0, sizeof(int)*world->buff_size);
 
 	player_reset_values(player, world);
-
-	player->menu_manager.current_menu = MAIN_MENU;
 }
 
 // void setup_game(world_t *world, player_t *player) {

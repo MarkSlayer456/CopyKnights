@@ -119,7 +119,7 @@ void enemy_spawn(enemy_t *e, enemy_type_t type, const enemy_data_t *enemy_data, 
     if(enemy_data == NULL) return;
     DEBUG_LOG("%s", "spawning enemy...");
     int i = 0;
-    while(i < MAX_ENEMIES_PER_LEVEL) {
+    while(i < MAX_ENEMIES) {
         if(enemy_data[i].type != type) {
             i++;
             continue;
@@ -401,8 +401,10 @@ void enemy_kill(enemy_t *enemy, world_t *world)
             for(int j = i; j < room->current_enemy_count-1; j++) {
                 room->enemies[j] = room->enemies[j+1];
             }
-            free(tmp);
-            room->enemies[room->current_enemy_count-1] = NULL;
+            tmp->type = ENEMY_NONE;
+            tmp->x = -10;
+            tmp->y = -10;
+            room->enemies[room->current_enemy_count-1] = tmp;
             room->current_enemy_count--;
             break;
 		}

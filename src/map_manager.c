@@ -301,16 +301,15 @@ room_t *load_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data, it
 				case POTENTIAL_ENEMY_SPAWN_CHAR:
 					enemy_spawn(room->enemies[room->current_enemy_count], enemy_generate_type(&map_seed, enemy_data, room->biome), enemy_data, j, i, x, y, room->biome);
 					room->tiles[i][j]->floor = EMPTY;
-					room->tiles[i][j]->item_count = 0;
+					// room->tiles[i][j]->item_count = 0;
 					room->current_enemy_count++;
 					break;
 				case POTENTIAL_CHEST_SPAWN_CHAR:
 					room->tiles[i][j]->floor = tok[j];
-					room->tiles[i][j]->item_count = 0;
+					// room->tiles[i][j]->item_count = 0;
 					break;
 				case POTENTIAL_ITEM_SPAWN_CHAR:
-					item_spawn(item_generate_type(&map_seed, item_data, room->biome), room->biome, room->tiles[i][j], item_data);
-					room->tiles[i][j]->item_count++;
+					item_spawn(item_generate_type(&map_seed, item_data, room->biome), room, room->tiles[i][j], item_data);
 					room->tiles[i][j]->floor = EMPTY;
 					break;
 				case POT_SPAWN_CHAR:
@@ -320,7 +319,7 @@ room_t *load_room(unsigned int *seed, int x, int y, enemy_data_t *enemy_data, it
 					break;
 				default:
 					room->tiles[i][j]->floor = tok[j];
-					room->tiles[i][j]->item_count = 0;
+					// room->tiles[i][j]->item_count = 0;
 					break;
 			}
 		}

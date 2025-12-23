@@ -338,6 +338,10 @@
 #define GRAVEMARROW_STAFF_NAME				"Gravemarrow Staff"
 #define VOIDMARROW_STAFF_NAME				"Voidmarrow Staff"
 
+
+///////////// pot //////////////
+#define POT_ITEM_SPAWN_CHANCE				.3
+
 ///////////// player //////////////
 
 #define NULL_CLASS_NAME					"NULL"
