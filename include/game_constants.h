@@ -421,4 +421,7 @@
 #define CAVE_ENTRANCE3									"A faint breeze smells of minerals and decay"
 #define CAVE_ENTRANCE4									"Drips of water echo through the darkness ahead"
 
+// menus
+#define MENU_CLASS_PROMPT								"Please select a class!"
+
 #endif

@@ -227,6 +227,9 @@ int main(int argc, char *argv[]) {
 			}
 			case LOG_BOOK_MENU:
 				break;
+			case CLASS_MENU:
+				display_and_manage_class_menu(main_menu, world, player, &player->menu_manager);
+				break;
 			case NULL_MENU:
 				player->menu_manager.current_menu = MAIN_MENU;
 				DEBUG_LOG("%s", "WARNING: NULL_MENU WAS SET, RESETTING TO MAIN_MENU");

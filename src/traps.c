@@ -72,6 +72,7 @@ void traps_triggered_check_enemies(world_t *world, room_t *room) {
 		const trap_data_t *trap_data = &world->trap_data[i];
 		for(int j = 0; j < room->current_enemy_count; j++) {
 			enemy_t *enemy = room->enemies[j];
+			if(enemy->type == ENEMY_NONE) continue;
 			if(trap_data->symbol == room->tiles[enemy->y][enemy->x]->floor) {
 				buff_t buff = buff_create();
 				buff.turns_left = trap_data->effect_duration;
@@ -101,11 +102,10 @@ void traps_triggered_check_enemies(world_t *world, room_t *room) {
 				buff.target_type_id = TARGET_ENEMY;
 				buff.target.enemy = enemy;
 				world->buffs = buff_add_to_list(buff, world->buffs, &world->buff_count, &world->buff_size);
-				enemy_damage(enemy, world, trap_data->damage);
 				if(trap_data->break_on_trigger) {
 					remove_trap(room->tiles[enemy->y][enemy->x], enemy->x, enemy->y);
 				}
-
+				enemy_damage(enemy, world, trap_data->damage);
 				break;
 			}
 		}

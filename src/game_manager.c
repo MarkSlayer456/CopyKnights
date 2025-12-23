@@ -14,11 +14,29 @@
 #include "types.h"
 #include "lantern.h"
 #include "save.h"
+#include "player.h"
 
 //wmove(win, x, y);
 //waddch(win, char);
 extern WINDOW *hud, *action_bar, *inventory_hud, *inventory_desc_hud;
 extern char walk_chars[WALK_CHAR_LENGTH];
+
+const int MENU_CLASS_LIST[] = {
+	SWORDSMAN,
+	BARBARIAN,
+	SPEARMAN,
+	ARCHER,
+	WIZARD,
+	MERCHANT,
+	ROGUE,
+	MONK,
+	PALADIN,
+	BRAWLER,
+	SAMURAI,
+	VOID_EMBRACE
+};
+
+const int MENU_CLASS_LIST_SIZE = sizeof(MENU_CLASS_LIST) / sizeof(MENU_CLASS_LIST[0]);
 
 void draw(world_t *world, player_t *player) {
 	werase(world->win);
@@ -574,6 +592,7 @@ void manage_menu_input(char c, menu_manager_t *menu_manager, world_t *world, pla
 		case RIGHT_ARROW:
 			break;
 		case UP_ARROW:
+		case KEY_W:
 			if(menu_manager->cursor_pos - 1 < 0) { 
 				menu_manager->cursor_pos = menu_manager->dests_count-1;
 			} else {
@@ -581,6 +600,7 @@ void manage_menu_input(char c, menu_manager_t *menu_manager, world_t *world, pla
 			}
 			break;
 		case DOWN_ARROW:
+		case KEY_S:
 			if(menu_manager->cursor_pos + 1 < menu_manager->dests_count) { 
 				menu_manager->cursor_pos++;
 			} else {
@@ -593,7 +613,7 @@ void manage_menu_input(char c, menu_manager_t *menu_manager, world_t *world, pla
 		case ENTER_KEY:
 			// TODO probablly want a switch statement here
 			if(menu_manager->dests[menu_manager->cursor_pos] == GAME) {
-				menu_manager->current_menu = GAME;
+				menu_manager->current_menu = CLASS_MENU;
 			} else if(menu_manager->dests[menu_manager->cursor_pos] == LOAD_MENU) {
 				menu_manager->current_menu = LOAD_MENU;
 			}
@@ -626,6 +646,76 @@ void display_and_manage_save_menu(WINDOW *win, char *buf, int max_len, world_t *
 			menu_manager->current_menu = GAME;
 			break;
 		}
+		wnoutrefresh(win);
+		doupdate();
+	}
+}
+
+void display_and_manage_class_menu(WINDOW *win, world_t *world, player_t *player, menu_manager_t *menu_manager) {
+	werase(win);
+	int ch;
+	int y = 1;
+	int x = 0;
+	waddstr(win, MENU_CLASS_PROMPT);
+	wmove(win, y, x);
+	waddstr(win, MENU_DIVIDE_LINE);
+	touchwin(win);
+	wrefresh(win);
+	int list_pos = 0;
+	char buf[128]; //TODO use a constant
+	for(int i = 0; i < MENU_CLASS_LIST_SIZE; i++) {
+		y++;
+		if(i == list_pos) {
+			DEBUG_LOG("Class name: %s", class_get_name(MENU_CLASS_LIST[i]));
+			snprintf(buf, 128, ">>%s", class_get_name(MENU_CLASS_LIST[i]));
+			wmove(win, y, x);
+			waddstr(win, buf);
+		} else {
+			snprintf(buf, 128, "%s", class_get_name(MENU_CLASS_LIST[i]));
+			wmove(win, y, x);
+			waddstr(win, buf);
+		}
+		memset(buf, 0, 128*sizeof(char));
+	}
+
+
+	while((ch = wgetch(win)) != ESC_KEY) {
+		if(ch == ENTER_KEY) {
+			player_change_class(player, world, MENU_CLASS_LIST[list_pos]);
+			menu_manager->current_menu = GAME;
+			break;
+		} else if(ch == KEY_S) {
+			list_pos++;
+		} else if(ch == KEY_W) {
+			list_pos--;
+		}
+
+		DEBUG_LOG("before list pos: %d", list_pos);
+
+		if(list_pos >= MENU_CLASS_LIST_SIZE) list_pos = 0;
+		if(list_pos < 0) list_pos = MENU_CLASS_LIST_SIZE-1;
+
+		DEBUG_LOG("after list pos: %d, %d", list_pos, MENU_CLASS_LIST_SIZE);
+
+		werase(win);
+		waddstr(win, MENU_CLASS_PROMPT);
+		y = 1;
+		wmove(win, y, x);
+		waddstr(win, MENU_DIVIDE_LINE);
+		for(int i = 0; i < MENU_CLASS_LIST_SIZE; i++) {
+			y++;
+			if(i == list_pos) {
+				snprintf(buf, 128, ">>%s", class_get_name(MENU_CLASS_LIST[i]));
+				wmove(win, y, x);
+				waddstr(win, buf);
+			} else {
+				snprintf(buf, 128, "%s", class_get_name(MENU_CLASS_LIST[i]));
+				wmove(win, y, x);
+				waddstr(win, buf);
+			}
+			memset(buf, 0, 128*sizeof(char));
+		}
+
 		wnoutrefresh(win);
 		doupdate();
 	}

@@ -1,3 +1,21 @@
 weapon name,target stat,value,action stat modifier,action stat value
 Black Stone Sword,NONE,0,NONE,0
+Black Stone Pickaxe,SPEED,-1,NONE,0
+Bronze Pickaxe,SPEED,-2,NONE,0
+Iron Pickaxe,SPEED,-2,NONE,0
+Steel Pickaxe,SPEED,-3,NONE,0
+Mithril Pickaxe,SPEED,-2,NONE,0
+Soulcrust Pickaxe,SPEED,-3,NONE,0
+Terracite Pickaxe,SPEED,-3,NONE,0
+Gravemarrow Pickaxe,SPEED,-3,NONE,0
+Voidmarrow Pickaxe,SPEED,-4,NONE,0
+Black Stone Staff,INTELLIGENCE,3,NONE,0
+Bronze Staff,INTELLIGENCE,4,NONE,0
+Iron Staff,INTELLIGENCE,5,NONE,0
+Steel Staff,INTELLIGENCE,6,NONE,0
+Mithril Staff,INTELLIGENCE,8,NONE,0
+Soulcrust Staff,INTELLIGENCE,10,NONE,0
+Terracite Staff,INTELLIGENCE,10,NONE,0
+Gravemarrow Staff,INTELLIGENCE,11,NONE,0
+Voidmarrow Staff,INTELLIGENCE,12,NONE,0
 

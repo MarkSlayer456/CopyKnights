@@ -85,6 +85,9 @@ void load_weapon_effects(world_t *world) {
 			item_data[i].stat_type.weapon.modifier_stats[idx].stat = get_stat(target_stat);
 			item_data[i].stat_type.weapon.equipped = false;
 			item_data[i].stat_type.weapon.modifier_count++;
+			char buf[128];
+			sprintf(buf, "%s: %d\n", target_stat, item_data[i].stat_type.weapon.modifier_stats[idx].modifier);
+			strcat(item_data[i].desc, buf);
 			break;
 		}
 	}
@@ -163,7 +166,7 @@ void load_weapon_data(world_t *world) {
 		}
 		if(item_data[world->item_data_count].stat_type.weapon.scaling_stat2 != NULL_STAT) {
 			snprintf(item_data[world->item_data_count].desc, MAX_ITEM_DESC_LEN, 
-					"damage: %d - %d\nscaling stats: %s (%c), %s (%c)\ntwo handed: %d\nmain hand: %d\nrange: %d",
+					"damage: %d - %d\nscaling stats: %s (%c), %s (%c)\ntwo handed: %d\nmain hand: %d\nrange: %d\ncritical chance: %d%%\n",
 					item_data[world->item_data_count].stat_type.weapon.min_attack,
 					item_data[world->item_data_count].stat_type.weapon.max_attack, 
 					stat_name1,
@@ -172,17 +175,19 @@ void load_weapon_data(world_t *world) {
 					stat2_grade,
 					item_data[world->item_data_count].stat_type.weapon.two_handed,
 					item_data[world->item_data_count].stat_type.weapon.main_hand,
-					item_data[world->item_data_count].stat_type.weapon.range);
+					item_data[world->item_data_count].stat_type.weapon.range,
+					(int) item_data[world->item_data_count].stat_type.weapon.crit_chance*100);
 		} else {
 			snprintf(item_data[world->item_data_count].desc, MAX_ITEM_DESC_LEN, 
-					"damage: %d - %d\nscaling stat: %s (%c)\ntwo handed: %d\nmain hand: %d\nrange: %d",
+					"damage: %d - %d\nscaling stat: %s (%c)\ntwo handed: %d\nmain hand: %d\nrange: %d\ncritical chance: %d%%\n",
 					item_data[world->item_data_count].stat_type.weapon.min_attack,
 					item_data[world->item_data_count].stat_type.weapon.max_attack, 
 					stat_name1,
 					stat1_grade,
 					item_data[world->item_data_count].stat_type.weapon.two_handed,
 					item_data[world->item_data_count].stat_type.weapon.main_hand,
-					item_data[world->item_data_count].stat_type.weapon.range);
+					item_data[world->item_data_count].stat_type.weapon.range,
+					(int) item_data[world->item_data_count].stat_type.weapon.crit_chance*100);
 		}
 		
 		DEBUG_LOG("Loaded Weapon Data: %d, %s, %d, %s",

@@ -46,6 +46,15 @@ class_type_t class_get_type(const char *name) {
 	return CLASS_NONE; // or an INVALID_TRAIT enum
 }
 
+const char *class_get_name(class_type_t name) {
+	for(int i = 0; i < class_type_map_len; i++) {
+		if(name == class_type_map[i].value) {
+			return class_type_map[i].name;
+		}
+	}
+	return "";
+}
+
 void load_class_data(class_data_t *class_data) {
 	FILE *fp = fopen("./data/classes.csv", "r");
 	if(!fp) {
@@ -698,19 +707,8 @@ void player_decrement_equipment_indexes(player_t *player, int loc) {
 	if(loc < equip->spell3) equip->spell3--;
 }
 
-void player_setup(player_t *player, world_t *world) {
-	inventory_manager_t inv_manager = {
-		.spells_selector = 0,
-		.inv_selector = 0,
-		.inv_offset = 0,
-		.loot_selector = 0,
-		.loot_offset = 0,
-		.cat = ITEM
-	};
-	player->inventory_manager = inv_manager;
-	player->x = 1;
-	player->y = 10;
-	player->player_class = SAMURAI;
+void player_change_class(player_t *player, world_t *world, enum class_type player_class) {
+	player->player_class = player_class;
 	for(int i = 0; i < MAX_CLASSES; i++) {
 		if(world->class_data[i].type == player->player_class) {
 			int base_strength = world->class_data[i].base_strength;
@@ -727,6 +725,25 @@ void player_setup(player_t *player, world_t *world) {
 			break;
 		}
 	}
+	player->health = player->constitution * 10;
+	player->max_health = player->constitution * 10;
+	player->mana = player->intelligence * 10;
+	player->max_mana = player->intelligence * 10;
+}
+
+void player_setup(player_t *player, world_t *world) {
+	inventory_manager_t inv_manager = {
+		.spells_selector = 0,
+		.inv_selector = 0,
+		.inv_offset = 0,
+		.loot_selector = 0,
+		.loot_offset = 0,
+		.cat = ITEM
+	};
+	player->inventory_manager = inv_manager;
+	player->x = 1;
+	player->y = 10;
+	player_change_class(player, world, SAMURAI);
 
 	player->health = player->constitution * 10;
 	player->max_health = player->constitution * 10;
@@ -781,23 +798,7 @@ void player_reset_values(player_t *player, world_t *world) {
 	player->inventory_manager = inv_manager;
 	player->x = 1;
 	player->y = 10;
-	player->player_class = BRAWLER;
-	for(int i = 0; i < MAX_CLASSES; i++) {
-		if(world->class_data[i].type == player->player_class) {
-			int base_strength = world->class_data[i].base_strength;
-			int base_dexterity = world->class_data[i].base_dexterity;
-			int base_intelligence = world->class_data[i].base_intelligence;
-			int base_constitution = world->class_data[i].base_constitution;
-			int base_speed = world->class_data[i].base_speed;
-
-			player->strength = base_strength;
-			player->dexterity = base_dexterity;
-			player->intelligence = base_intelligence;
-			player->constitution = base_constitution;
-			player->speed = base_speed;
-			break;
-		}
-	}
+	player_change_class(player, world, SAMURAI);
 
 	player->health = player->constitution * 10;
 	player->max_health = player->constitution * 10;

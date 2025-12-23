@@ -34,6 +34,8 @@ void draw_load_menu(const load_menu_t *load_menu);
 
 void display_and_manage_save_menu(WINDOW *win, char *buf, int max_len, world_t *world, player_t *player, menu_manager_t *menu_manager);
 
+void display_and_manage_class_menu(WINDOW *win, world_t *world, player_t *player, menu_manager_t *menu_manager);
+
 void manage_load_menu_input(char c, load_menu_t *load_menu, world_t *world, player_t *player, menu_manager_t *menu_manager);
 
 void manage_menu_input(char c, menu_manager_t *menu_manager, world_t *world, player_t *player);

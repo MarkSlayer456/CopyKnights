@@ -12,7 +12,9 @@ extern WINDOW *hud, *action_bar, *inventory_hud, *inventory_desc_hud;
 
 void hud_update_player_health(const player_t *player, const buff_t *buff_array, int buff_count) {
 	wmove(hud, 0, 0);
-	wprintw(hud, "Player Status");
+	char buf[64];
+	snprintf(buf, sizeof(buf), "Class: %s", class_get_name(player->player_class));
+	waddstr(hud, buf);
 	int y = 1;
 	int x = 0;
 	wmove(hud, y, x);
@@ -20,15 +22,9 @@ void hud_update_player_health(const player_t *player, const buff_t *buff_array, 
 	waddch(hud, ':');
 	waddch(hud, ' ');
 	//TODO rename all strings in this function
-	char buf[64];
 	snprintf(buf, sizeof(buf), "%d / %d | Mana: %d / %d | Level: %d | XP: %d / %d", player->health, player->max_health, player->mana, player->max_mana, player->level, player->xp, xp_to_level_up(player->level));
 	waddstr(hud, buf);
 	
-// 	getyx(hud, y, x);
-// 	wmove(hud, y+1, 0);
-// 	snprintf(buf, sizeof(buf), "Level: %d | XP: %d / %d", player->level, player->xp, xp_to_level_up(player->level));
-// 	waddstr(hud, buf);
-//
 	// this will break if any stats are over 3 digits
 	getyx(hud, y, x);
 	wmove(hud, y+1, 0);
@@ -83,7 +79,7 @@ void hud_update_nearby_enemies(world_t *world, player_t *player) {
 			continue;
 		}
 		enemy_t *enemy = room->enemies[world->turn_order[i]];
-		if(enemy != NULL) {
+		if(enemy != NULL && enemy->type != ENEMY_NONE) {
 			if(room->tiles[enemy->y][enemy->x]->has_light) {
 				pos += snprintf(str6 + pos, sizeof(str6)-pos, "[%c] ", enemy->symbol);
 			} else {

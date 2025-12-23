@@ -6,6 +6,8 @@
 
 class_type_t class_get_type(const char *name);
 
+const char *class_get_name(class_type_t name);
+
 void load_class_data(class_data_t *class_data);
 
 void player_wait(player_t *player, world_t *world);
@@ -75,6 +77,8 @@ void player_take_loot_item(room_t *room, player_t *player);
 void player_get_nearby_loot(room_t *room, player_t *player);
 
 void player_clear_nearby_loot(player_t *player);
+
+void player_change_class(player_t *player, world_t *world, enum class_type player_class);
 
 void player_setup(player_t *player, world_t *world);
 

@@ -39,6 +39,7 @@ enum menu {
 	LOAD_MENU,
 	SAVE_MENU,
 	LOG_BOOK_MENU,
+	CLASS_MENU,
 	GAME
 };
 
