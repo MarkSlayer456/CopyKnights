@@ -168,7 +168,7 @@
 #define MUD_CRAWLER_ENEMY_NAME				"Mud Crawler"
 #define BOG_LURKER_ENEMY_NAME				"Bog Lurker"
 
-#define ENEMY_GROWTH_MODIFER				1.15
+#define ENEMY_GROWTH_MODIFER				0.8
 
 #define ENEMY_TRAIT_PASSIVE_NAME				"Passive"
 #define ENEMY_TRAIT_AGGRESSIVE_NAME				"Aggressive"

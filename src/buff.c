@@ -73,10 +73,11 @@ void buff_remove_effects(buff_t *buff_array, uint8_t index) {
 void buff_apply(buff_t *buff_array, uint8_t *buff_count, world_t *world) {
 	for(int i = 0; i < (*buff_count); i++) {
 		buff_t *buff = &buff_array[i];
-		if(buff->turns_left == 0) {
+		if(buff->turns_left <= 0) {
 			buff_remove_effects(buff_array, i);
 			buff_remove_from_list(i, buff_array, buff_count);
-			return;
+			i--; // buff count decrments from the remove so we have to decrement i as well
+			continue;
 		} else if(!buff->applied) {
 			if(buff->target_type_id == TARGET_PLAYER) {
 				player_t *player = buff->target.player;
@@ -84,15 +85,19 @@ void buff_apply(buff_t *buff_array, uint8_t *buff_count, world_t *world) {
 				player->dexterity += buff->flat_dexterity; 
 				player->intelligence += buff->flat_intelligence; 
 				player->constitution += buff->flat_constitution;
-				player->speed += buff->flat_speed; 
-				player->strength *= (1 + buff->percent_strength); 
-				player->dexterity *= (1 + buff->percent_dexterity); 
-				player->intelligence *= (1 + buff->percent_intelligence); 
-				player->constitution *= (1 + buff->percent_constitution); 
-				player->speed *= (1 + buff->percent_speed); 
+				player->speed += buff->flat_speed;
+				player->strength *= (1 + buff->percent_strength);
+				player->dexterity *= (1 + buff->percent_dexterity);
+				player->intelligence *= (1 + buff->percent_intelligence);
+				player->constitution *= (1 + buff->percent_constitution);
+				player->speed *= (1 + buff->percent_speed);
 			} else if(buff->target_type_id == TARGET_ENEMY) {
 				enemy_t *enemy = buff->target.enemy;
-				if(enemy == NULL) return;
+				if(enemy == NULL || enemy->type == ENEMY_NONE) {
+					buff_remove_effects(buff_array, i);
+					buff_remove_from_list(i, buff_array, buff_count);
+					i--;
+				}
 				enemy->strength += buff->flat_strength; 
 				enemy->dexterity += buff->flat_dexterity; 
 				enemy->intelligence += buff->flat_intelligence; 
@@ -110,20 +115,20 @@ void buff_apply(buff_t *buff_array, uint8_t *buff_count, world_t *world) {
 		if(buff->target_type_id == TARGET_PLAYER) {
 			player_damage(buff->target.player, world, buff->damage);
 		} else if(buff->target_type_id == TARGET_ENEMY && buff->target.enemy) {
-			enemy_damage(buff->target.enemy, world, buff->damage);
+			enemy_damage(buff->target.enemy, world, buff->damage, 1);
 		}
 		buff->turns_left--;
-	} 
-}
-
-void buff_remove_from_list(uint8_t index, buff_t *buff_array, uint8_t *buff_count) {
-	if(index < (*buff_count)) {
-		for(uint8_t i = index; i < (*buff_count)-1; i++) {
-			buff_array[i] = buff_array[i+1];
-		}
-		(*buff_count)--;
 	}
-	memset(&buff_array[*buff_count], 0, sizeof(buff_t));
+}
+//TODO buff_count can't be unsigned because of the -1 in this function it can cause serious issues
+void buff_remove_from_list(uint8_t index, buff_t *buff_array, uint8_t *buff_count) {
+	if(index > (*buff_count)) return;
+
+	for(uint8_t i = index; i < (*buff_count)-1; i++) {
+		buff_array[i] = buff_array[i+1];
+	}
+	(*buff_count)--;
+	memset(&buff_array[*buff_count], 0, sizeof(buff_t)); //TODO move this?
 }
 
 buff_t *buff_add_to_list(buff_t buff, buff_t *buff_array, uint8_t *buff_count, uint8_t *buff_size) {

@@ -15,6 +15,7 @@
 #include "lantern.h"
 #include "save.h"
 #include "player.h"
+#include "functions.h"
 
 //wmove(win, x, y);
 //waddch(win, char);
@@ -358,7 +359,7 @@ int pick_next_actor(world_t *world, player_t *player) {
 	int idx = INVALID_ACTOR_INDEX;
 	int fastest = 0;
 	while(true) {
-		player->action_points += player->speed;
+		player->action_points += MAX(player->speed, 1);
 		if(player->action_points >= TIME_TO_ACT) {
 			fastest = player->action_points;
 			idx = PLAYER_TURN_ORDER_INDEX;
@@ -367,7 +368,7 @@ int pick_next_actor(world_t *world, player_t *player) {
 		for(int i = 0; i < world->room[player->global_x][player->global_y]->current_enemy_count; i++) {
 			enemy_t *enemy = world->room[player->global_x][player->global_y]->enemies[i];
 			if(enemy == NULL) continue;
-			enemy->action_points += enemy->speed;
+			enemy->action_points += MAX(enemy->speed, 1);
 			if(enemy->action_points >= TIME_TO_ACT) {
 				if(fastest < enemy->action_points) {
 					fastest = enemy->action_points;
@@ -402,7 +403,7 @@ void generate_turn_order_display(world_t *world, player_t *player) {
 	while(world->turn_order_size < MAX_ENEMIES_PER_LEVEL) {
 		int largest = 0;
 		int idx = INVALID_ACTOR_INDEX;
-		player_projected_ap += player->speed;
+		player_projected_ap += MAX(player->speed, 1);
 		if(player_projected_ap >= TIME_TO_ACT && player_projected_ap > largest) {
 			largest = player_projected_ap;
 			idx = PLAYER_TURN_ORDER_INDEX;
@@ -412,7 +413,7 @@ void generate_turn_order_display(world_t *world, player_t *player) {
 		for(int i = 0; i < room->current_enemy_count; i++) {
 			enemy_t *enemy = room->enemies[i];
 			if(enemy == NULL) continue;
-			projected_enemy_ap[i] += enemy->speed;
+			projected_enemy_ap[i] += MAX(enemy->speed, 1);
 			if(projected_enemy_ap[i] >= TIME_TO_ACT && projected_enemy_ap[i] > largest) {
 				largest = projected_enemy_ap[i];
 				idx = i;
@@ -547,6 +548,7 @@ void manage_load_menu_input(char c, load_menu_t *load_menu, world_t *world, play
 			break;
 		case RIGHT_ARROW:
 			break;
+		case KEY_W:
 		case UP_ARROW:
 			if(load_menu->cursor_pos > 0) {
 				if(load_menu->cursor_pos - load_menu->cursor_offset == 0) {
@@ -555,6 +557,7 @@ void manage_load_menu_input(char c, load_menu_t *load_menu, world_t *world, play
 				load_menu->cursor_pos--;
 			}
 			break;
+		case KEY_S:
 		case DOWN_ARROW: {
 				if(load_menu->cursor_pos + 1 < load_menu->filename_count) {
 					if(load_menu->cursor_pos - load_menu->cursor_offset >= LOAD_MENU_VISIBLE_ENTRIES-1) {
@@ -688,6 +691,8 @@ void display_and_manage_class_menu(WINDOW *win, world_t *world, player_t *player
 			list_pos++;
 		} else if(ch == KEY_W) {
 			list_pos--;
+		} else if(ch == CTRL_Q ) {
+			shutdown(world, player);
 		}
 
 		DEBUG_LOG("before list pos: %d", list_pos);

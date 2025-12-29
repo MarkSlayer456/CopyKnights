@@ -88,6 +88,7 @@ int main(int argc, char *argv[]) {
 	world->enemy_data = calloc(MAX_ENEMIES, sizeof(enemy_data_t));
 	for(int row = 0; row < MAX_ENEMIES; row++) {
 		for(int i = 0; i < NUMBER_OF_BIOMES; i++) {
+			world->enemy_data[row].type = ENEMY_NONE;
 			world->enemy_data[row].can_spawn[i] = false;
 			world->enemy_data[row].lowest_level[i] = -1;
 			world->enemy_data[row].highest_level[i]= -1;

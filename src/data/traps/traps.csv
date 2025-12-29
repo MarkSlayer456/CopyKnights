@@ -1,5 +1,5 @@
 trap id,duration,initial damage,damage over time,break on trigger,symbol,buff type
 Hole,0,10,0,1,0,BLD
-Mud,10,0,0,0,~,ICE
+Mud,1,0,0,0,~,ICE
 Twisted Root,3,15,5,1,",PSN
 Stalagmite,0,40,0,0,^,BLD

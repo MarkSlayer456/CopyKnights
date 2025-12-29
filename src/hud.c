@@ -28,7 +28,7 @@ void hud_update_player_health(const player_t *player, const buff_t *buff_array, 
 	// this will break if any stats are over 3 digits
 	getyx(hud, y, x);
 	wmove(hud, y+1, 0);
-	snprintf(buf, sizeof(buf), "Str: %d | Dex: %d | Int: %d | Const: %d | Spd: %d", (int)player->strength, (int)player->dexterity, (int)player->intelligence, (int)player ->constitution, (int)player->speed);
+	snprintf(buf, sizeof(buf), "Str: %d | Dex: %d | Int: %d | Const: %d | Spd: %d", (int)player->strength, (int)player->dexterity, (int)player->intelligence, (int)player->constitution, (int)player->speed);
 	waddstr(hud, buf);
 
 	getyx(hud, y, x);
@@ -47,10 +47,10 @@ void hud_update_player_health(const player_t *player, const buff_t *buff_array, 
 	strcat(buf, "Status: ");
 	for(int i = 0; i < buff_count; i++) {
 		if(i == max_status_effects) break;
-		if(i != 0) {
-			strcat(buf, ", ");
-		}
 		if(buff_array[i].target_type_id == TARGET_PLAYER) {
+			if(i != 0) {
+				strcat(buf, ", ");
+			}
 			strcat(buf, buff_array[i].name);
 		}
 	}

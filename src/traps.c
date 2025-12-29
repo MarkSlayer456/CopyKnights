@@ -105,7 +105,7 @@ void traps_triggered_check_enemies(world_t *world, room_t *room) {
 				if(trap_data->break_on_trigger) {
 					remove_trap(room->tiles[enemy->y][enemy->x], enemy->x, enemy->y);
 				}
-				enemy_damage(enemy, world, trap_data->damage);
+				enemy_damage(enemy, world, trap_data->damage, 1);
 				break;
 			}
 		}

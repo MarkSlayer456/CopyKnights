@@ -176,7 +176,7 @@ void load_weapon_data(world_t *world) {
 					item_data[world->item_data_count].stat_type.weapon.two_handed,
 					item_data[world->item_data_count].stat_type.weapon.main_hand,
 					item_data[world->item_data_count].stat_type.weapon.range,
-					(int) item_data[world->item_data_count].stat_type.weapon.crit_chance*100);
+					(int) (item_data[world->item_data_count].stat_type.weapon.crit_chance*100));
 		} else {
 			snprintf(item_data[world->item_data_count].desc, MAX_ITEM_DESC_LEN, 
 					"damage: %d - %d\nscaling stat: %s (%c)\ntwo handed: %d\nmain hand: %d\nrange: %d\ncritical chance: %d%%\n",
@@ -187,7 +187,7 @@ void load_weapon_data(world_t *world) {
 					item_data[world->item_data_count].stat_type.weapon.two_handed,
 					item_data[world->item_data_count].stat_type.weapon.main_hand,
 					item_data[world->item_data_count].stat_type.weapon.range,
-					(int) item_data[world->item_data_count].stat_type.weapon.crit_chance*100);
+					(int) (item_data[world->item_data_count].stat_type.weapon.crit_chance*100));
 		}
 		
 		DEBUG_LOG("Loaded Weapon Data: %d, %s, %d, %s",

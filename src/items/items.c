@@ -545,9 +545,12 @@ void drop_item(tile_t *tile, item_data_t *item_data, item_ids_t item_id, int qua
         tile->items[pos]->stack += quantity;
         return;
     }
-    item_t *item = tile->items[tile->item_count++];
+    item_t *item = tile->items[tile->item_count];
+    if(!item) {
+        return;
+    }
+    tile->item_count++;
     for(int i = 0; i < MAX_ITEMS; i++) {
-        if(!item) continue;
         if(item_data[i].id == BLANK) continue;
         if(item_data[i].id == item_id) {
             strcpy(item->name, item_data[i].name);

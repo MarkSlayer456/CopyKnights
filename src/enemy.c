@@ -393,10 +393,11 @@ void load_enemy_drop_data(enemy_data_t *enemy_data) {
 
 void enemy_kill(enemy_t *enemy, world_t *world)
 {
+    if(!enemy || enemy->type == ENEMY_NONE) return;
     room_t *room = world->room[enemy->global_x][enemy->global_y];
     enemy_handle_death_drops(enemy, world->enemy_data, world->item_data, room->tiles[enemy->y][enemy->x]);
 	for(int i = 0; i < MAX_ENEMIES_PER_LEVEL; i++) {
-		if(enemy && enemy == room->enemies[i]) {
+		if(enemy == room->enemies[i]) {
             enemy_t *tmp = room->enemies[i];
             for(int j = i; j < room->current_enemy_count-1; j++) {
                 room->enemies[j] = room->enemies[j+1];
@@ -433,9 +434,9 @@ void enemy_handle_death_drops(enemy_t *enemy, enemy_data_t *enemy_data, item_dat
 /*
  * returns true on kill returns false otherwise
  */
-bool enemy_damage(enemy_t *enemy, world_t *world, int amount) {
+bool enemy_damage(enemy_t *enemy, world_t *world, int amount, bool ignore_dodge) {
     if(!enemy) return false;
-    if(enemy_check_dodge_chance(enemy, world)) return false;
+    if(ignore_dodge && enemy_check_dodge_chance(enemy, world)) return false;
     enemy->health -= amount;
     if(enemy->health <= 0) {
         enemy_kill(enemy, world);
@@ -447,9 +448,9 @@ bool enemy_damage(enemy_t *enemy, world_t *world, int amount) {
 /*
  * returns true on kill returns false otherwise
  */
-bool enemy_damage_ignore_armor(enemy_t *enemy, world_t *world, int amount) {
+bool enemy_damage_ignore_armor(enemy_t *enemy, world_t *world, int amount, bool ignore_dodge) {
     if(!enemy) return false;
-    if(enemy_check_dodge_chance(enemy, world)) return false;
+    if(ignore_dodge && enemy_check_dodge_chance(enemy, world)) return false;
     enemy->health -= amount;
     if(enemy->health <= 0) {
         enemy_kill(enemy, world);

@@ -14,8 +14,6 @@
 #include "entrances.h"
 #include "pot.h"
 
-#define MIN(a,b)       (a < b) ? a : b
-#define MAX(a,b)       (a > b) ? a : b
 
 extern char walk_chars[WALK_CHAR_LENGTH];
 
@@ -350,7 +348,7 @@ void player_attack(player_t *player, world_t *world, direction_t dir) {
 		char message[MAX_MESSAGE_LENGTH_WITHOUT_PREFIX];
 		snprintf(message, MAX_MESSAGE_LENGTH_WITHOUT_PREFIX, "You attacked for %d", unarmed_damage);
 		display_combat_message(world, message);
-		if(enemy_damage(enemy, world, unarmed_damage)) {
+		if(enemy_damage(enemy, world, unarmed_damage, 0)) {
 			player_add_xp(player, xp, world->class_data);
 		}
 		return;
@@ -374,7 +372,7 @@ void player_attack(player_t *player, world_t *world, direction_t dir) {
 		char message[MAX_MESSAGE_LENGTH_WITHOUT_PREFIX];
 		snprintf(message, MAX_MESSAGE_LENGTH_WITHOUT_PREFIX, "You attacked for %d", damage);
 		display_combat_message(world, message);
-		if(enemy_damage(enemy, world, damage)) {
+		if(enemy_damage(enemy, world, damage, 0)) {
 			player_add_xp(player, xp, world->class_data);
 		}
 		return;
@@ -420,7 +418,7 @@ void player_attack(player_t *player, world_t *world, direction_t dir) {
 		char message[MAX_MESSAGE_LENGTH_WITHOUT_PREFIX];
 		snprintf(message, MAX_MESSAGE_LENGTH_WITHOUT_PREFIX, "You attacked for %d", damage);
 		display_combat_message(world, message);
-		if(enemy_damage(enemy, world, damage)) {
+		if(enemy_damage(enemy, world, damage, 0)) {
 			player_add_xp(player, xp, world->class_data);
 		}
 	}
@@ -553,6 +551,7 @@ void player_cycle_loot_selector_down(player_t *player) {
 
 void player_open_loot(player_t *player) {
 	if(player->nearby_loot_count == 0) return;
+	player->inventory_manager.loot_selector = 0;
 	player->state = PLAYER_STATE_LOOTING;
 }
 
@@ -599,13 +598,16 @@ bool player_add_to_inv(player_t *player, item_t item) {
 void player_drop_item(player_t *player, world_t *world) {
 	item_t item = player->inventory[player->inventory_manager.inv_selector];
 	drop_item(world->room[player->global_x][player->global_y]->tiles[player->y][player->x], world->item_data, item.id, item.stack);
-	memset(player->inventory+player->inventory_manager.inv_selector, 0, sizeof(item_t));
+	memset(player->inventory+player->inventory_manager.inv_selector, 0, sizeof(item_t)); //TODO this is not safe
 	player_organize_inv(player, player->inventory_manager.inv_selector);
 	player_get_nearby_loot(world->room[player->global_x][player->global_y], player);
 }
 
 void player_take_loot_item(room_t *room, player_t *player) {
 	item_t *selected_item = player->nearby_loot[player->inventory_manager.loot_selector];
+	if(!selected_item) {
+		player->inventory_manager.loot_selector = 0;
+	}
 	player_add_to_inv(player, *selected_item);
 	int start_y = player->y - 1;
 	int start_x = player->x - 1;
@@ -625,8 +627,8 @@ void player_take_loot_item(room_t *room, player_t *player) {
 				DEBUG_LOG("selected_item: %p, %d ",(void *)selected_item, selected_item->id);
 				if(item == selected_item) {
 					remove_item_from_tile(room->tiles[y][x], item);
-					if(player->inventory_manager.loot_selector == player->nearby_loot_count-1 && player->inventory_manager.loot_selector > 0) {
-						player->inventory_manager.loot_selector--;
+					if(player->inventory_manager.loot_selector == player->nearby_loot_count-1) {
+						player_cycle_loot_selector_up(player);
 					}
 					break;
 				}
@@ -654,7 +656,7 @@ void player_get_nearby_loot(room_t *room, player_t *player) {
 	
 	for(int y = start_y; y <= end_y; y++) {
 		for(int x = start_x; x <= end_x; x++) {
-			for(int i = 0; i < MAX_ITEMS_PER_TILE; i++) {
+			for(int i = 0; i < room->tiles[y][x]->item_count; i++) {
 				item_t *item = room->tiles[y][x]->items[i];
 				if(item == NULL || item->stack == 0) continue;
 				player->nearby_loot[player->nearby_loot_count++] = item;

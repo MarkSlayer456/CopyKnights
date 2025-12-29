@@ -263,8 +263,8 @@ void load_player(player_t *player, FILE *file, item_data_t *item_data) {
 	fread(&player->max_health, sizeof(int), 1, file);
 	fread(&player->strength, sizeof(float), 1, file);
 	fread(&player->dexterity, sizeof(float), 1, file);
-	fread(&player->constitution, sizeof(float), 1, file);
 	fread(&player->intelligence, sizeof(float), 1, file);
+	fread(&player->constitution, sizeof(float), 1, file);
 	fread(&player->speed, sizeof(float), 1, file);
 	fread(&player->x, sizeof(int), 1, file);
 	fread(&player->y, sizeof(int), 1, file);

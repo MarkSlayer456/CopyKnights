@@ -30,8 +30,8 @@ void enemy_kill(enemy_t *enemy, world_t *world);
 
 void enemy_handle_death_drops(enemy_t *enemy, enemy_data_t *enemy_data, item_data_t *item_data, tile_t *tile);
 
-bool enemy_damage(enemy_t *enemy, world_t *world, int amount);
-bool enemy_damage_ignore_armor(enemy_t *enemy, world_t *world, int amount);
+bool enemy_damage(enemy_t *enemy, world_t *world, int amount, bool ignore_dodge);
+bool enemy_damage_ignore_armor(enemy_t *enemy, world_t *world, int amount, bool ignore_dodge);
 
 void enemy_attack(enemy_t *enemy, player_t *player, world_t *world);
 
