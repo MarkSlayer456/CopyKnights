@@ -242,10 +242,10 @@ void display_inventory_desc_hud(world_t *world, player_t *player) {
 	box(inventory_desc_hud, 0, 0);
 	int visible_item_count = INVENTORY_HEIGHT-2;
 	char desc_title_inv[32] = "Description";
-	wmove(inventory_hud, 0, (39-strlen(desc_title_inv))/2);
-	waddstr(inventory_hud, desc_title_inv);
-	wmove(inventory_hud, 0, INVENTORY_WIDTH-(INVENTORY_WIDTH/4)-(strlen(desc_title_inv))/2);
-	waddstr(inventory_hud, desc_title_inv);
+	wmove(inventory_desc_hud, 0, (39-strlen(desc_title_inv))/2);
+	waddstr(inventory_desc_hud, desc_title_inv);
+	wmove(inventory_desc_hud, 0, INVENTORY_WIDTH-(INVENTORY_WIDTH/4)-(strlen(desc_title_inv))/2);
+	waddstr(inventory_desc_hud, desc_title_inv);
 	for (int y = 0; y < INVENTORY_HEIGHT; y++) {
 		mvwaddch(inventory_desc_hud, y, 39, '|');
 	}

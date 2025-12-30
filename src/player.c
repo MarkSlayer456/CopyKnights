@@ -13,6 +13,7 @@
 #include "types.h"
 #include "entrances.h"
 #include "pot.h"
+#include "buff.h"
 
 
 extern char walk_chars[WALK_CHAR_LENGTH];
@@ -355,18 +356,25 @@ void player_attack(player_t *player, world_t *world, direction_t dir) {
 	}
 
 
+
 	if(player->inventory[equip.attack_weapon].value_type == VALUE_TYPE_SPELL) {
-		DEBUG_LOG("%s", "reached value type spell in player_attack");
-		int raw_damage = 0;
 		spell_stats_t *spell = &player->inventory[equip.attack_weapon].stat_type.spell;
+		if(player->mana < spell->mana_cost) {
+			display_combat_message(world, NOT_ENOUGH_MANA_MESSAGE);
+			return;
+		}
+		player->mana -= spell->mana_cost;
 		enemy_t *enemy = player_get_dir_enemy(player, world, dir, spell->range);
 		if(!enemy) return;
-		int xp = (enemy->health + enemy->strength) * 5; // TODO this needs changed
+
 		double required_stat = spell->min_damage + spell->max_damage;
 		double scaling_factor = get_weapon_stat_scaling_factor(player, INTELLIGENCE, required_stat);
 		double stat_weight = scaling_factor * get_percent_from_grade(spell->stat_grade);
 		double rand_weight = (((double)rand() / RAND_MAX) * (1-(get_percent_from_grade(spell->stat_grade))));
-		raw_damage = ceil(spell->max_damage * (stat_weight + rand_weight));
+
+		int raw_damage = ceil(spell->max_damage * (stat_weight + rand_weight));
+		raw_damage = MAX(spell->min_damage, raw_damage);
+		int xp = (enemy->health + enemy->strength) * 5; // TODO this needs changed
 		int damage = raw_damage * (DEFENSE_SCALING_CONSTANT)/(DEFENSE_SCALING_CONSTANT+enemy->defense);
 		damage = MAX(1, damage);
 		char message[MAX_MESSAGE_LENGTH_WITHOUT_PREFIX];
@@ -374,7 +382,25 @@ void player_attack(player_t *player, world_t *world, direction_t dir) {
 		display_combat_message(world, message);
 		if(enemy_damage(enemy, world, damage, 0)) {
 			player_add_xp(player, xp, world->class_data);
+		} else { // if enemy is not dead
+			float random = (float) rand() / (float) RAND_MAX;
+			if(spell->status_chance >= random) {
+				int raw_status_damage = ceil(spell->buff_max_damage * (stat_weight + rand_weight));
+				raw_status_damage = MAX(spell->min_damage, raw_status_damage);
+				int status_damage = raw_status_damage * (DEFENSE_SCALING_CONSTANT)/(DEFENSE_SCALING_CONSTANT+enemy->defense);
+				status_damage = MAX(1, status_damage);
+				buff_t buff = buff_create();
+				buff.target_type_id = TARGET_ENEMY;
+				buff.target.enemy = enemy;
+				buff.damage = status_damage;
+				buff.turns_left = spell->buff_duration;
+
+				buff_set_type(&buff, spell->buff_type);
+				buff_add_to_list(buff, world->buffs, &world->buff_count, &world->buff_size);
+			}
 		}
+
+
 		return;
 	}
 
@@ -489,6 +515,15 @@ void player_check_level_up(player_t *player, const class_data_t *class_data) {
 				player->intelligence += ((int)(growth_intelligence));
 				player->constitution += ((int)(growth_constitution));
 				player->speed += ((int)(growth_speed));
+				int old_max_health = player->max_health;
+				player->max_health = player_get_base_constitution(player, class_data) * 10;
+				int gained_health = player->max_health - old_max_health;
+				player_increase_health(player, gained_health);
+
+				int old_max_mana = player->max_mana;
+				player->max_mana = player_get_base_intelligence(player, class_data) * 10;
+				int gained_mana = player->max_mana -old_max_mana;
+				player_increase_mana(player, gained_mana);
 				break;
 			}
 		}
@@ -733,6 +768,48 @@ void player_change_class(player_t *player, world_t *world, enum class_type playe
 	player->max_mana = player->intelligence * 10;
 }
 
+float player_get_base_strength(player_t *player, const class_data_t *class_data) {
+	for(int i = 0; i < MAX_CLASSES; i++) {
+		if(class_data[i].type == player->player_class) {
+			return class_data[i].base_strength + (class_data[i].growth_strength * player->level);
+		}
+	}
+	return 0;
+}
+
+float player_get_base_dexterity(player_t *player, const class_data_t *class_data) {
+	for(int i = 0; i < MAX_CLASSES; i++) {
+		if(class_data[i].type == player->player_class) {
+			return class_data[i].base_dexterity + (class_data[i].growth_dexterity * player->level);
+		}
+	}
+	return 0;
+}
+float player_get_base_intelligence(player_t *player, const class_data_t *class_data) {
+	for(int i = 0; i < MAX_CLASSES; i++) {
+		if(class_data[i].type == player->player_class) {
+			return class_data[i].base_intelligence + (class_data[i].growth_intelligence * player->level);
+		}
+	}
+	return 0;
+}
+float player_get_base_constitution(player_t *player, const class_data_t *class_data) {
+	for(int i = 0; i < MAX_CLASSES; i++) {
+		if(class_data[i].type == player->player_class) {
+			return class_data[i].base_constitution + (class_data[i].growth_constitution * player->level);
+		}
+	}
+	return 0;
+}
+float player_get_base_speed(player_t *player, const class_data_t *class_data) {
+	for(int i = 0; i < MAX_CLASSES; i++) {
+		if(class_data[i].type == player->player_class) {
+			return class_data[i].base_speed + (class_data[i].growth_speed * player->level);
+		}
+	}
+	return 0;
+}
+
 void player_setup(player_t *player, world_t *world) {
 	inventory_manager_t inv_manager = {
 		.spells_selector = 0,
@@ -804,6 +881,8 @@ void player_reset_values(player_t *player, world_t *world) {
 
 	player->health = player->constitution * 10;
 	player->max_health = player->constitution * 10;
+	player->mana = player->intelligence * 10;
+	player->max_mana = player->intelligence * 10;
 	player->global_x = 0;
 	player->global_y = 0;
 	player->action_points = 0;

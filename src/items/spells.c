@@ -76,6 +76,9 @@ void load_spell_data(world_t *world) {
 		char *status_chance = strtok(NULL, ",");
 		char *stat_grade = strtok(NULL, ",");
 		char *buff_type = strtok(NULL, ",");
+		char *buff_duration = strtok(NULL, ",");
+		char *buff_min_damage = strtok(NULL, ",");
+		char *buff_max_damage = strtok(NULL, ",");
 
 		if(!spell_name || !min_damage || !max_damage || !range || !crit_chance
 			|| !status_chance || !buff_type) {
@@ -94,12 +97,16 @@ void load_spell_data(world_t *world) {
 		item_data[world->item_data_count].stat_type.spell.status_chance = atof(status_chance);
 		item_data[world->item_data_count].stat_type.spell.stat_grade = get_grade(stat_grade);
 		item_data[world->item_data_count].stat_type.spell.buff_type = buff_get_type(buff_type);
+		item_data[world->item_data_count].stat_type.spell.buff_duration = (int16_t)atoi(buff_duration);
+		item_data[world->item_data_count].stat_type.spell.buff_min_damage = (int16_t)atoi(buff_min_damage);
+		item_data[world->item_data_count].stat_type.spell.buff_max_damage = (int16_t)atoi(buff_max_damage);
 
 
 		snprintf(item_data[world->item_data_count].desc, MAX_ITEM_DESC_LEN,
-			"damage: %d - %d\nscaling stat: INT (A)\nrange: %d\ncritical chance: %f\nstatus chance: %f",
+			"damage: %d - %d\nmana cost: %d\nscaling stat: INT (A)\nrange: %d\ncritical chance: %f\nstatus chance: %f",
 			item_data[world->item_data_count].stat_type.spell.min_damage,
 			item_data[world->item_data_count].stat_type.spell.max_damage,
+			item_data[world->item_data_count].stat_type.spell.mana_cost,
 			item_data[world->item_data_count].stat_type.spell.range,
 			item_data[world->item_data_count].stat_type.spell.crit_chance,
 			item_data[world->item_data_count].stat_type.spell.status_chance);

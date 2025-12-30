@@ -25,6 +25,9 @@ typedef struct {
 	int8_t range;
 	double crit_chance;
 	double status_chance;
+	int16_t buff_duration;
+	int16_t buff_min_damage;
+	int16_t buff_max_damage;
 	enum grade stat_grade;
 	bool equipped;
 	bool applies_buff;

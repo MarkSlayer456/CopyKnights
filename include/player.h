@@ -80,6 +80,12 @@ void player_clear_nearby_loot(player_t *player);
 
 void player_change_class(player_t *player, world_t *world, enum class_type player_class);
 
+float player_get_base_strength(player_t *player, const class_data_t *class_data);
+float player_get_base_dexterity(player_t *player, const class_data_t *class_data);
+float player_get_base_intelligence(player_t *player, const class_data_t *class_data);
+float player_get_base_constitution(player_t *player, const class_data_t *class_data);
+float player_get_base_speed(player_t *player, const class_data_t *class_data);
+
 void player_setup(player_t *player, world_t *world);
 
 void player_reset_values(player_t *player, world_t *world);

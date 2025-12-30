@@ -381,6 +381,7 @@
 
 #define MAX_MENUS						16
 
+#define NOT_ENOUGH_MANA_MESSAGE				"You don't have enough mana to cast this spell!"
 
 #define SAVE_FILE_MAX_LEN				64
 
