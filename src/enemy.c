@@ -436,7 +436,7 @@ void enemy_handle_death_drops(enemy_t *enemy, enemy_data_t *enemy_data, item_dat
  */
 bool enemy_damage(enemy_t *enemy, world_t *world, int amount, bool ignore_dodge) {
     if(!enemy) return false;
-    if(ignore_dodge && enemy_check_dodge_chance(enemy, world)) return false;
+    if(!ignore_dodge && enemy_check_dodge_chance(enemy, world)) return false;
     enemy->health -= amount;
     if(enemy->health <= 0) {
         enemy_kill(enemy, world);
@@ -450,7 +450,7 @@ bool enemy_damage(enemy_t *enemy, world_t *world, int amount, bool ignore_dodge)
  */
 bool enemy_damage_ignore_armor(enemy_t *enemy, world_t *world, int amount, bool ignore_dodge) {
     if(!enemy) return false;
-    if(ignore_dodge && enemy_check_dodge_chance(enemy, world)) return false;
+    if(!ignore_dodge && enemy_check_dodge_chance(enemy, world)) return false;
     enemy->health -= amount;
     if(enemy->health <= 0) {
         enemy_kill(enemy, world);

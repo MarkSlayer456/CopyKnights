@@ -1,2 +1,5 @@
 food name,target stat,value,duration
 Rotten Apple,SPEED,-2,5
+Pizza,SPEED,-1,5
+Bear Chili,STRENGTH,2,10
+Dragonfire Jerky,DEXTERITY,4,10

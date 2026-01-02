@@ -90,6 +90,7 @@ void save_player(player_t *player, FILE *file) {
 	
 	fwrite(&player->inventory_count, sizeof(int), 1, file);
 	for(int i = 0; i < player->inventory_count; i++) {
+		if(player->inventory[i].stack == 0) continue;
 		fwrite(&player->inventory[i].id, sizeof(item_ids_t), 1, file);
 		fwrite(&player->inventory[i].stack, sizeof(int), 1, file);
 		if(player->inventory[i].value_type == VALUE_TYPE_WEAPON) {
@@ -273,12 +274,12 @@ void load_player(player_t *player, FILE *file, item_data_t *item_data) {
 	
 	fread(&player->inventory_count, sizeof(int), 1, file);
 	for(int i = 0; i < player->inventory_count; i++) {
-		fread(&player->inventory[i].id, sizeof(item_ids_t), 1, file);
+		fread(&player->inventory[i].id, sizeof(item_ids_t), 1, file); // TODO this causes save files to not work if you add any items at all, should probably store this as a string
 		fread(&player->inventory[i].stack, sizeof(int), 1, file);
+		if(player->inventory[i].stack == 0) continue;
 		load_item_from_data(&player->inventory[i], item_data);
 		if(player->inventory[i].value_type == VALUE_TYPE_WEAPON) {
 			fread(&player->inventory[i].stat_type.weapon.equipped, sizeof(bool), 1, file);
-			DEBUG_LOG("main_hand: %d, Equipped: %d", player->inventory[i].stat_type.weapon.main_hand, player->inventory[i].stat_type.weapon.equipped);
 			if(player->inventory[i].stat_type.weapon.equipped) {
 				if(player->inventory[i].stat_type.weapon.main_hand) {
 					player->equipment.main_hand = i;
@@ -330,6 +331,7 @@ void load_world(world_t *world, player_t *player, FILE *file) {
 		}
 	}
 	fread(&world->seed, sizeof(int), 1, file);
+	DEBUG_LOG("seed: %d", world->seed);
 	
 	fread(&world->messages_size, sizeof(int), 1, file);
 	fread(&world->max_message_storage, sizeof(int), 1, file);
@@ -342,7 +344,6 @@ void load_world(world_t *world, player_t *player, FILE *file) {
 	for(int i = 0; i < world->messages_size; i++) {
 		int len;
 		fread(&len, sizeof(int), 1, file);
-		DEBUG_LOG("i = %d", i);
 		fread(world->messages[i], sizeof(char), len, file);
 	}
 	

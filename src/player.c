@@ -510,11 +510,11 @@ void player_check_level_up(player_t *player, const class_data_t *class_data) {
 				float growth_intelligence = class_data[i].growth_intelligence;
 				float growth_constitution = class_data[i].growth_constitution;
 				float growth_speed = class_data[i].growth_speed;
-				player->strength += ((int)(growth_strength));
-				player->dexterity += ((int)(growth_dexterity));
-				player->intelligence += ((int)(growth_intelligence));
-				player->constitution += ((int)(growth_constitution));
-				player->speed += ((int)(growth_speed));
+				player->strength += ((float)(growth_strength));
+				player->dexterity += ((float)(growth_dexterity));
+				player->intelligence += ((float)(growth_intelligence));
+				player->constitution += ((float)(growth_constitution));
+				player->speed += ((float)(growth_speed));
 				int old_max_health = player->max_health;
 				player->max_health = player_get_base_constitution(player, class_data) * 10;
 				int gained_health = player->max_health - old_max_health;
@@ -771,7 +771,7 @@ void player_change_class(player_t *player, world_t *world, enum class_type playe
 float player_get_base_strength(player_t *player, const class_data_t *class_data) {
 	for(int i = 0; i < MAX_CLASSES; i++) {
 		if(class_data[i].type == player->player_class) {
-			return class_data[i].base_strength + (class_data[i].growth_strength * player->level);
+			return class_data[i].base_strength + (class_data[i].growth_strength * (player->level-1));
 		}
 	}
 	return 0;
@@ -780,7 +780,7 @@ float player_get_base_strength(player_t *player, const class_data_t *class_data)
 float player_get_base_dexterity(player_t *player, const class_data_t *class_data) {
 	for(int i = 0; i < MAX_CLASSES; i++) {
 		if(class_data[i].type == player->player_class) {
-			return class_data[i].base_dexterity + (class_data[i].growth_dexterity * player->level);
+			return class_data[i].base_dexterity + (class_data[i].growth_dexterity * (player->level-1));
 		}
 	}
 	return 0;
@@ -788,7 +788,7 @@ float player_get_base_dexterity(player_t *player, const class_data_t *class_data
 float player_get_base_intelligence(player_t *player, const class_data_t *class_data) {
 	for(int i = 0; i < MAX_CLASSES; i++) {
 		if(class_data[i].type == player->player_class) {
-			return class_data[i].base_intelligence + (class_data[i].growth_intelligence * player->level);
+			return class_data[i].base_intelligence + (class_data[i].growth_intelligence * (player->level-1));
 		}
 	}
 	return 0;
@@ -796,7 +796,7 @@ float player_get_base_intelligence(player_t *player, const class_data_t *class_d
 float player_get_base_constitution(player_t *player, const class_data_t *class_data) {
 	for(int i = 0; i < MAX_CLASSES; i++) {
 		if(class_data[i].type == player->player_class) {
-			return class_data[i].base_constitution + (class_data[i].growth_constitution * player->level);
+			return class_data[i].base_constitution + (class_data[i].growth_constitution * (player->level-1));
 		}
 	}
 	return 0;
@@ -804,7 +804,7 @@ float player_get_base_constitution(player_t *player, const class_data_t *class_d
 float player_get_base_speed(player_t *player, const class_data_t *class_data) {
 	for(int i = 0; i < MAX_CLASSES; i++) {
 		if(class_data[i].type == player->player_class) {
-			return class_data[i].base_speed + (class_data[i].growth_speed * player->level);
+			return class_data[i].base_speed + (class_data[i].growth_speed * (player->level-1));
 		}
 	}
 	return 0;

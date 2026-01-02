@@ -1,8 +1,11 @@
 name,health,mana
 Health Potion,100,100
 Apple,10,10
-Rotten Apple,5,0
-Chicken Dinner,50,10
-Rat Meat,15,10
-
-
+Rotten Apple,5,5
+Chicken Dinner,50,50
+Rat Meat,15,15
+Dragonfire Jerky,50,50
+Celestial Cornbread,1000,1000
+Nightbloom Grapes,5,5
+Pizza,25,25
+Bear Chili,25,25

@@ -199,6 +199,12 @@
 #define CHICKEN_DINNER_NAME					"Chicken Dinner"
 #define ROTTEN_APPLE_NAME 					"Rotten Apple"
 #define RAT_MEAT_NAME						"Rat Meat"
+#define DRAGONFIRE_JERKY_NAME				"Dragonfire Jerky"
+#define CELESTIAL_CORNBREAD_NAME			"Celestial Cornbread"
+#define NIGHTBLOOM_GRAPES_NAME				"Nightbloom Grapes"
+#define PIZZA_NAME							"Pizza"
+#define BEAR_CHILI_NAME						"Bear Chili"
+
 
 #define OIL_NAME							"Oil"
 
@@ -265,7 +271,14 @@
 #define RARITY_COMMON_NAME					"Common"
 #define RARITY_UNCOMMOM_NAME				"Uncommon"
 #define RARITY_RARE_NAME					"Rare"
+#define RARITY_EPIC_NAME					"Epic"
 #define RARITY_LEGENDARY_NAME				"Legendary"
+
+#define RARITY_COMMON_CHANCE				.50
+#define RARITY_UNCOMMON_CHANCE				.35
+#define RARITY_RARE_CHANCE					.1
+#define RARITY_EPIC_CHANCE					.045
+#define RARITY_LEGENDARY_CHANCE				.005
 
 // swords
 #define BLACK_STONE_SWORD_NAME				"Black Stone Sword"

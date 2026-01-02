@@ -781,7 +781,7 @@ void return_to_main_menu(world_t *world, player_t *player) {
 	}
 
 	for(int i = 0; i < world->max_message_storage; i++) {
-		memset(world->messages[i], 0, world->messages_size);
+		memset(world->messages[i], 0, MAX_MESSAGE_LENGTH*sizeof(char));
 	}
 	memset(world->turn_order, 0, sizeof(int)*world->turn_order_size);
 	memset(world->buffs, 0, sizeof(int)*world->buff_size);

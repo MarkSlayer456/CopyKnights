@@ -29,6 +29,7 @@ type_map_t rarity_map[] = {
     {RARITY_COMMON_NAME, COMMON},
     {RARITY_UNCOMMOM_NAME, UNCOMMON},
     {RARITY_RARE_NAME, RARE},
+    {RARITY_EPIC_NAME, RARE},
     {RARITY_LEGENDARY_NAME, LEGENDARY},
 };
 
@@ -65,6 +66,12 @@ type_map_t item_type_map[] = {
     {ROTTEN_APPLE_NAME, ROTTEN_APPLE},
     {CHICKEN_DINNER_NAME, CHICKEN_DINNER},
     {RAT_MEAT_NAME, RAT_MEAT},
+    {DRAGONFIRE_JERKY_NAME, DRAGONFIRE_JERKY},
+    {CELESTIAL_CORNBREAD_NAME, CELESTIAL_CORNBREAD},
+    {NIGHTBLOOM_GRAPES_NAME, NIGHTBLOOM_GRAPES},
+    {PIZZA_NAME, PIZZA},
+    {BEAR_CHILI_NAME, BEAR_CHILI},
+
     {OIL_NAME, OIL},
     
     {BLACKSTONE_ARMOR_NAME, BLACKSTONE_ARMOR},
@@ -194,7 +201,7 @@ stats_t get_stat(const char *name) {
 
 rarity_t get_rarity(const char *name) {
     for(int i = 0; i < rarity_map_len; i++) {
-        if(strcmp(name, rarity_map[i].name) == 0) {
+        if(strcasecmp(name, rarity_map[i].name) == 0) {
             return rarity_map[i].value;
         }
     }
@@ -512,12 +519,29 @@ void item_spawn(item_ids_t id, room_t *room, tile_t *tile, item_data_t *item_dat
     }
 }
 
+rarity_t item_generate_rarity() {
+    float random = (float) rand() / (float) RAND_MAX;
+    if(random >= RARITY_COMMON_CHANCE) {
+        return COMMON;
+    } else if(random >= RARITY_UNCOMMON_CHANCE + RARITY_COMMON_CHANCE) {
+        return UNCOMMON;
+    } else if(random >= RARITY_RARE_CHANCE + RARITY_UNCOMMON_CHANCE + RARITY_COMMON_CHANCE) {
+        return RARE;
+    } else if(random >= RARITY_EPIC_CHANCE + RARITY_RARE_CHANCE + RARITY_UNCOMMON_CHANCE + RARITY_COMMON_CHANCE) {
+        return EPIC;
+    } else if(random >= RARITY_LEGENDARY_CHANCE + RARITY_EPIC_CHANCE + RARITY_RARE_CHANCE + RARITY_UNCOMMON_CHANCE + RARITY_COMMON_CHANCE) {
+        return LEGENDARY;
+    }
+    return COMMON;
+}
+
 item_ids_t item_generate_type(unsigned int *seed, item_data_t *item_data, biome_t biome) {
     // TODO needs to check for rarity
+    rarity_t rarity = item_generate_rarity();
     item_ids_t items[MAX_ITEMS];
     int items_size = 0;
     for(int i = 0; i < MAX_ITEMS; i++) {
-        if(item_data[i].spawn_biomes[biome]) {
+        if(item_data[i].spawn_biomes[biome] && item_data[i].rarity[biome] == rarity) {
             items[items_size++] = item_data[i].id;
         }
     }

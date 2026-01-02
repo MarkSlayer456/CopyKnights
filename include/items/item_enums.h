@@ -6,6 +6,7 @@ typedef enum rarity {
 	COMMON,
 	UNCOMMON,
 	RARE,
+	EPIC,
 	LEGENDARY
 } rarity_t;
 
@@ -36,6 +37,11 @@ typedef enum item_ids {
 	ROTTEN_APPLE,
 	CHICKEN_DINNER,
 	RAT_MEAT,
+	DRAGONFIRE_JERKY,
+	CELESTIAL_CORNBREAD,
+	NIGHTBLOOM_GRAPES,
+	PIZZA,
+	BEAR_CHILI,
 	
 	// oil
 	OIL,

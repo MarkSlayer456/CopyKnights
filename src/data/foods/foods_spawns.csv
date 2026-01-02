@@ -1,19 +1,47 @@
 food,biome,spawn rarity
-Chicken Dinner,cave,common
-Chicken Dinner,bog,common
-Chicken Dinner,catacombs,common
-Chicken Dinner,ancient city,common
-Chicken Dinner,arcane labyrinth,common
-Chicken Dinner,void hollow,common
-Health Potion,cave,common
-Health Potion,bog,common
-Health Potion,catacombs,common
-Health Potion,ancient city,common
-Health Potion,arcane labyrinth,common
-Health Potion,void hollow,common
+Chicken Dinner,cave,uncommon
+Chicken Dinner,bog,uncommon
+Chicken Dinner,catacombs,uncommon
+Chicken Dinner,ancient city,uncommon
+Chicken Dinner,arcane labyrinth,uncommon
+Chicken Dinner,void hollow,uncommon
+Health Potion,cave,rare
+Health Potion,bog,rare
+Health Potion,catacombs,rare
+Health Potion,ancient city,rare
+Health Potion,arcane labyrinth,rare
+Health Potion,void hollow,rare
 Apple,cave,common
 Apple,bog,common
 Apple,catacombs,common
 Apple,ancient city,common
 Apple,arcane labyrinth,common
 Apple,void hollow,common
+Nightbloom Grapes,cave,common
+Nightbloom Grapes,bog,common
+Nightbloom Grapes,ancient city,common
+Celestial Cornbread,cave,legendary
+Celestial Cornbread,bog,legendary
+Celestial Cornbread,catacombs,legendary
+Celestial Cornbread,ancient city,legendary
+Celestial Cornbread,arcane labyrinth,legendary
+Celestial Cornbread,void hollow,legendary
+Dragonfire Jerky,cave,epic
+Dragonfire Jerky,bog,epic
+Dragonfire Jerky,catacombs,epic
+Dragonfire Jerky,ancient city,epic
+Dragonfire Jerky,arcane labyrinth,epic
+Dragonfire Jerky,void hollow,epic
+Pizza,cave,uncommon
+Pizza,bog,uncommon
+Pizza,catacombs,uncommon
+Pizza,ancient city,uncommon
+Pizza,arcane labyrinth,uncommon
+Pizza,void hollow,uncommon
+Bear Chili,cave,uncommon
+Bear Chili,bog,uncommon
+Bear Chili,catacombs,uncommon
+Bear Chili,ancient city,uncommon
+Bear Chili,arcane labyrinth,uncommon
+Bear Chili,void hollow,uncommon
+
