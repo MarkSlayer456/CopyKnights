@@ -89,7 +89,8 @@
 
 //TODO add more ...
 
-#define WALK_CHAR_LENGTH						16
+#define WALK_CHAR_LENGTH							16
+#define WANT_WALK_CHAR_LENGTH						16
 
 #define ENEMY_CHAR      'E' // used when finding enemies on the map
 

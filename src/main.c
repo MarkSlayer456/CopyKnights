@@ -173,9 +173,9 @@ int main(int argc, char *argv[]) {
 			case GAME:
 				if(world->room[0][0]->is_created == false) {
 					//TODO reset world function
-					load_room(&world->seed, 0, 0, world->enemy_data, world->item_data, world);
-					enemy_spawn(first->enemies[0], BAT, world->enemy_data, 1, 1, 0, 0, first->biome);
-					first->current_enemy_count++;
+					world->room[0][0] = load_room(&world->seed, 0, 0, world->enemy_data, world->item_data, world);
+					enemy_spawn(world->room[0][0]->enemies[0], BAT, world->enemy_data, 1, 1, 0, 0, world->room[0][0]->biome);
+					world->room[0][0]->current_enemy_count++;
 					calculate_door_masks(world);
 					calculate_main_path(&world->seed, world);
 					world->turn_order_size = 0;

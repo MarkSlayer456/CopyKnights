@@ -170,12 +170,18 @@ void save_room(room_t *room, FILE *file) {
 				fwrite(&room->tiles[y][x]->items[i]->id, sizeof(item_ids_t), 1, file);
 				fwrite(&room->tiles[y][x]->items[i]->stack, sizeof(int), 1, file);
 			}
-			fwrite(&room->tiles[y][x]->deleted_trap_count, sizeof(uint8_t), 1, file);
-			for(int i = 0; i < room->tiles[y][x]->deleted_trap_count; i++) {
-				fwrite(&room->tiles[y][x]->deleted_trap_x[i], sizeof(uint8_t), 1, file);
-				fwrite(&room->tiles[y][x]->deleted_trap_y[i], sizeof(uint8_t), 1, file);
-			}
 		}
+	}
+	fwrite(&room->current_pot_count, sizeof(int8_t), 1, file);
+	for(int i = 0; i < room->current_pot_count; i++) {
+		fwrite(&room->pots[i].x, sizeof(int8_t), 1, file);
+		fwrite(&room->pots[i].y, sizeof(int8_t), 1, file);
+		fwrite(&room->pots[i].broken, sizeof(bool), 1, file);
+	}
+	fwrite(&room->deleted_trap_count, sizeof(uint8_t), 1, file);
+	for(int i = 0; i < room->deleted_trap_count; i++) {
+		fwrite(&room->deleted_trap_x[i], sizeof(uint8_t), 1, file);
+		fwrite(&room->deleted_trap_y[i], sizeof(uint8_t), 1, file);
 	}
 	fwrite(&room->current_enemy_count, sizeof(int8_t), 1, file);
 	for (int i = 0; i < room->current_enemy_count; i++) {
@@ -374,18 +380,26 @@ void load_room_save(room_t *room, FILE *file, item_data_t *item_data) {
 			// fwrite(&room->tiles[y][x]->floor, sizeof(char), 1, file);
 			fread(&room->tiles[y][x]->item_count, sizeof(int8_t), 1, file);
 			for(int i = 0; i < room->tiles[y][x]->item_count; i++) {
-				room->tiles[y][x]->items[i] = calloc(1, sizeof(item_t));
 				fread(&room->tiles[y][x]->items[i]->id, sizeof(item_ids_t), 1, file);
 				fread(&room->tiles[y][x]->items[i]->stack, sizeof(int), 1, file);
 				load_item_from_data(room->tiles[y][x]->items[i], item_data);
 			}
-			fread(&room->tiles[y][x]->deleted_trap_count, sizeof(uint8_t), 1, file);
-			for(int i = 0; i < room->tiles[y][x]->deleted_trap_count; i++) {
-				fread(&room->tiles[y][x]->deleted_trap_x[i], sizeof(uint8_t), 1, file);
-				fread(&room->tiles[y][x]->deleted_trap_y[i], sizeof(uint8_t), 1, file);
-			}
 		}
 	}
+
+	fread(&room->current_pot_count, sizeof(int8_t), 1, file);
+	for(int i = 0; i < room->current_pot_count; i++) {
+		fread(&room->pots[i].x, sizeof(int8_t), 1, file);
+		fread(&room->pots[i].y, sizeof(int8_t), 1, file);
+		fread(&room->pots[i].broken, sizeof(bool), 1, file);
+	}
+
+	fread(&room->deleted_trap_count, sizeof(uint8_t), 1, file);
+	for(int i = 0; i < room->deleted_trap_count; i++) {
+		fread(&room->deleted_trap_x[i], sizeof(uint8_t), 1, file);
+		fread(&room->deleted_trap_y[i], sizeof(uint8_t), 1, file);
+	}
+
 	fread(&room->current_enemy_count, sizeof(int8_t), 1, file);
 	for (int i = 0; i < room->current_enemy_count; i++) {
 		fread(room->enemies[i], sizeof(enemy_t), 1, file);

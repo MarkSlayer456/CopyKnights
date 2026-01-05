@@ -60,7 +60,7 @@ void traps_triggered_check_player(world_t *world, player_t *player) {
 			world->buffs = buff_add_to_list(buff, world->buffs, &world->buff_count, &world->buff_size);
 			player_damage(player, world, trap_data->damage);
 			if(trap_data->break_on_trigger) {
-				remove_trap(world->room[player->global_x][player->global_y]->tiles[player->y][player->x], player->x, player->y);
+				remove_trap(world->room[player->global_x][player->global_y], player->x, player->y);
 			}
 			break;
 		}
@@ -103,7 +103,7 @@ void traps_triggered_check_enemies(world_t *world, room_t *room) {
 				buff.target.enemy = enemy;
 				world->buffs = buff_add_to_list(buff, world->buffs, &world->buff_count, &world->buff_size);
 				if(trap_data->break_on_trigger) {
-					remove_trap(room->tiles[enemy->y][enemy->x], enemy->x, enemy->y);
+					remove_trap(room, enemy->x, enemy->y);
 				}
 				enemy_damage(enemy, world, trap_data->damage, 1);
 				break;
@@ -112,11 +112,11 @@ void traps_triggered_check_enemies(world_t *world, room_t *room) {
 	}
 }
 
-void remove_trap(tile_t *tile, int x, int y) {
-	tile->floor = EMPTY;
-	tile->deleted_trap_x[tile->deleted_trap_count] = x;
-	tile->deleted_trap_y[tile->deleted_trap_count] = y;
-	tile->deleted_trap_count++;
+void remove_trap(room_t *room, int x, int y) {
+	room->tiles[y][x]->floor = EMPTY;
+	room->deleted_trap_x[room->deleted_trap_count] = x;
+	room->deleted_trap_y[room->deleted_trap_count] = y;
+	room->deleted_trap_count++;
 
 }
 

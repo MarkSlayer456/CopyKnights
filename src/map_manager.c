@@ -357,12 +357,19 @@ void load_room_floor_tiles(room_t *room) {
 				default: {
 					tile_t *tile = room->tiles[i][j];
 					tile->floor = tok[j];
-					for(int k = 0; k < tile->deleted_trap_count; k++) {
-						if(i == tile->deleted_trap_y[k] && j == tile->deleted_trap_x[k]) {
+					for(int k = 0; k < room->deleted_trap_count; k++) {
+						if(i == room->deleted_trap_y[k] && j == room->deleted_trap_x[k]) {
 							tile->floor = EMPTY;
 							break;
 						}
 					}
+					for(int k = 0; k < room->current_pot_count; k++) {
+						if(i == room->pots[k].y && j == room->pots[k].x && room->pots[k].broken) {
+							tile->floor = EMPTY;
+							break;
+						}
+					}
+
 					break;
 				}
 			}
@@ -427,8 +434,7 @@ void remove_item_from_tile(tile_t *tile, item_t *item) {
 }
 
 char check_tile(const room_t *room, const player_t *player, int y, int x) {
-	//TODO trap check?
-	if((x < 0 || y < 0) || (x >= ROOM_WIDTH-1 || y >= ROOM_HEIGHT-1)) {
+	if((x < 0 || y < 0) || (x >= ROOM_WIDTH || y >= ROOM_HEIGHT)) {
 		return ' ';
 	}
 	if(x == player->x && y == player->y) {
@@ -440,10 +446,15 @@ char check_tile(const room_t *room, const player_t *player, int y, int x) {
 			return tmp->symbol;
 		}
 	}
-	if(x > 0 && y > 0) {
-		return room->tiles[y][x]->floor;
+
+	for(int i = 0; i < room->current_pot_count; i++) {
+		const pot_t *pot = &room->pots[i];
+		if(pot->x == x && pot->y == y && !pot->broken) {
+			return POT;
+		}
 	}
-	return ' ';
+
+	return room->tiles[y][x]->floor;
 }
 
 room_t *get_current_room(world_t *world, player_t *player) {

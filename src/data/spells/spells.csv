@@ -1,7 +1,7 @@
 name,min damage,max damage,cost,range,critical chance,status chance,stat grade,buff type,buff duration,buff min damage,buff max damage
-fireball spell book,3,10,10,5,0,1,A,BRN,3,2,5
-ice spell book,3,10,10,5,0,1,A,ICE,3,2,5
-lightning spell book,3,10,10,5,0,0,A,NIL,0,0,0
-healing spell book,3,10,10,5,0,1,A,RGN,3,2,5
-poison spell book,3,10,10,5,0,1,A,PSN,3,2,5
-void spell book,3,10,10,5,0,1,A,BLK,3,2,5
+fireball spell book,3,50,10,5,0,1,A,BRN,3,2,5
+ice spell book,3,40,7,5,0,1,A,ICE,7,3,7
+lightning spell book,3,60,10,5,0,0,A,NIL,0,0,0
+healing spell book,3,50,7,5,0,1,A,RGN,0,0,0
+poison spell book,3,20,5,5,0,1,A,PSN,10,5,10
+void spell book,3,60,10,5,0,1,A,BLK,3,3,7

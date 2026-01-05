@@ -14,6 +14,8 @@
 #include "items/items.h"
 
 extern char walk_chars[WALK_CHAR_LENGTH];
+char wants_to_walk_on[WANT_WALK_CHAR_LENGTH] = {EMPTY, DOOR, MUD, CHEST};
+
 enemy_type_map_t biome_type_map[] = {
     {NULL_ENEMY_NAME, ENEMY_NONE},
     {CAVE_NAME, CAVE},
@@ -787,13 +789,22 @@ int find_spot_near(const enemy_t *enemy, const world_t *world, const player_t *p
     return 0;
 }
 
+static bool enemy_wants_to_walk_on(char symbol) {
+    for(int i = 0; i < WANT_WALK_CHAR_LENGTH; i++) {
+        if(symbol == wants_to_walk_on[i]) {
+            return true;
+        }
+    }
+    return false;
+}
+
 bool enemy_can_walk(char symbol) {
     for(int i = 0; i < WALK_CHAR_LENGTH; i++) {
         if(symbol == walk_chars[i]) {
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 void enemy_create_path_lists(enemy_t *enemy) {
@@ -922,11 +933,12 @@ int get_path_node_neighbors(path_node_t node, path_node_t neighbors[4], enemy_t 
         if(enemy->clist[ny][nx] == true) {
             continue;
         }
-        if(!enemy_can_walk(check_tile(room, player, ny, nx))) {
+        if(!enemy_wants_to_walk_on(check_tile(room, player, ny, nx))) {
             // DEBUG_LOG("enemy can't walk there: %d, %d", nx, ny);
             continue;
         }
         int move_cost = 1;
+        //TODO trap tiles modifing speed, should affect move cost
         if(enemy->all_nodes[ny][nx].checked) {
             // DEBUG_LOG("error: %d", 2);
             // continue;
@@ -934,7 +946,6 @@ int get_path_node_neighbors(path_node_t node, path_node_t neighbors[4], enemy_t 
             int cur_g = enemy->all_nodes[ny][nx].g;
             if(new_g < cur_g) {
                 // DEBUG_LOG("found lower value %d < %d, replacing", new_g, cur_g);
-                //TODO trap tiles modifing speed
                 enemy->all_nodes[ny][nx].g = new_g;
                 enemy->all_nodes[ny][nx].f = enemy->all_nodes[ny][nx].g + enemy->all_nodes[ny][nx].h;
                 enemy->all_nodes[ny][nx].px = node.x;
@@ -946,7 +957,6 @@ int get_path_node_neighbors(path_node_t node, path_node_t neighbors[4], enemy_t 
             }
         }
         neighbors[count].checked = true;
-        //TODO trap tiles modifing speed
         int dist = abs(nx - enemy->end_x) + abs(ny - enemy->end_y);
         neighbors[count].x = nx;
         neighbors[count].y = ny;

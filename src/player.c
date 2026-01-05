@@ -181,17 +181,8 @@ char player_check_dir(player_t *player, world_t *world, direction_t dir) {
 	if(dir == UP) y--;
 	
 	room_t *room = world->room[player->global_x][player->global_y];
-	for(int i = 0; i < room->current_enemy_count; i++) {
-		if(room->enemies[i] == NULL) continue;
-		if(y == room->enemies[i]->y && x == room->enemies[i]->x) {
-			return ENEMY_CHAR;
-		}  
-	}
-	if(y <= ROOM_HEIGHT && x <= ROOM_WIDTH) {
-		return room->tiles[y][x]->floor;
-	} else {
-		return ' ';
-	}
+	char tmp = check_tile(room, player, y, x);
+	return tmp;
 }
 
 int player_can_move_dir(player_t *player, world_t *world, direction_t dir) {

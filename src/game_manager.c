@@ -518,6 +518,7 @@ void draw_load_menu(const load_menu_t *load_menu) {
 	waddstr(load_menu->win, MENU_DIVIDE_LINE);
 	char display_str[256];
 	for(int i = load_menu->cursor_offset; i < (LOAD_MENU_VISIBLE_ENTRIES + load_menu->cursor_offset); i++) {
+		if(i >= load_menu->filename_count) break;
 		wmove(load_menu->win, y_pos, 0);
 		if(i == load_menu->cursor_pos) {
 			snprintf(display_str, sizeof(display_str), ">>%s", load_menu->filename[i]);

@@ -7,7 +7,7 @@ enum trap_id get_trap_id(const char *id);
 void traps_triggered_check_player(world_t *world, player_t *player);
 void traps_triggered_check_enemies(world_t *world, room_t *room);
 
-void remove_trap(tile_t *tile, int x, int y);
+void remove_trap(room_t *room, int x, int y);
 
 void load_trap_effects(world_t *world);
 
