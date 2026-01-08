@@ -595,6 +595,20 @@ void player_close_inventory(player_t *player) {
 	player->state  = PLAYER_STATE_MOVING;
 }
 
+void player_cycle_popup_menu_cursor_up(player_t *player, popup_menu_t *popup_menu) {
+	if(popup_menu->cursor_pos == 0) {
+		popup_menu->cursor_pos = popup_menu->max_cursor_pos;
+	}
+	popup_menu->cursor_pos--;
+}
+
+void player_cycle_popup_menu_cursor_down(player_t *player, popup_menu_t *popup_menu) {
+	popup_menu->cursor_pos++;
+	if(popup_menu->cursor_pos >= popup_menu->max_cursor_pos) {
+		popup_menu->cursor_pos = 0;
+	}
+}
+
 int player_inv_contains(player_t *player, item_t item) {
 	for(int i = 0; i < player->inventory_count; i++) {
 		if(player->inventory[i].id == item.id) {
@@ -815,6 +829,14 @@ void player_setup(player_t *player, world_t *world) {
 	player->y = 10;
 	player_change_class(player, world, SAMURAI);
 
+	player->spell_equip_menu.win = newwin(SPELL_EQUIP_MENU_HEIGHT, SPELL_EQUIP_MENU_WIDTH, SCREEN_HEIGHT/2-3, SCREEN_WIDTH/2-15);
+	player->spell_equip_menu.cursor_pos = 0;
+	player->spell_equip_menu.cursor_offset = 0;
+	player->spell_equip_menu.max_cursor_pos = MAX_SPELL_SLOTS;
+	player->spell_equip_menu.data_capacity = 0;
+	player->spell_equip_menu.data_count = 0;
+	player->spell_equip_menu.data = NULL;
+
 	player->health = player->constitution * 10;
 	player->max_health = player->constitution * 10;
 	player->mana = player->intelligence * 10;
@@ -869,6 +891,13 @@ void player_reset_values(player_t *player, world_t *world) {
 	player->x = 1;
 	player->y = 10;
 	player_change_class(player, world, SAMURAI);
+
+	player->spell_equip_menu.cursor_pos = 0;
+	player->spell_equip_menu.cursor_offset = 0;
+	player->spell_equip_menu.max_cursor_pos = MAX_SPELL_SLOTS;
+	player->spell_equip_menu.data_capacity = 0;
+	player->spell_equip_menu.data_count = 0;
+	player->spell_equip_menu.data = NULL;
 
 	player->health = player->constitution * 10;
 	player->max_health = player->constitution * 10;

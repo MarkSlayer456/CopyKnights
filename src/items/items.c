@@ -6,6 +6,7 @@
 #include "enemy.h"
 #include "types.h"
 #include "game_constants.h"
+#include "game_manager.h"
 #include "map_manager.h"
 #include "functions.h"
 #include <strings.h>
@@ -167,6 +168,11 @@ type_map_t item_type_map[] = {
     {VOIDMARROW_STAFF_NAME, VOIDMARROW_STAFF},
 
     {FIREBALL_SPELL_BOOK_NAME, FIREBALL_SPELL_BOOK},
+    {ICE_SPELL_BOOK_NAME, ICE_SPELL_BOOK},
+    {LIGHTNING_SPELL_BOOK_NAME, LIGHTNING_SPELL_BOOK},
+    {HEALING_SPELL_BOOK_NAME, HEALING_SPELL_BOOK},
+    {POISON_SPELL_BOOK_NAME, POISON_SPELL_BOOK},
+    {VOID_SPELL_BOOK_NAME, VOID_SPELL_BOOK}
 };
 
 const int item_type_map_len = sizeof(item_type_map) / sizeof(item_type_map[0]);
@@ -243,7 +249,9 @@ int use_item(player_t *player)
             remove_item(player);
             success = 1;
         } else if(player->inventory[player->inventory_manager.inv_selector].value_type == VALUE_TYPE_SPELL) {
-            success = handle_spell_one_change(player, player->inventory_manager.inv_selector);
+            player->state = PLAYER_STATE_EQUIPPING_SPELL;
+            // display_popup_menu(player, player->spell_equip_menu);
+            // success = handle_spell_one_change(player, player->inventory_manager.inv_selector);
         } else {
             switch(player->inventory[player->inventory_manager.inv_selector].id) {
                 case BLANK:
@@ -261,6 +269,16 @@ int use_item(player_t *player)
         }
 	}
 	return success;
+}
+
+void equip_spell(player_t *player, int spell_slot) {
+    if(spell_slot == 1) {
+        handle_spell_one_change(player, player->inventory_manager.inv_selector);
+    } else if(spell_slot == 2) {
+        handle_spell_two_change(player, player->inventory_manager.inv_selector);
+    } else if(spell_slot == 3) {
+        handle_spell_three_change(player, player->inventory_manager.inv_selector);
+    }
 }
 
 int handle_armor_change(player_t *player, int new_armor) {

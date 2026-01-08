@@ -8,6 +8,8 @@
 #include <string.h>
 #include "types.h"
 
+#define MAX(a, b) a > b ? a : b
+
 extern WINDOW *hud, *action_bar, *inventory_hud, *inventory_desc_hud;
 
 void hud_update_player_health(const player_t *player, const buff_t *buff_array, int buff_count) {
@@ -67,7 +69,7 @@ void hud_update_player_health(const player_t *player, const buff_t *buff_array, 
 }
 
 void hud_update_nearby_enemies(world_t *world, player_t *player) {
-	int detect_radius = player->lantern.power;
+	int detect_radius = MAX(2, player->lantern.power);
 	room_t *room = world->room[player->global_x][player->global_y];
 	
 	wmove(hud, PLAYER_STATS_HUD_SPACE, 0);
@@ -92,8 +94,8 @@ void hud_update_nearby_enemies(world_t *world, player_t *player) {
 	int y_offset = 0;
 	for(int i = 0; i < room->current_enemy_count; i++) {
 		if(!room->enemies[i]) continue;
-		if(room->enemies[i]->x >= player->x-detect_radius && room->enemies[i]->x < player->x+detect_radius &&
-			room->enemies[i]->y >= player->y-(detect_radius) && room->enemies[i]->y < player->y+(detect_radius)) {
+		if(room->enemies[i]->x > player->x-detect_radius && room->enemies[i]->x < player->x+detect_radius &&
+			room->enemies[i]->y > player->y-(detect_radius) && room->enemies[i]->y < player->y+(detect_radius)) {
 			wmove(hud, PLAYER_STATS_HUD_SPACE+y_offset+1, 0);
 			char name[32];
 			snprintf(name, sizeof(name), "%s", room->enemies[i]->name);

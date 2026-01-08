@@ -152,6 +152,11 @@ typedef enum item_ids {
 
 	// spells
 	FIREBALL_SPELL_BOOK,
+	ICE_SPELL_BOOK,
+	LIGHTNING_SPELL_BOOK,
+	HEALING_SPELL_BOOK,
+	POISON_SPELL_BOOK,
+	VOID_SPELL_BOOK
 } item_ids_t;
 
 #endif

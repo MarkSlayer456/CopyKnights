@@ -46,6 +46,10 @@ void draw(world_t *world, player_t *player) {
 	werase(inventory_hud);
 	werase(inventory_desc_hud);
 	// draw stuff...
+	if(player->state == PLAYER_STATE_EQUIPPING_SPELL) {
+		display_spell_equip_menu(player, player->spell_equip_menu);
+		return;
+	}
 	if(player->state == PLAYER_STATE_INVENTORY || player->state == PLAYER_STATE_LOOTING) {
 		display_inventory_hud(world, player);
 		display_inventory_desc_hud(world, player);
@@ -249,6 +253,28 @@ bool manage_input(char c, world_t *world, player_t *player, menu_manager_t *menu
 				player_take_loot_item(room, player);
 				break;
 			// TODO need a way to cancel attacks
+			default:
+				break;
+		}
+		return false;
+	} else if(player->state == PLAYER_STATE_EQUIPPING_SPELL) {
+		switch(x) {
+			case CTRL_Q:
+				shutdown(world, player);
+				break;
+			case KEY_B:
+				player->state = PLAYER_STATE_INVENTORY; //TODO
+				break;
+			case KEY_W:
+				player_cycle_popup_menu_cursor_up(player, &player->spell_equip_menu);
+				break;
+			case KEY_S:
+				player_cycle_popup_menu_cursor_down(player, &player->spell_equip_menu);
+				break;
+			case ENTER_KEY:
+				equip_spell(player, player->spell_equip_menu.cursor_pos+1);
+				player->state = PLAYER_STATE_INVENTORY;
+				break;
 			default:
 				break;
 		}
@@ -726,6 +752,65 @@ void display_and_manage_class_menu(WINDOW *win, world_t *world, player_t *player
 		doupdate();
 	}
 }
+
+void display_spell_equip_menu(player_t *player, popup_menu_t menu) {
+	WINDOW *win = menu.win;
+	werase(win);
+	int y = 1;
+	int x = 1;
+	wmove(win, y++, x);
+	waddstr(win, "Which Spell Slot?");
+	wmove(win, y, x);
+	touchwin(win);
+	wrefresh(win);
+	box(win, 0, 0);
+	char full[66] = ">>";
+	char str[64];
+	if(player->equipment.spell1 >= 0) {
+		snprintf(str, sizeof(str), "1: %s", player->inventory[player->equipment.spell1].name);
+	} else {
+		snprintf(str, sizeof(str), "%s", "1: ");
+	}
+	if(player->spell_equip_menu.cursor_pos == 0) {
+		strcat(full, str);
+		waddstr(win, full);
+	} else {
+		waddstr(win, str);
+	}
+	y++;
+	wmove(win, y, x);
+
+	if(player->equipment.spell2 >= 0) {
+		snprintf(str, sizeof(str), "2: %s", player->inventory[player->equipment.spell2].name);
+	} else {
+		snprintf(str, sizeof(str), "%s", "2: ");
+	}
+	if(player->spell_equip_menu.cursor_pos == 1) {
+		strcat(full, str);
+		waddstr(win, full);
+	} else {
+		waddstr(win, str);
+	}
+	y++;
+	wmove(win, y, x);
+
+	if(player->equipment.spell3 >= 0) {
+		snprintf(str, sizeof(str), "3: %s", player->inventory[player->equipment.spell3].name);
+	} else {
+		snprintf(str, sizeof(str), "%s", "3: ");
+	}
+	if(player->spell_equip_menu.cursor_pos == 2) {
+		strcat(full, str);
+		waddstr(win, full);
+	} else {
+		waddstr(win, str);
+	}
+	y++;
+	wmove(win, y, x);
+	wnoutrefresh(win);
+	doupdate();
+}
+
 
 direction_t direction_from_key(int key) {
 	switch(key) {

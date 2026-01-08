@@ -247,6 +247,11 @@
 
 // spells
 #define FIREBALL_SPELL_BOOK_NAME						"Fireball Spell Book"
+#define ICE_SPELL_BOOK_NAME								"Ice Spell Book"
+#define LIGHTNING_SPELL_BOOK_NAME						"Lightning Spell Book"
+#define HEALING_SPELL_BOOK_NAME							"Healing Spell Book"
+#define POISON_SPELL_BOOK_NAME							"Poison Spell Book"
+#define VOID_SPELL_BOOK_NAME							"Void Spell Book"
 
 
 // armor types
@@ -389,6 +394,10 @@
 #define MAX_CLASSES						32
 
 #define STARTING_OIL					100
+
+#define MAX_SPELL_SLOTS					3
+#define SPELL_EQUIP_MENU_WIDTH			31
+#define SPELL_EQUIP_MENU_HEIGHT			7
 
 #define STARTING_BUFF_SIZE			   8
 #define BUFF_NAME_MAX_LEN				4

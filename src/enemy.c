@@ -517,7 +517,6 @@ int enemy_get_base_speed(enemy_t *enemy, const enemy_data_t *enemy_data) {
 void enemy_handle_lighting_buff(enemy_t *enemy, world_t *world) {
     const tile_t *tile = world->room[enemy->global_x][enemy->global_y]->tiles[enemy->y][enemy->x];
     if(tile->has_light && enemy->trait == LIGHT_CENTERED) {
-        DEBUG_LOG("%s", "big buff applied");
         enemy_set_constitution(enemy, enemy_get_base_constitution(enemy, world->enemy_data)+ENEMY_LIGHT_CONSTITUTION_BUFF);
         enemy_set_strength(enemy, enemy_get_base_constitution(enemy, world->enemy_data)+ENEMY_LIGHT_STRENGTH_BUFF);
         enemy_set_speed(enemy, enemy_get_base_constitution(enemy, world->enemy_data)+ENEMY_LIGHT_SPEED_BUFF);
@@ -526,7 +525,6 @@ void enemy_handle_lighting_buff(enemy_t *enemy, world_t *world) {
         enemy_set_strength(enemy, enemy_get_base_constitution(enemy, world->enemy_data)+ENEMY_DARK_STRENGTH_BUFF);
         enemy_set_speed(enemy, enemy_get_base_constitution(enemy, world->enemy_data)+ENEMY_DARK_SPEED_BUFF);
     } else {
-        DEBUG_LOG("%s", "resetting to base stats");
         enemy_set_constitution(enemy, enemy_get_base_constitution(enemy, world->enemy_data));
         enemy_set_strength(enemy, enemy_get_base_constitution(enemy, world->enemy_data));
         enemy_set_speed(enemy, enemy_get_base_constitution(enemy, world->enemy_data));

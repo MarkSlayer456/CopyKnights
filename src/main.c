@@ -162,6 +162,7 @@ int main(int argc, char *argv[]) {
 
 	world->room[0][0]->door_mask = 0x6;
 	drop_item(world->room[0][0]->tiles[10][1], world->item_data, FIREBALL_SPELL_BOOK, 1);
+	drop_item(world->room[0][0]->tiles[10][1], world->item_data, POISON_SPELL_BOOK, 1);
 	calculate_door_masks(world);
 	calculate_main_path(&world->seed, world);
 	
@@ -200,6 +201,7 @@ int main(int argc, char *argv[]) {
 
 				if(world->is_player_turn || actor == PLAYER_TURN_ORDER_INDEX) {
 					lantern_update_dimming(&player->lantern);
+					draw(world, player);
 					bool run = false;
 					char c;
 					while(run == false) {

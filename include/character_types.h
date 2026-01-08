@@ -2,7 +2,18 @@
 
 #define CHARACTER_TYPES_H_
 
+#include <ncurses.h>
 #include "items/item_types.h"
+
+typedef struct {
+	WINDOW *win;
+	uint8_t cursor_pos;
+	uint8_t cursor_offset;
+	uint8_t max_cursor_pos;
+	uint8_t data_count;
+	uint16_t data_capacity;
+	void *data;
+} popup_menu_t;
 
 //TODO I want to redo this
 typedef struct {
@@ -102,6 +113,7 @@ typedef struct player {
 	equipment_t equipment;
 	int oil;
 	player_state_t state;
+	popup_menu_t spell_equip_menu;
 	
 	inventory_manager_t inventory_manager;
 	menu_manager_t menu_manager;

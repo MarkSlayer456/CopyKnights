@@ -15,6 +15,8 @@ double get_percent_from_grade(enum grade g);
 // returns 1 on success and 0 on fail
 int use_item(player_t *player);
 
+void equip_spell(player_t *player, int spell_slot);
+
 int handle_armor_change(player_t *player, int new_armor);
 int handle_weapon_change(player_t *player, int new_weapon);
 int handle_spell_one_change(player_t *player, int new_spell1);

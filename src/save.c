@@ -88,6 +88,10 @@ void save_player(player_t *player, FILE *file) {
 	fwrite(&player->global_x, sizeof(int), 1, file);
 	fwrite(&player->global_y, sizeof(int), 1, file);
 	
+	fwrite(&player->equipment.spell1, sizeof(int), 1, file);
+	fwrite(&player->equipment.spell2, sizeof(int), 1, file);
+	fwrite(&player->equipment.spell3, sizeof(int), 1, file);
+
 	fwrite(&player->inventory_count, sizeof(int), 1, file);
 	for(int i = 0; i < player->inventory_count; i++) {
 		if(player->inventory[i].stack == 0) continue;
@@ -115,6 +119,9 @@ void save_player(player_t *player, FILE *file) {
 	fwrite(&player->equipment.armor_id, sizeof(item_ids_t), 1, file);
 	fwrite(&player->equipment.main_hand_id, sizeof(item_ids_t), 1, file);
 	fwrite(&player->equipment.off_hand_id, sizeof(item_ids_t), 1, file);
+	fwrite(&player->equipment.spell1_id, sizeof(item_ids_t), 1, file);
+	fwrite(&player->equipment.spell2_id, sizeof(item_ids_t), 1, file);
+	fwrite(&player->equipment.spell3_id, sizeof(item_ids_t), 1, file);
 	fwrite(&player->equipment.main_hand_two_handed, sizeof(bool), 1, file);
 	
 	fwrite(&player->oil, sizeof(int), 1, file);
@@ -277,7 +284,11 @@ void load_player(player_t *player, FILE *file, item_data_t *item_data) {
 	fread(&player->y, sizeof(int), 1, file);
 	fread(&player->global_x, sizeof(int), 1, file);
 	fread(&player->global_y, sizeof(int), 1, file);
-	
+
+	fread(&player->equipment.spell1, sizeof(int), 1, file);
+	fread(&player->equipment.spell2, sizeof(int), 1, file);
+	fread(&player->equipment.spell3, sizeof(int), 1, file);
+
 	fread(&player->inventory_count, sizeof(int), 1, file);
 	for(int i = 0; i < player->inventory_count; i++) {
 		fread(&player->inventory[i].id, sizeof(item_ids_t), 1, file); // TODO this causes save files to not work if you add any items at all, should probably store this as a string
@@ -317,6 +328,10 @@ void load_player(player_t *player, FILE *file, item_data_t *item_data) {
 	fread(&player->equipment.armor_id, sizeof(item_ids_t), 1, file);
 	fread(&player->equipment.main_hand_id, sizeof(item_ids_t), 1, file);
 	fread(&player->equipment.off_hand_id, sizeof(item_ids_t), 1, file);
+	fread(&player->equipment.spell1_id, sizeof(item_ids_t), 1, file);
+	fread(&player->equipment.spell2_id, sizeof(item_ids_t), 1, file);
+	fread(&player->equipment.spell3_id, sizeof(item_ids_t), 1, file);
+
 	fread(&player->equipment.main_hand_two_handed, sizeof(bool), 1, file);
 	
 	fread(&player->oil, sizeof(int), 1, file);

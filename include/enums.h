@@ -80,6 +80,7 @@ typedef enum {
 	PLAYER_STATE_LOOTING,
 	PLAYER_STATE_TALKING,
 	PLAYER_STATE_MENU, // settings menu not an inventory
+	PLAYER_STATE_EQUIPPING_SPELL
 } player_state_t;
 
 typedef enum action_bar_selectors { 

@@ -64,6 +64,9 @@ void player_close_loot(player_t *player);
 void player_open_inventory(player_t *player);
 void player_close_inventory(player_t *player);
 
+void player_cycle_popup_menu_cursor_up(player_t *player, popup_menu_t *popup_menu);
+void player_cycle_popup_menu_cursor_down(player_t *player, popup_menu_t *popup_menu);
+
 // removes an item from the inventory list, not used to decrease item count
 void player_organize_inv(player_t *player, int loc);
 // returns the index of where item is located in inventory, or -1 if it's not in the inventory
