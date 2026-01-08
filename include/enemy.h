@@ -35,6 +35,23 @@ bool enemy_damage_ignore_armor(enemy_t *enemy, world_t *world, int amount, bool 
 
 void enemy_attack(enemy_t *enemy, player_t *player, world_t *world);
 
+int enemy_get_base_strength(enemy_t *enemy, const enemy_data_t *enemy_data);
+int enemy_get_base_dexterity(enemy_t *enemy, const enemy_data_t *enemy_data);
+int enemy_get_base_intelligence(enemy_t *enemy, const enemy_data_t *enemy_data);
+int enemy_get_base_constitution(enemy_t *enemy, const enemy_data_t *enemy_data);
+int enemy_get_base_speed(enemy_t *enemy, const enemy_data_t *enemy_data);
+
+
+void enemy_set_strength(enemy_t *enemy, int amount);
+void enemy_set_dexterity(enemy_t *enemy, int amount);
+void enemy_set_intelligence(enemy_t *enemy, int amount);
+void enemy_set_constitution(enemy_t *enemy, int amount);
+void enemy_set_speed(enemy_t *enemy, int amount);
+
+void enemy_increase_constitution(enemy_t *enemy);
+
+void enemy_handle_lighting_buff(enemy_t *enemy, world_t *world);
+
 void enemy_decide_move(enemy_t *enemy, world_t *world, player_t *player);
 
 void enemy_decide_move_passive(enemy_t *enemy, world_t *world, player_t *player);

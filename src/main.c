@@ -183,13 +183,21 @@ int main(int argc, char *argv[]) {
 				}
 				calculate_light(world, player);
 				generate_turn_order_display(world, player);
+				for(int i = 0; i < world->room[player->global_x][player->global_y]->current_enemy_count; i++) {
+					enemy_t *enemy = world->room[player->global_x][player->global_y]->enemies[i];
+					if(enemy != NULL) {
+						enemy_handle_lighting_buff(enemy, world);
+					}
+				}
 				draw(world, player);
 				player_get_nearby_loot(world->room[player->global_x][player->global_y], player);
 				int actor = INVALID_ACTOR_INDEX;
+
 				if(!world->is_player_turn) {
 					actor = pick_next_actor(world, player);
 					assert(actor != INVALID_ACTOR_INDEX);
 				}
+
 				if(world->is_player_turn || actor == PLAYER_TURN_ORDER_INDEX) {
 					lantern_update_dimming(&player->lantern);
 					bool run = false;
@@ -204,6 +212,7 @@ int main(int argc, char *argv[]) {
 				} else if(actor >= 0) {
 					enemy_t *enemy = world->room[player->global_x][player->global_y]->enemies[actor];
 					if(enemy != NULL) {
+						enemy_handle_lighting_buff(enemy, world);
 						enemy_decide_move(enemy, world, player);
 					}
 				}

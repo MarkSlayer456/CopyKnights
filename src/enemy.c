@@ -472,6 +472,95 @@ void enemy_attack(enemy_t *enemy, player_t *player, world_t *world)
     enemy_handle_knockback(enemy, player, world);
 }
 
+int enemy_get_base_strength(enemy_t *enemy, const enemy_data_t *enemy_data) {
+    for(int i = 0; i < ENEMY_TYPE_COUNT; i++) {
+        if(enemy_data[i].type == enemy->type) {
+            return enemy_data[i].base_strength + (ENEMY_GROWTH_MODIFER* (enemy->level-1));
+        }
+    }
+    return 0;
+}
+
+int enemy_get_base_dexterity(enemy_t *enemy, const enemy_data_t *enemy_data) {
+    for(int i = 0; i < ENEMY_TYPE_COUNT; i++) {
+        if(enemy_data[i].type == enemy->type) {
+            return enemy_data[i].base_dexterity + (ENEMY_GROWTH_MODIFER * (enemy->level-1));
+        }
+    }
+    return 0;
+}
+int enemy_get_base_intelligence(enemy_t *enemy, const enemy_data_t *enemy_data) {
+    for(int i = 0; i < ENEMY_TYPE_COUNT; i++) {
+        if(enemy_data[i].type == enemy->type) {
+            return enemy_data[i].base_intelligence + (ENEMY_GROWTH_MODIFER * (enemy->level-1));
+        }
+    }
+    return 0;
+}
+int enemy_get_base_constitution(enemy_t *enemy, const enemy_data_t *enemy_data) {
+    for(int i = 0; i < ENEMY_TYPE_COUNT; i++) {
+        if(enemy_data[i].type == enemy->type) {
+            return enemy_data[i].base_constitution + (ENEMY_GROWTH_MODIFER * (enemy->level-1));
+        }
+    }
+    return 0;
+}
+int enemy_get_base_speed(enemy_t *enemy, const enemy_data_t *enemy_data) {
+    for(int i = 0; i < ENEMY_TYPE_COUNT; i++) {
+        if(enemy_data[i].type == enemy->type) {
+            return enemy_data[i].base_speed + (ENEMY_GROWTH_MODIFER * (enemy->level-1));
+        }
+    }
+    return 0;
+}
+
+void enemy_handle_lighting_buff(enemy_t *enemy, world_t *world) {
+    const tile_t *tile = world->room[enemy->global_x][enemy->global_y]->tiles[enemy->y][enemy->x];
+    if(tile->has_light && enemy->trait == LIGHT_CENTERED) {
+        DEBUG_LOG("%s", "big buff applied");
+        enemy_set_constitution(enemy, enemy_get_base_constitution(enemy, world->enemy_data)+ENEMY_LIGHT_CONSTITUTION_BUFF);
+        enemy_set_strength(enemy, enemy_get_base_constitution(enemy, world->enemy_data)+ENEMY_LIGHT_STRENGTH_BUFF);
+        enemy_set_speed(enemy, enemy_get_base_constitution(enemy, world->enemy_data)+ENEMY_LIGHT_SPEED_BUFF);
+    } else if(!tile->has_light && enemy->trait == DARK_CENTERED) {
+        enemy_set_constitution(enemy, enemy_get_base_constitution(enemy, world->enemy_data)+ENEMY_DARK_CONSTITUTION_BUFF);
+        enemy_set_strength(enemy, enemy_get_base_constitution(enemy, world->enemy_data)+ENEMY_DARK_STRENGTH_BUFF);
+        enemy_set_speed(enemy, enemy_get_base_constitution(enemy, world->enemy_data)+ENEMY_DARK_SPEED_BUFF);
+    } else {
+        DEBUG_LOG("%s", "resetting to base stats");
+        enemy_set_constitution(enemy, enemy_get_base_constitution(enemy, world->enemy_data));
+        enemy_set_strength(enemy, enemy_get_base_constitution(enemy, world->enemy_data));
+        enemy_set_speed(enemy, enemy_get_base_constitution(enemy, world->enemy_data));
+    }
+}
+
+void enemy_set_strength(enemy_t *enemy, int amount) {
+    enemy->strength = amount;
+}
+
+void enemy_set_dexterity(enemy_t *enemy, int amount) {
+    enemy->dexterity = amount;
+}
+
+void enemy_set_intelligence(enemy_t *enemy, int amount) {
+    enemy->intelligence = amount;
+}
+
+void enemy_set_constitution(enemy_t *enemy, int amount) {
+    int old = enemy->constitution;
+    enemy->constitution = amount;
+    int diff = enemy->constitution - old;
+    int increase = diff*10;
+    if(enemy->health + increase <= 0) {
+        enemy->health = 1;
+    } else {
+        enemy->health += increase;
+    }
+}
+
+void enemy_set_speed(enemy_t *enemy, int amount) {
+    enemy->speed = amount;
+}
+
 void enemy_decide_move(enemy_t *enemy, world_t *world, player_t *player)
 {
     // TODO move the player check to enemy_can_move functions; just makes more sense, also need loop for them

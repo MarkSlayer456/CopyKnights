@@ -92,8 +92,8 @@ void hud_update_nearby_enemies(world_t *world, player_t *player) {
 	int y_offset = 0;
 	for(int i = 0; i < room->current_enemy_count; i++) {
 		if(!room->enemies[i]) continue;
-		if(room->enemies[i]->x > player->x-detect_radius && room->enemies[i]->x < player->x+detect_radius &&
-			room->enemies[i]->y > player->y-(detect_radius) && room->enemies[i]->y < player->y+(detect_radius)) {
+		if(room->enemies[i]->x >= player->x-detect_radius && room->enemies[i]->x < player->x+detect_radius &&
+			room->enemies[i]->y >= player->y-(detect_radius) && room->enemies[i]->y < player->y+(detect_radius)) {
 			wmove(hud, PLAYER_STATS_HUD_SPACE+y_offset+1, 0);
 			char name[32];
 			snprintf(name, sizeof(name), "%s", room->enemies[i]->name);
