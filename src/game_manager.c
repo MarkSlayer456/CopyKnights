@@ -34,7 +34,9 @@ const int MENU_CLASS_LIST[] = {
 	PALADIN,
 	BRAWLER,
 	SAMURAI,
-	VOID_EMBRACE
+	VOID_EMBRACE,
+	VOID_KNIGHT,
+	VOID_ASSASSIN
 };
 
 const int MENU_CLASS_LIST_SIZE = sizeof(MENU_CLASS_LIST) / sizeof(MENU_CLASS_LIST[0]);
@@ -48,6 +50,10 @@ void draw(world_t *world, player_t *player) {
 	// draw stuff...
 	if(player->state == PLAYER_STATE_EQUIPPING_SPELL) {
 		display_spell_equip_menu(player, player->spell_equip_menu);
+		return;
+	}
+	if(player->state == PLAYER_STATE_DEAD) {
+		display_death_menu(player, player->death_menu);
 		return;
 	}
 	if(player->state == PLAYER_STATE_INVENTORY || player->state == PLAYER_STATE_LOOTING) {
@@ -140,6 +146,18 @@ bool manage_input(char c, world_t *world, player_t *player, menu_manager_t *menu
 				break;
 			case KEY_S:
 				player_move_dir(player, world, DOWN);
+				break;
+			case UP_ARROW:
+				player_attack(player, world, UP);
+				break;
+			case DOWN_ARROW:
+				player_attack(player, world, DOWN);
+				break;
+			case LEFT_ARROW:
+				player_attack(player, world, LEFT);
+				break;
+			case RIGHT_ARROW:
+				player_attack(player, world, RIGHT);
 				break;
 			case KEY_SPACE:
 				player_wait(player, world);
@@ -279,6 +297,18 @@ bool manage_input(char c, world_t *world, player_t *player, menu_manager_t *menu
 				break;
 		}
 		return false;
+	} else if(player->state == PLAYER_STATE_DEAD) {
+		switch(x) {
+			case CTRL_Q:
+				shutdown(world, player);
+				break;
+			case ENTER_KEY:
+				end_game(world, player);
+				break;
+			default:
+				break;
+		}
+		return true;
 	}
 	return false;
 }
@@ -807,6 +837,31 @@ void display_spell_equip_menu(player_t *player, popup_menu_t menu) {
 	}
 	y++;
 	wmove(win, y, x);
+	wnoutrefresh(win);
+	doupdate();
+}
+
+void display_death_menu(player_t *player, popup_menu_t menu) {
+	WINDOW *win = menu.win;
+	werase(win);
+	box(win, 0, 0);
+	touchwin(win);
+	wrefresh(win);
+
+	char str[64];
+	int y = 1;
+	char title[9] = "You Died";
+	wmove(win, y++, (DEATH_MENU_WIDTH/2) - strlen(title)/2);
+	waddstr(win, title);
+
+	snprintf(str, sizeof(str), "Class: %s | Level: %d", class_get_name(player->player_class), player->level);
+	wmove(win, y, DEATH_MENU_WIDTH/2 - strlen(str)/2);
+	waddstr(win, str);
+	y+=2;
+	snprintf(str, sizeof(str), ">>Return to Main Menu");
+	wmove(win, y, DEATH_MENU_WIDTH/2 - strlen(str)/2);
+	waddstr(win, str);
+
 	wnoutrefresh(win);
 	doupdate();
 }

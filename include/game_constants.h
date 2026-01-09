@@ -383,6 +383,8 @@
 #define BRAWLER_CLASS_NAME				"Brawler"
 #define SAMURAI_CLASS_NAME				"Samurai"
 #define VOID_EMBRACE_CLASS_NAME			"Void Embrace"
+#define VOID_KNIGHT_CLASS_NAME			"Void Knight"
+#define VOID_ASSASSIN_CLASS_NAME		"Void Asssassin"
 
 #define BASE_STRENGTH					10
 #define BASE_DEXTERITY					10
@@ -398,6 +400,8 @@
 #define MAX_SPELL_SLOTS					3
 #define SPELL_EQUIP_MENU_WIDTH			31
 #define SPELL_EQUIP_MENU_HEIGHT			7
+#define DEATH_MENU_WIDTH			31
+#define DEATH_MENU_HEIGHT			7
 
 #define STARTING_BUFF_SIZE			   8
 #define BUFF_NAME_MAX_LEN				4

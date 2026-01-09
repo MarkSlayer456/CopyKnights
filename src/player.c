@@ -31,7 +31,9 @@ class_type_map_t class_type_map[] = {
 	{PALADIN_CLASS_NAME, PALADIN},
 	{BRAWLER_CLASS_NAME, BRAWLER},
 	{SAMURAI_CLASS_NAME, SAMURAI},
-	{VOID_EMBRACE_CLASS_NAME, VOID_EMBRACE}
+	{VOID_EMBRACE_CLASS_NAME, VOID_EMBRACE},
+	{VOID_KNIGHT_CLASS_NAME, VOID_KNIGHT},
+	{VOID_ASSASSIN_CLASS_NAME, VOID_ASSASSIN}
 };
 
 const int class_type_map_len = sizeof(class_type_map) / sizeof(class_type_map[0]);
@@ -203,14 +205,15 @@ void player_wait(player_t *player, world_t *world)
 void player_damage(player_t *player, world_t *world, int attack) {
 	player->health -= attack;
 	if(player->health <= 0) {
-		end_game(world, player);
+		player->state = PLAYER_STATE_DEAD;
+
 	}
 }
 
 void player_damage_ignore_armor(player_t *player, world_t *world, int attack) {
 	player->health -= attack;
 	if(player->health <= 0) {
-		end_game(world, player);
+		player->state = PLAYER_STATE_DEAD;
 	}
 }
 
@@ -829,13 +832,21 @@ void player_setup(player_t *player, world_t *world) {
 	player->y = 10;
 	player_change_class(player, world, SAMURAI);
 
-	player->spell_equip_menu.win = newwin(SPELL_EQUIP_MENU_HEIGHT, SPELL_EQUIP_MENU_WIDTH, SCREEN_HEIGHT/2-3, SCREEN_WIDTH/2-15);
+	player->spell_equip_menu.win = newwin(SPELL_EQUIP_MENU_HEIGHT, SPELL_EQUIP_MENU_WIDTH, SCREEN_HEIGHT/2-(SPELL_EQUIP_MENU_HEIGHT/2), SCREEN_WIDTH/2-(SPELL_EQUIP_MENU_WIDTH/2));
 	player->spell_equip_menu.cursor_pos = 0;
 	player->spell_equip_menu.cursor_offset = 0;
 	player->spell_equip_menu.max_cursor_pos = MAX_SPELL_SLOTS;
 	player->spell_equip_menu.data_capacity = 0;
 	player->spell_equip_menu.data_count = 0;
 	player->spell_equip_menu.data = NULL;
+
+	player->death_menu.win = newwin(DEATH_MENU_HEIGHT, DEATH_MENU_WIDTH, SCREEN_HEIGHT/2-(DEATH_MENU_HEIGHT/2), SCREEN_WIDTH/2-(DEATH_MENU_WIDTH/2));
+	player->death_menu.cursor_pos = 0;
+	player->death_menu.cursor_offset = 0;
+	player->death_menu.max_cursor_pos = 1;
+	player->death_menu.data_capacity = 0;
+	player->death_menu.data_count = 0;
+	player->death_menu.data = NULL;
 
 	player->health = player->constitution * 10;
 	player->max_health = player->constitution * 10;
@@ -898,6 +909,13 @@ void player_reset_values(player_t *player, world_t *world) {
 	player->spell_equip_menu.data_capacity = 0;
 	player->spell_equip_menu.data_count = 0;
 	player->spell_equip_menu.data = NULL;
+
+	player->death_menu.cursor_pos = 0;
+	player->death_menu.cursor_offset = 0;
+	player->death_menu.max_cursor_pos = 1;
+	player->death_menu.data_capacity = 0;
+	player->death_menu.data_count = 0;
+	player->death_menu.data = NULL;
 
 	player->health = player->constitution * 10;
 	player->max_health = player->constitution * 10;

@@ -37,6 +37,7 @@ void display_and_manage_save_menu(WINDOW *win, char *buf, int max_len, world_t *
 void display_and_manage_class_menu(WINDOW *win, world_t *world, player_t *player, menu_manager_t *menu_manager);
 
 void display_spell_equip_menu(player_t *player, popup_menu_t menu);
+void display_death_menu(player_t *player, popup_menu_t menu);
 
 void manage_load_menu_input(char c, load_menu_t *load_menu, world_t *world, player_t *player, menu_manager_t *menu_manager);
 

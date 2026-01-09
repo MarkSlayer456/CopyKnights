@@ -80,7 +80,8 @@ typedef enum {
 	PLAYER_STATE_LOOTING,
 	PLAYER_STATE_TALKING,
 	PLAYER_STATE_MENU, // settings menu not an inventory
-	PLAYER_STATE_EQUIPPING_SPELL
+	PLAYER_STATE_EQUIPPING_SPELL,
+	PLAYER_STATE_DEAD
 } player_state_t;
 
 typedef enum action_bar_selectors { 
@@ -110,7 +111,9 @@ typedef enum class_type {
 	PALADIN,
 	BRAWLER,
 	SAMURAI,
-	VOID_EMBRACE
+	VOID_EMBRACE,
+	VOID_KNIGHT,
+	VOID_ASSASSIN
 } class_type_t;
 
 typedef enum trait {

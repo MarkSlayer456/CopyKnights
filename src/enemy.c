@@ -643,7 +643,10 @@ void enemy_decide_move_dark_centered(enemy_t *enemy, world_t *world, player_t *p
 }
 
 void enemy_decide_move_light_centered(enemy_t *enemy, world_t *world, player_t *player) {
-
+    if(enemy_attempt_attack(enemy, world, player)) {
+        return;
+    }
+    enemy_move_toward_location(enemy, world, player, player->y, player->x, false);
 }
 
 void enemy_decide_move_survival(enemy_t *enemy, world_t *world, player_t *player) {

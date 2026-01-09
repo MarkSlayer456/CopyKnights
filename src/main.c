@@ -39,6 +39,7 @@ WINDOW *action_bar; // OLG player's inventory/spells menu, maybe a help menu in 
 WINDOW *error; // USED FOR ERROR CHECKING ONLY
 WINDOW *inventory_hud; // player's inventory
 WINDOW *inventory_desc_hud; // player's description in the inventory
+
 char walk_chars[WALK_CHAR_LENGTH] = {EMPTY, HOLE, TWISTED_ROOT, STALAGMITE, DOOR, MUD, CHEST}; // characters entites can walk on
 
 int main(int argc, char *argv[]) {
