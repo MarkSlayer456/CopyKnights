@@ -1,29 +1,29 @@
 armor_name,target_stat,value
 Blackstone Armor,STRENGTH,2
 Blackstone Armor,SPEED,-1
-Bronze Armor,STRENGTH,5
+Bronze Armor,STRENGTH,3
 Bronze Armor,SPEED,-2
-Iron Armor,STRENGTH,8
+Iron Armor,STRENGTH,4
 Iron Armor,SPEED,-3
-Steel Armor,STRENGTH,10
+Steel Armor,STRENGTH,6
 Steel Armor,SPEED,-4
-Mithril Armor,STRENGTH,12
+Mithril Armor,STRENGTH,7
 Mithril Armor,SPEED,-2
-Soulcrust Armor,STRENGTH,16
+Soulcrust Armor,STRENGTH,6
 Soulcrust Armor,SPEED,-5
-Terracite Armor,STRENGTH,18
+Terracite Armor,STRENGTH,8
 Terracite Armor,SPEED,-6
-Gravemarrow Armor,STRENGTH,20
+Gravemarrow Armor,STRENGTH,10
 Gravemarrow Armor,SPEED,-8
 Voidmarrow Armor,STRENGTH,25
 Voidmarrow Armor,SPEED,-8
-Rat Hide Armor,DEXTERITY,1
-Slime Armor,DEXTERITY,2
-Bog Iron Armor,DEXTERITY,2
-Bone Armor,DEXTERITY,2
-Sunsteel Armor,DEXTERITY,2
-False Iron Armor,DEXTERITY,4
-Barkmail Armor,DEXTERITY,3
+Rat Hide Armor,DEXTERITY,3
+Slime Armor,DEXTERITY,4
+Bog Iron Armor,DEXTERITY,5
+Bone Armor,DEXTERITY,6
+Sunsteel Armor,DEXTERITY,7
+False Iron Armor,DEXTERITY,8
+Barkmail Armor,DEXTERITY,10
 Dragon Bone Armor,DEXTERITY,5
 Cloak,INTELLIGENCE,3
 Leather Cloak,INTELLIGENCE,5

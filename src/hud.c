@@ -47,13 +47,15 @@ void hud_update_player_health(const player_t *player, const buff_t *buff_array, 
 
 	int max_status_effects = 4;
 	strcat(buf, "Status: ");
+	int player_count = 0;
 	for(int i = 0; i < buff_count; i++) {
-		if(i == max_status_effects) break;
+		if(player_count == max_status_effects) break;
 		if(buff_array[i].target_type_id == TARGET_PLAYER) {
-			if(i != 0) {
+			if(player_count != 0) {
 				strcat(buf, ", ");
 			}
 			strcat(buf, buff_array[i].name);
+			player_count++;
 		}
 	}
 	getyx(hud, y, x);

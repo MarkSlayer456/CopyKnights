@@ -570,7 +570,7 @@ void player_cycle_loot_selector_up(player_t *player) {
 
 void player_cycle_loot_selector_down(player_t *player) {
 	int visible_item_count = INVENTORY_HEIGHT-2;
-	if(player->nearby_loot[player->inventory_manager.loot_selector+1] != NULL) {
+	if(player->nearby_loot[player->inventory_manager.loot_selector+1]->id != BLANK) {
 		if(player->inventory_manager.loot_selector - player->inventory_manager.loot_offset >= visible_item_count-1) {
 			player->inventory_manager.loot_offset++;
 		}
